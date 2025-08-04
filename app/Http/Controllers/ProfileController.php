@@ -65,6 +65,22 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')->with('status', 'Photo updated successfully!');
     }
+    public function deletePhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Delete photo file if exists
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+            
+            // Clear the photo path from database
+            $user->update([
+                'profile_photo_path' => null,
+            ]);
+        }
+
+        return Redirect::route('profile.edit')->with('success', 'Photo removed successfully!');
+    }
 
     /**
      * Delete the user's account.

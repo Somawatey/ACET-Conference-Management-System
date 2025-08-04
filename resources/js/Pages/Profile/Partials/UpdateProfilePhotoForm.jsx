@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Transition } from '@headlessui/react';
-import { useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage, router } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import Croppie from 'croppie';
 import 'croppie/croppie.css';
@@ -14,6 +14,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
     const [showCropper, setShowCropper] = useState(false);
     const [croppedImage, setCroppedImage] = useState(null);
     const [croppieInstance, setCroppieInstance] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     
     const { auth } = usePage().props;
     const currentPhoto = auth.user.profile_photo_url;
@@ -29,7 +30,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
         return name
             .split(' ')
             .map(word => word.charAt(0).toUpperCase())
-            .slice(0, 2) // Take first 2 initials
+            .slice(0, 2)
             .join('');
     };
 
@@ -118,15 +119,41 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
     };
 
     const deletePhoto = () => {
-        setData('photo', null);
-        setPhotoPreview(null);
-        setCroppedImage(null);
-        setShowCropper(false);
-        if (croppieInstance) {
-            croppieInstance.destroy();
-            setCroppieInstance(null);
+        // If there's a pending cropped image, just clear it
+        if (croppedImage && !hasProfilePhoto()) {
+            setData('photo', null);
+            setPhotoPreview(null);
+            setCroppedImage(null);
+            setShowCropper(false);
+            if (croppieInstance) {
+                croppieInstance.destroy();
+                setCroppieInstance(null);
+            }
+            fileInput.current.value = '';
+            return;
         }
-        fileInput.current.value = '';
+
+        // If user has an actual profile photo, delete it from server
+        if (hasProfilePhoto() && currentPhoto && !currentPhoto.includes('default-avatar')) {
+            setIsDeleting(true);
+            
+            router.delete(route('profile.photo.delete'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setCroppedImage(null);
+                    setPhotoPreview(null);
+                    setData('photo', null);
+                    if (croppieInstance) {
+                        croppieInstance.destroy();
+                        setCroppieInstance(null);
+                    }
+                    fileInput.current.value = '';
+                },
+                onFinish: () => {
+                    setIsDeleting(false);
+                }
+            });
+        }
     };
 
     const submit = (e) => {
@@ -177,7 +204,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
                         )}
                         
                         {/* Photo indicator badge */}
-                        <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
+                        {/* <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
                             {hasProfilePhoto() ? (
                                 <svg className="h-3 w-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
@@ -187,7 +214,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
                             )}
-                        </div>
+                        </div> */}
                     </div>
                     
                     <div className="space-y-2">
@@ -195,7 +222,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
                             <SecondaryButton 
                                 type="button" 
                                 onClick={selectNewPhoto}
-                                disabled={showCropper}
+                                disabled={showCropper || isDeleting}
                             >
                                 {hasProfilePhoto() ? 'Change Photo' : 'Add Photo'}
                             </SecondaryButton>
@@ -204,9 +231,10 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
                                 <SecondaryButton 
                                     type="button" 
                                     onClick={deletePhoto}
-                                    className="text-red-600 hover:text-red-500"
+                                    disabled={isDeleting || processing}
+                                    className="text-red-600 hover:text-red-500 disabled:opacity-50"
                                 >
-                                    Remove Photo
+                                    {isDeleting ? 'Removing...' : 'Remove Photo'}
                                 </SecondaryButton>
                             )}
                         </div>
@@ -215,11 +243,11 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
                             <p className="text-xs text-gray-500">
                                 JPG, JPEG, PNG up to 2MB. Image will be cropped to circle.
                             </p>
-                            {!hasProfilePhoto() && (
+                            {/* {!hasProfilePhoto() && (
                                 <p className="text-xs text-blue-600">
                                     Currently showing your initials: <strong>{getUserInitials(userName)}</strong>
                                 </p>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
@@ -294,7 +322,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
                 )}
             </form>
 
-            {/* Custom Croppie Styles using CSS-in-JS */}
+            {/* Custom Croppie Styles */}
             <style jsx>{`
                 .croppie-container .cr-boundary {
                     margin: 0 auto;
