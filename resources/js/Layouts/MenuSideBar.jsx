@@ -231,29 +231,29 @@ export default function MenuSideBar({ }) {
                             )}
                             {can['category-list'] && (
                                 <>
-
-                                    <li className={`nav-item ${(route().current('categories.index') || route().current('categories.create')) && 'menu-is-opening menu-open'}`}>
-                                        <a href="#" className={`nav-link ${(route().current('categories.index') || route().current('categories.create')) && 'active'}`}>
-                                            <i className="nav-icon far fa-plus-square"></i>
-                                            <p> CATEGORY
-                                                <i className="fas fa-angle-left right"></i>
-                                            </p>
-                                        </a>
-                                        <ul className="nav nav-treeview">
-                                            <li className="nav-item">
-                                                <Link href={route('categories.index')} className={`nav-link ${route().current('categories.index') && 'active'}`}>
-                                                    <i className="fa-solid fa-list-ul nav-icon text-warning"></i>
-                                                    <p>LIST</p>
-                                                </Link>
-                                            </li>
-                                            <li className="nav-item">
-                                                <Link href={route('categories.create')} className={`nav-link ${route().current('categories.create') && 'active'}`}>
-                                                    <i className="fa-regular fa-square-plus nav-icon text-info"></i>
-                                                    <p>CREATE</p>
-                                                </Link>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                
+                                <li className={`nav-item ${(route().current('categories.index') || route().current('categories.create')) && 'menu-is-opening menu-open'}`}>
+                                    <a href="#" className={`nav-link ${(route().current('categories.index') || route().current('categories.create')) && 'active'}`}>
+                                        <i className="nav-icon far fa-plus-square"></i>
+                                        <p> CATEGORY
+                                            <i className="fas fa-angle-left right"></i>
+                                        </p>
+                                    </a>
+                                    <ul className="nav nav-treeview">
+                                        <li className="nav-item">
+                                            <Link href={route('categories.index')} className={`nav-link ${route().current('categories.index') && 'active'}`}>
+                                                <i className="fa-solid fa-list-ul nav-icon text-warning"></i>
+                                                <p>LIST</p>
+                                            </Link>
+                                        </li>
+                                        <li className="nav-item">
+                                            <Link href={route('categories.create')} className={`nav-link ${route().current('categories.create') && 'active'}`}>
+                                                <i className="fa-regular fa-square-plus nav-icon text-info"></i>
+                                                <p>CREATE</p>
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                </li>
                                 </>
                             )}
                             {can['role-list' || 'user-list'] && (
