@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,6 +39,47 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit');
+    }
+
+    public function updatePhoto(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'], // 2MB max
+        ]);
+
+        $user = $request->user();
+
+        // Delete old photo if exists
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+
+        // Store new photo
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('profile-photos', 'public');
+            
+            $user->update([
+                'profile_photo_path' => $path,
+            ]);
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'Photo updated successfully!');
+    }
+    public function deletePhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Delete photo file if exists
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+            
+            // Clear the photo path from database
+            $user->update([
+                'profile_photo_path' => null,
+            ]);
+        }
+
+        return Redirect::route('profile.edit')->with('success', 'Photo removed successfully!');
     }
 
     /**

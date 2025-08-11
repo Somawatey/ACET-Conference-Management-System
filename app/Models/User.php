@@ -23,6 +23,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'profile_photo_path',
     ];
 
     /**
@@ -34,6 +35,16 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
     ];
+    protected $appends = [
+        'profile_photo_url',
+    ];
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo_path 
+            ? asset('storage/' . $this->profile_photo_path)
+            : asset('images/default-avatar.png');
+    }
+
 
     /**
      * Get the attributes that should be cast.
