@@ -30,7 +30,7 @@ const AdminLayout = ({breadcrumb, children }) => {
                         <a className="nav-link" data-toggle="dropdown" href="#">
                             <i className="far fa-user"></i>
                         </a>
-                        <div className="dropdown-menu dropdown-menu-right">
+                        <div className="dropdown-menu dropdown-menu-right ">
                             <Link href={route('profile.edit')} className="dropdown-item">Profile</Link>
                             <div className="dropdown-divider"></div>
                             <Link

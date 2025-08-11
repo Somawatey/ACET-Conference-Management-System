@@ -59,10 +59,11 @@ export default function DeleteUserForm({ className = '' }) {
                     retain.
                 </p>
             </header>
-
+            <div className='flex justify-end'>
             <DangerButton onClick={confirmUserDeletion}>
                 Delete Account
             </DangerButton>
+            </div>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
                 <form onSubmit={deleteUser} className="p-6">

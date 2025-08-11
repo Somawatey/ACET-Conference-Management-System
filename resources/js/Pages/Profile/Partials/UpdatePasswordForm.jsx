@@ -121,9 +121,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                     />
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
+                <div className="flex items-center gap-4 justify-end">
                     <Transition
                         show={recentlySuccessful}
                         enter="transition ease-in-out"
@@ -135,6 +133,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                             Saved.
                         </p>
                     </Transition>
+                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
                 </div>
             </form>
         </section>
