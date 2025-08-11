@@ -9,7 +9,6 @@ import { useEffect } from 'react';
 export default function MenuSideBar({ }) {
     const { url, auth } = usePage().props;
     const can = auth?.can ?? {};
-
     useEffect(() => {
         // Ensure dropdowns, tooltips, and modals work
         $('[data-toggle="dropdown"]').dropdown();
@@ -21,21 +20,6 @@ export default function MenuSideBar({ }) {
             $(this).Treeview('init');
         });
     }, []);
-
-    // Generate user initials
-    const getUserInitials = (name) => {
-        if (!name) return 'U';
-        return name
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase())
-            .slice(0, 2)
-            .join('');
-    };
-
-    // Check if user has a profile photo
-    const hasProfilePhoto = () => {
-        return auth?.user?.profile_photo_url && !auth.user.profile_photo_url.includes('default-avatar');
-    };
 
     return (
         <>
@@ -178,35 +162,10 @@ export default function MenuSideBar({ }) {
                 <div className="sidebar">
                     <div className="user-panel mt-3 pb-3 mb-3 d-flex">
                         <div className="image">
-                            <Link href={route('profile.edit')}>
-                                {hasProfilePhoto() ? (
-                                    <img
-                                        src={auth.user.profile_photo_url}
-                                        className="img-circle elevation-2"
-                                        alt="User Image"
-                                        style={{ width: '34px', height: '34px', objectFit: 'cover' }}
-                                    />
-                                ) : (
-                                    <div
-                                        className="img-circle elevation-2 d-flex align-items-center justify-content-center"
-                                        style={{
-                                            width: '34px',
-                                            height: '34px',
-                                            background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                                            color: 'white',
-                                            fontSize: '14px',
-                                            fontWeight: 'bold'
-                                        }}
-                                    >
-                                        {getUserInitials(auth?.user?.name)}
-                                    </div>
-                                )}
-                            </Link>
+                            <img src={'/images/avatar.png'} className="img-circle elevation-2" alt="User Image" />
                         </div>
                         <div className="info">
-                            <Link href={route('profile.edit')} className="d-block">
-                                <span>{auth?.user?.name}</span>
-                            </Link>
+                            <Link href="#" className="d-block"><span> {auth?.user?.name} </span></Link>
                         </div>
                     </div>
                     <nav className="mt-2">
@@ -217,45 +176,6 @@ export default function MenuSideBar({ }) {
                                     <p>Dashboard</p>
                                 </Link>
                             </li>
-                            {/* <li className="nav-item">
-                                <Link href="#" className="nav-link">
-                                    <i className="nav-icon fas fa-th"></i>
-                                    <p>
-                                        Widgets
-                                        <span className="right badge badge-danger">New</span>
-                                    </p>
-                                </Link>
-                            </li> */}
-                            {can['category-list'] && (
-                                <li className="nav-header">SETTING</li>
-                            )}
-                            {can['category-list'] && (
-                                <>
-                                
-                                <li className={`nav-item ${(route().current('categories.index') || route().current('categories.create')) && 'menu-is-opening menu-open'}`}>
-                                    <a href="#" className={`nav-link ${(route().current('categories.index') || route().current('categories.create')) && 'active'}`}>
-                                        <i className="nav-icon far fa-plus-square"></i>
-                                        <p> CATEGORY
-                                            <i className="fas fa-angle-left right"></i>
-                                        </p>
-                                    </a>
-                                    <ul className="nav nav-treeview">
-                                        <li className="nav-item">
-                                            <Link href={route('categories.index')} className={`nav-link ${route().current('categories.index') && 'active'}`}>
-                                                <i className="fa-solid fa-list-ul nav-icon text-warning"></i>
-                                                <p>LIST</p>
-                                            </Link>
-                                        </li>
-                                        <li className="nav-item">
-                                            <Link href={route('categories.create')} className={`nav-link ${route().current('categories.create') && 'active'}`}>
-                                                <i className="fa-regular fa-square-plus nav-icon text-info"></i>
-                                                <p>CREATE</p>
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </li>
-                                </>
-                            )}
                             {can['role-list' || 'user-list'] && (
                                 <li className="nav-header">AUTHENTICATION</li>
                             )}
