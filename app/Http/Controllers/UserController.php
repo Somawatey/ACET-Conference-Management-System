@@ -29,32 +29,35 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email'), // use table name and column explicitly
-            ],
-            'password' => ['required', 'string', 'min:8'],
-            'roles' => ['nullable'],
-            'roles.*' => ['string', 'exists:roles,name'], // validate each role exists if provided
-        ])->validate();
+{
+    $validated = Validator::make($request->all(), [
+        'name' => ['required', 'string', 'max:255'],
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            Rule::unique('users', 'email'),
+        ],
+        'password' => ['required', 'string', 'min:8', 'confirmed'], // Add confirmed rule
+        'roles' => ['required', 'array'], // Change to array and make required
+        'roles.*' => ['integer', 'exists:roles,id'], // Validate IDs not names
+    ])->validate();
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+    ]);
 
-        if (!empty($validated['roles'])) {
-            $user->assignRole($validated['roles']);
-        }
-        return to_route('users.index')->with("success", "User created successfully");
+    // Get role names from IDs for assignment
+    if (!empty($validated['roles'])) {
+        $roleNames = Role::whereIn('id', $validated['roles'])->pluck('name')->toArray();
+        $user->assignRole($roleNames);
     }
+
+    return to_route('users.index')->with("success", "User created successfully");
+}
 
     public function edit($id)
     {
