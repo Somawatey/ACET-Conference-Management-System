@@ -208,38 +208,27 @@ export default function UserPage({ users }) {
                                 </tbody>
                             </table>
                         </div>
-
                         {/*-- Pagination --*/}
                         <div className="mt-8">
                             <Pagination links={users.links} />
                         </div>
                     </div>
                 </div>
+                
 
                 {/*-- Delete Confirmation Modal --*/}
+                {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (
-                    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center">
+                    <div className="fixed inset-0 z-50 bg-opacity-60 flex justify-center items-center">
                         <div className="bg-white text-black p-8 rounded-lg shadow-xl w-full max-w-md">
-                            <div className="flex items-center mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.867-.833-2.464 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                                </svg>
-                                <h2 className="text-2xl font-bold">Confirm Deletion</h2>
-                            </div>
-                            <p className="mb-4">Are you sure you want to delete the user "<strong>{deleteData.name}</strong>"? This action cannot be undone.</p>
+                            <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
+                            <p>Are you sure you want to delete the user "<strong>{deleteData.name}</strong>"? This action cannot be undone.</p>
                             {errors.id && <p className="text-red-500 text-sm mt-2">{errors.id}</p>}
                             <div className="mt-6 flex justify-end space-x-4">
-                                <button 
-                                    onClick={closeModal} 
-                                    className="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-md transition duration-200"
-                                >
+                                <button onClick={closeModal} className="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-md">
                                     Cancel
                                 </button>
-                                <button 
-                                    onClick={deleteDataRow} 
-                                    disabled={processing} 
-                                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md disabled:bg-red-400 transition duration-200"
-                                >
+                                <button onClick={deleteDataRow} disabled={processing} className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md disabled:bg-red-400">
                                     {processing ? 'Deleting...' : 'Delete'}
                                 </button>
                             </div>
