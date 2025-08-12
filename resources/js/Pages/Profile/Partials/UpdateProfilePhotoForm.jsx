@@ -188,33 +188,26 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
             <form onSubmit={submit} className="mt-6 space-y-6">
                 {/* Current Photo Display */}
                 <div className="flex items-center space-x-6">
-                    <div className="shrink-0 relative">
+                    <div className="shrink-0 relative group cursor-pointer" onClick={selectNewPhoto}>
                         {hasProfilePhoto() ? (
                             <img
-                                className="h-20 w-20 object-cover rounded-full border-4 border-gray-300 shadow-lg"
+                                className="h-40 w-40 object-cover rounded-full border-4 border-gray-300 shadow-lg"
                                 src={croppedImage || currentPhoto}
                                 alt="Current profile photo"
                             />
                         ) : (
-                            <div className="h-20 w-20 rounded-full border-4 border-gray-300 shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                            <div className="h-40 w-40 rounded-full border-4 border-gray-300 shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                                 <span className="text-white text-lg font-bold">
                                     {getUserInitials(userName)}
                                 </span>
                             </div>
                         )}
-                        
-                        {/* Photo indicator badge */}
-                        {/* <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
-                            {hasProfilePhoto() ? (
-                                <svg className="h-3 w-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                                </svg>
-                            ) : (
-                                <svg className="h-3 w-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                </svg>
-                            )}
-                        </div> */}
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <span className="text-white text-sm font-semibold">
+                                {hasProfilePhoto() ? 'Change Photo' : 'Upload Photo'}
+                            </span>
+                        </div>
                     </div>
                     
                     <div className="space-y-2">
@@ -302,7 +295,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
 
                 {/* Save Button */}
                 {data.photo && croppedImage && (
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 justify-end mr-3">
                         <PrimaryButton disabled={processing}>
                             {processing ? 'Uploading...' : 'Save Photo'}
                         </PrimaryButton>
