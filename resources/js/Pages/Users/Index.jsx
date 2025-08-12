@@ -131,23 +131,14 @@ export default function UserPage({ users }) {
                                 </tbody>
                             </table>
                         </div>
-
                         {/*-- Pagination --*/}
-                        <nav className="flex justify-center items-center mt-8" aria-label="Pagination">
-                            <a href="#" className="bg-[#FFFFFF] text-black hover:bg-black-700 relative inline-flex items-center px-4 py-2 text-sm font-medium">
-                                Previous
-                            </a>
-                            <a href="#" aria-current="page" className="z-10 bg-[#0000FF] text-white relative inline-flex items-center px-4 py-2 text-sm font-medium">1</a>
-                            <a href="#" className="bg-[#FFFFFF] text-black hover:bg-black-700 relative inline-flex items-center px-4 py-2 text-sm font-medium">2</a>
-                            <a href="#" className="bg-[#FFFFFF] text-black hover:bg-black-700 relative inline-flex items-center px-4 py-2 text-sm font-medium">3</a>
-                            <a href="#" className="bg-[#FFFFFF] text-black hover:bg-black-700 relative inline-flex items-center px-4 py-2 text-sm font-medium">4</a>
-                            <a href="#" className="bg-[#FFFFFF] text-black hover:bg-black-700 relative inline-flex items-center px-4 py-2 text-sm font-medium">5</a>
-                            <a href="#" className="bg-[#FFFFFF] text-black hover:bg-black-700 relative inline-flex items-center px-4 py-2 text-sm font-medium">
-                                Next
-                            </a>
-                        </nav>
+                        <div className="mt-6 flex mr-4">
+                            <Pagination links={users.links} />
+                        </div>
+                        
                     </div>
                 </div>
+                
 
                 {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (

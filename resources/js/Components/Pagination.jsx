@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 export default function Pagination({ links }) {    
     return (
-        links?.length > 10 ? 
+        links?.length <= 10 ? 
             <ul className="pagination pagination-sm m-0 float-right">
                 {links?.map((link, key) => (
                     link?.url === null ?
