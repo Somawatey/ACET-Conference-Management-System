@@ -10,15 +10,15 @@
         "@inertiajs/react": "^1.0.0",
         "@tailwindcss/forms": "^0.5.3",
         "@vitejs/plugin-react": "^4.2.0",
-        "autoprefixer": "^10.4.12",
+        "autoprefixer": "^10.4.21",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
         "husky": "^9.1.7",
         "laravel-vite-plugin": "^1.0",
-        "postcss": "^8.4.31",
+        "postcss": "^8.5.6",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "tailwindcss": "^3.2.1",
+        "tailwindcss": "^3.4.17",
         "vite": "^5.0"
     },
     "dependencies": {
@@ -26,9 +26,12 @@
         "@popperjs/core": "^2.11.8",
         "admin-lte": "^3.2.0",
         "bootstrap": "^4.3.1",
+        "cropperjs": "^2.0.1",
+        "croppie": "^2.6.5",
         "jquery": "^3.7.1",
         "moment": "^2.30.1",
         "popper.js": "^1.16.1",
+        "react-cropper": "^2.3.3",
         "summernote": "^0.9.1"
     }
 }
