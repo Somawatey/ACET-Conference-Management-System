@@ -5,13 +5,8 @@ import MenuSideBar from './MenuSideBar';
 import $ from 'jquery';
 import { Link, usePage } from '@inertiajs/react';
 
-const AdminLayout = ({breadcrumb, children }) => {
-    const user = usePage().props.auth.user;
-    useEffect(() => {
-        // Ensure dropdowns, tooltips, and modals work
-        $('[data-toggle="dropdown"]').dropdown();
-    }, []);
-    
+const AdminLayout = ({ breadcrumb, children }) => {
+
     return (
         <div className="wrapper">
             {/* Navbar */}
@@ -46,6 +41,7 @@ const AdminLayout = ({breadcrumb, children }) => {
                 </ul>
             </nav>
 
+            {/* nav & sidebar */}
             <MenuSideBar />
 
             {/* Content Wrapper */}
@@ -53,11 +49,7 @@ const AdminLayout = ({breadcrumb, children }) => {
                 {breadcrumb && breadcrumb}
                 <section className="content">{children}</section>
             </div>
-
-            {/* Footer */}
-            <footer className="main-footer">
-                <strong>Copyright &copy; 2025</strong> All rights reserved.
-            </footer>
+            
         </div>
     );
 };
