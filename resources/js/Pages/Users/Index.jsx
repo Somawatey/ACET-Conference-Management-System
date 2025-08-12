@@ -25,6 +25,23 @@ export default function UserPage({ users }) {
             name: ''
         });
 
+    // Generate user initials from name
+    const getUserInitials = (name) => {
+        if (!name) return 'U';
+        return name
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase())
+            .slice(0, 2)
+            .join('');
+    };
+
+    // Check if user has a profile photo
+    const hasProfilePhoto = (user) => {
+        return user?.profile_photo_url && 
+               !user.profile_photo_url.includes('default-avatar') &&
+               user.profile_photo_url !== null;
+    };
+
     const confirmDataDeletion = (data) => {
         setDataEdit(data);
         setDeleteData('id', data.id)
@@ -110,20 +127,23 @@ export default function UserPage({ users }) {
                                                 <td className="p-4">{user.id}</td>
                                                 <td className="p-4 font-medium">
                                                     <div className="flex items-center">
-                                                        {user.profile_photo_url ? (
+                                                        {hasProfilePhoto(user) ? (
                                                             <img 
                                                                 src={user.profile_photo_url} 
-                                                                className="w-8 h-8 rounded-full mr-3" 
-                                                                alt="User"
+                                                                className="w-8 h-8 rounded-full mr-3 object-cover border-2 border-gray-200" 
+                                                                alt="User Profile"
                                                             />
                                                         ) : (
                                                             <div 
-                                                                className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-bold mr-3"
+                                                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
+                                                                style={{
+                                                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
+                                                                }}
                                                             >
-                                                                {user.name?.charAt(0).toUpperCase()}
+                                                                {getUserInitials(user.name)}
                                                             </div>
                                                         )}
-                                                        {user.name}
+                                                        <span className="text-gray-900">{user.name}</span>
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
@@ -154,7 +174,7 @@ export default function UserPage({ users }) {
                                                     <div className="flex items-center justify-center space-x-4">
                                                         {/*-- Edit Button --*/}
                                                         {can['user-edit'] && (
-                                                            <Link href={route('users.edit', user.id)} className="text-gray-600 hover:text-blue-600">
+                                                            <Link href={route('users.edit', user.id)} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                                 </svg>
@@ -162,7 +182,7 @@ export default function UserPage({ users }) {
                                                         )}
                                                         {/*-- Delete Button --*/}
                                                         {can['user-delete'] && (
-                                                            <button onClick={() => confirmDataDeletion(user)} className="text-gray-600 hover:text-red-600">
+                                                            <button onClick={() => confirmDataDeletion(user)} className="text-gray-600 hover:text-red-600 transition-colors duration-200">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                                 </svg>
