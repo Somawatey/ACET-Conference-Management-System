@@ -28,6 +28,7 @@ class PermissionSeeder extends Seeder
             'paper-create',
             'paper-edit',
             'paper-delete',
+            'paper-assign',
 
         ];
 

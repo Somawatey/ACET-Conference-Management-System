@@ -12,7 +12,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import moment from 'moment';
 import { useState } from 'react';
 
-export default function UserPage({ roles }) {
+export default function RolePage({ roles }) {
     const { auth } = usePage().props;
     const can = auth?.can ?? {}; 
     const datasList = roles.data;
