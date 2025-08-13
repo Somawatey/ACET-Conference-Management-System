@@ -89,6 +89,28 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [PaperAssignmentController::class, 'update'])->name('paper-assignments.update');
         Route::delete("/{id}", [PaperAssignmentController::class, 'destroy'])->name('paper-assignments.destroy')->middleware(['check:paper-assign']);
     });
+    // paper decision
+    Route::prefix('paper-decisions')
+    ->name('paper-decisions.') // Adds 'paper-decisions.' prefix to all route names
+    ->middleware(['auth', 'permission:paper-decision']) // Apply to the whole group
+    ->group(function () {
+        // GET /paper-decisions
+        // Name: paper-decisions.index
+        Route::get('/', [PaperController::class, 'decisions'])->name('index');
+
+        // GET /paper-decisions/{id}
+        // Name: paper-decisions.show
+        Route::get('/{id}', [PaperController::class, 'decisionShow'])->name('show');
+
+        // POST /paper-decisions/{id}/accept
+        // Name: paper-decisions.accept
+        Route::post("/{id}/accept", [PaperController::class, 'accept'])->name('accept');
+
+        // POST /paper-decisions/{id}/reject
+        // Name: paper-decisions.reject
+        Route::post("/{id}/reject", [PaperController::class, 'reject'])->name('reject');
+    });
+
 });
 
 
