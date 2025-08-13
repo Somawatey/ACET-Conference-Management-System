@@ -12,81 +12,89 @@ export default function PaperInfo({ className = '', data = {}, errors = {}, onCh
                     Paper Information
                 </h1>
             </header>
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
-                {/* Left side: Track, Topic, Paper Title */}
-                <div className="space-y-6">
+            <div className="mt-6 space-y-6">
+                {/* Track and Topic side by side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <InputLabel htmlFor="track" value="Track" />
-                        <TextInput
+                        <select
                             id="track"
                             name="track"
-                            className="mt-1 block w-full"
-                            placeholder="Enter track"
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                             required
                             value={data.track || ''}
                             onChange={onChange}
-                        />
+                        >
+                            <option value="">Select track</option>
+                            <option value="main">Main Track</option>
+                            <option value="student">Student Track</option>
+                        </select>
                         <InputError className="mt-2" message={errors.track} />
                     </div>
                     <div>
                         <InputLabel htmlFor="topic" value="Topic" />
-                        <TextInput
+                        <select
                             id="topic"
                             name="topic"
-                            className="mt-1 block w-full"
-                            placeholder="Enter topic"
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                             required
                             value={data.topic || ''}
                             onChange={onChange}
-                        />
+                        >
+                            <option value="">Select topic</option>
+                            <option value="NLP">NLP</option>
+                            <option value="AI">AI</option>
+                            <option value="Data Sciences">Data Sciences</option>
+                            <option value="IoT Networking">IoT Networking</option>
+                        </select>
                         <InputError className="mt-2" message={errors.topic} />
                     </div>
-                    <div>
-                        <InputLabel htmlFor="paper_title" value="Paper Title" />
-                        <TextInput
-                            id="paper_title"
-                            name="paper_title"
-                            className="mt-2 block w-full"
-                            placeholder="Enter paper title"
-                            required
-                            value={data.paper_title || ''}
-                            onChange={onChange}
-                        />
-                        <InputError className="mt-2" message={errors.paper_title} />
-                    </div>
                 </div>
-                {/* Right side: Abstract, Keyword */}
-                <div className="space-y-6">
-                    <div>
-                        <InputLabel htmlFor="abstract" value="Abstract" />
-                        <TextArea
-                            id="abstract"
-                            name="abstract"
-                            className="mt-1 block w-full"
-                            placeholder="Enter abstract"
-                            required
-                            rows={5}
-                            value={data.abstract || ''}
-                            onChange={onChange}
-                        />
-                        <InputError className="mt-2" message={errors.abstract} />
-                    </div>
-                    <div>
-                        <InputLabel htmlFor="keyword" value="Keyword(s)" />
-                        <TextInput
-                            id="keyword"
-                            name="keyword"
-                            className=" block w-full"
-                            placeholder="Enter keywords, separated by commas"
-                            required
-                            value={data.keyword || ''}
-                            onChange={onChange}
-                        />
-                        <InputError className="mt-2" message={errors.keyword} />
-                    </div>
+                {/* Paper Title */}
+                <div>
+                    <InputLabel htmlFor="paper_title" value="Paper Title" />
+                    <TextInput
+                        id="paper_title"
+                        name="paper_title"
+                        className="mt-2 block w-full"
+                        placeholder="Enter paper title"
+                        required
+                        value={data.paper_title || ''}
+                        onChange={onChange}
+                    />
+                    <InputError className="mt-2" message={errors.paper_title} />
                 </div>
-                {/* Upload below both columns */}
-                <div className="lg:col-span-1">
+                {/* Abstract */}
+                <div>
+                    <InputLabel htmlFor="abstract" value="Abstract" />
+                    <TextArea
+                        id="abstract"
+                        name="abstract"
+                        className="mt-1 block w-full"
+                        placeholder="Enter abstract"
+                        required
+                        rows={5}
+                        value={data.abstract || ''}
+                        onChange={onChange}
+                    />
+                    <InputError className="mt-2" message={errors.abstract} />
+                </div>
+                {/* Keywords */}
+                <div>
+                    <InputLabel htmlFor="keyword" value="Keyword(s)" />
+                    <TextInput
+                        id="keyword"
+                        name="keyword"
+                        className="mt-1 block w-full"
+                        placeholder="Enter keywords, separated by commas"
+                        required
+                        value={data.keyword || ''}
+                        onChange={onChange}
+                    />
+                    <InputError className="mt-2" message={errors.keyword} />
+                </div>
+                {/* Upload */}
+                <div>
                     <PaperUpload />
                 </div>
             </div>

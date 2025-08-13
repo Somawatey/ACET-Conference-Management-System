@@ -49,6 +49,15 @@ export default function Submit() {
                         </div>
                     </header>
                     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        {/* Custom Header and Description */}
+                        <div className="mb-8">
+                            <h1 className="text-3xl font-semibold text-blue-900 mb-2">
+                                Welcome to the ACET 2025 Paper Submission Form.
+                            </h1>
+                            <p className="text-medium text-gray-700">
+                                Please complete all required fields in this form to submit your research paper for review and consideration at the ASEAN Conference on Emerging Technologies 2025. This form collects essential information about the authors, affiliations, paper title, abstract, and relevant topics. Your submission will be evaluated by our program committee, and accepted papers will be included in the official conference proceedings.
+                            </p>
+                        </div>
                         <form onSubmit={handleSubmit}>
                             <div className="bg-white/80 rounded-xl p-8 shadow-lg border border-blue-100">
                                 <AuthorInfo data={data} errors={errors} onChange={handleChange} />
@@ -56,7 +65,7 @@ export default function Submit() {
                             <div className="mt-8 bg-white/80 rounded-xl p-8 shadow-lg border border-blue-100">
                                 <PaperInfo data={data} errors={errors} onChange={handleChange} />
                             </div>
-                            <div className="mt-8 bg-white/80 rounded-xl p-8 shadow-lg border border-blue-100">
+                            <div className="mt-8 bg-[#fff5f5]/80 rounded-xl p-8 shadow-lg border border-blue-100">
                                 <Declare data={data} errors={errors} onChange={handleChange} />
                             </div>
                             <div className="mt-8 flex justify-end">
