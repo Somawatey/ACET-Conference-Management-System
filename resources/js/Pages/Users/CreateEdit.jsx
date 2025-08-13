@@ -65,13 +65,13 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
             {/* Set the browser page title */}
             <Head title={headWeb} />
-            <section className="bg-gray-50 dark:bg-gray-900">
+            <section className="bg-white dark:bg-white">
               <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                   <div className="p-6 space-y-6 sm:p-8">
-                    <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                      {headWeb}
-                    </h1>
+                                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-dark text-center">
+                        {headWeb}
+                      </h1>
                     <form className="space-y-4 md:space-y-6" onSubmit={submit}>
                       <div>
                         <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
@@ -81,7 +81,7 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
                           id="name"
                           value={data.name}
                           onChange={(e) => setData('name', e.target.value)}
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           placeholder="Reviewer"
                           required
                         />
@@ -95,29 +95,29 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
                           id="email"
                           value={data.email}
                           onChange={(e) => setData('email', e.target.value)}
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           placeholder="name@company.com"
                           required
                         />
                         <InputError className="mt-2" message={errors.email} />
                       </div>
                       <div>
-                        <label htmlFor="roles" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Role</label>
-                        <select
-                          name="roles"
-                          id="roles"
-                          value={data.roles[0] || ''}
-                          onChange={handleSelectRole}
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          required
-                        >
-                          <option value="">Select a role</option>
-                          {roles.map((role) => (
-                            <option key={role.id} value={role.id}>{role.name}</option>
-                          ))}
-                        </select>
-                        <InputError className="mt-2" message={errors.roles} />
-                      </div>
+    <label htmlFor="roles" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Role</label>
+    <select
+      name="roles"
+      id="roles"
+      value={data.roles[0] || ''}
+      onChange={handleSelectRole}
+      className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      required
+    >
+      <option value="" disabled className="text-gray-400 dark:text-gray-500">Select a role</option>
+      {roles.map((role) => (
+        <option key={role.id} value={role.id}>{role.name}</option>
+      ))}
+    </select>
+    <InputError className="mt-2" message={errors.roles} />
+</div>
                       <div>
                         <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                         <div className="relative">
@@ -128,7 +128,7 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="••••••••"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             required={!user?.id}
                           />
                           <button
@@ -153,7 +153,7 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
                           value={data.password_confirmation}
                           onChange={(e) => setData('password_confirmation', e.target.value)}
                           placeholder="••••••••"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           required={!user?.id}
                         />
                         <InputError className="mt-2" message={errors.password_confirmation} />

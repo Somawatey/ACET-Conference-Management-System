@@ -71,9 +71,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         const photoPath = auth?.user?.profile_photo_path;
         const photoUrl = auth?.user?.profile_photo_url;
         
-        // Return false for testing - REMOVE THIS LINE TO RESTORE NORMAL BEHAVIOR
-        return false;
-        
         // Check if profile_photo_path exists and is not empty/null
         if (photoPath && photoPath.trim() !== '' && photoPath !== null) {
             return true;
@@ -315,8 +312,17 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </h1>
                     <p className="text-gray-500 mt-4 max-w-2xl mx-auto">Bringing researchers together, one paper at a time. Your work deserves the world's stage.</p>
                     <div className="flex justify-center gap-4 mt-8">
-                        <button className="bg-blue text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300">Submit Your Paper</button>
-                        <button className="border border-gray-300 px-6 py-3 rounded-full hover:bg-gray-100 hover:scale-105 ease-in-out duration-300">Get The Templates</button>
+                       <div className="flex justify-center gap-4 mt-8">
+                            <Link
+                                href={route('submissions.create')}  // ✅ Consistent with your pattern
+                                className="bg-blue text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
+                            >
+                                Submit Your Paper
+                            </Link>
+                            <button className="border border-gray-300 px-6 py-3 rounded-full hover:bg-gray-100 hover:scale-105 ease-in-out duration-300">
+                                Get The Templates
+                            </button>
+                        </div>
                     </div>
                     {/* Rating */}
                     <div className="mt-6 flex flex-col justify-center items-center gap-2 text-yellow-500">
@@ -441,7 +447,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     className="flex flex-col items-center justify-center gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[blue] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[blue]"
                                 >   
                                     <div>
-                                        <div className="flex justify-center items-center size-12 shrink-0 justify-center rounded-full bg-[blue]/10 sm:size-16">
+                                        <div className="flex justify-center items-center size-12 shrink-0 rounded-full bg-[blue]/10 sm:size-16">
                                             <svg
                                                 className="size-5 sm:size-6"
                                                 xmlns="http://www.w3.org/2000/svg"

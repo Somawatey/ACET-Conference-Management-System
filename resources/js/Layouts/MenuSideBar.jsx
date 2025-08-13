@@ -281,6 +281,7 @@ export default function MenuSideBar() {
                         </li>
 
                         <li>
+                            <Link href={route('submissions.create')} className={`nav-link ${route().current('submissions.create') && 'active'}`}>
                             <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                 <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white ml-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z" />
@@ -289,6 +290,7 @@ export default function MenuSideBar() {
                                 </svg>
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Submit Form</span>
                             </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>
