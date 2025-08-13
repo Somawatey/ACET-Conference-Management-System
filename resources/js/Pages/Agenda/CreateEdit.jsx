@@ -3,7 +3,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
-import "cally"; // Import the cally web component
 
 const AgendaForm = () => {
     const [formData, setFormData] = useState({
