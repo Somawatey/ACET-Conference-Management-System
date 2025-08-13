@@ -58,8 +58,8 @@ export default function RoleCreateEdit({ role, permissions }) {
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
             <Head title={headWeb} />
             <section className="bg-white dark:bg-white">
-              <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+              <div className=" flex items-center w-full justify-center px-6 m-0 md:h-screen lg:py-0">
+                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 h-[600px]">
                   <div className="p-6 space-y-6 sm:p-8">
                     <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-dark text-center">
                       {headWeb}
@@ -84,7 +84,7 @@ export default function RoleCreateEdit({ role, permissions }) {
                         <label htmlFor="permissions" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                           <span className='text-danger'>*</span>Permissions
                         </label>
-                        <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto bg-gray-50">
+                        <div className="border border-gray-300 rounded-lg p-3 max-h-[300px] overflow-y-auto bg-gray-50">
                           {permissions.map(permission => (
                             <div key={permission.id} className="py-1">
                               <input
