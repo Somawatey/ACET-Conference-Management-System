@@ -191,7 +191,7 @@ const AgendaForm = () => {
                                             />
                                             <label
                                                 htmlFor={`endTime-${idx}`}
-                                                className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium bg-white border rounded-lg cursor-pointer transition peer-checked:bg-blue-600 peer-checked:text-white"
+                                                className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium bg-white border rounded-sm cursor-pointer transition peer-checked:bg-blue-600 peer-checked:text-white"
                                             >
                                                 {time}
                                             </label>
