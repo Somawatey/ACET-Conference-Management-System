@@ -71,9 +71,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         const photoPath = auth?.user?.profile_photo_path;
         const photoUrl = auth?.user?.profile_photo_url;
         
-        // Return false for testing - REMOVE THIS LINE TO RESTORE NORMAL BEHAVIOR
-        return false;
-        
         // Check if profile_photo_path exists and is not empty/null
         if (photoPath && photoPath.trim() !== '' && photoPath !== null) {
             return true;

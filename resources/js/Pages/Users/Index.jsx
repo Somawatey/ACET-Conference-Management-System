@@ -215,8 +215,6 @@ export default function UserPage({ users }) {
                     </div>
                 </div>
                 
-
-                {/*-- Delete Confirmation Modal --*/}
                 {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (
                     <div className="fixed inset-0 z-50 bg-opacity-60 flex justify-center items-center">
