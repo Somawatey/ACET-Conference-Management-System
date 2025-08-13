@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\PaperAssignmentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,14 +29,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
-
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index')->middleware(['check:category-list']);
-    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create')->middleware(['check:category-create']);
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::patch('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::get('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-
     Route::prefix('roles')->group(function () {
         Route::get('/', [RolesController::class, 'index'])->name('roles.index')->middleware(['check:role-list']);
         Route::get('/create', [RolesController::class, 'create'])->name('roles.create')->middleware(['check:role-create']);
@@ -51,6 +44,22 @@ Route::middleware('auth')->group(function () {
         Route::post("/", [UserController::class, 'store'])->name('users.store');
         Route::patch("/{id}", [UserController::class, 'update'])->name('users.update');
         Route::delete("/{id}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
+    });
+
+    Route::prefix('papers')->group(function () {
+        Route::get('/', [PaperController::class, 'index'])->name('papers.index')->middleware(['check:paper-list']);
+        Route::get('/create', [PaperController::class, 'create'])->name('papers.create')->middleware(['check:paper-create']);
+        Route::get('/{id}', [PaperController::class, 'edit'])->name('papers.edit')->middleware(['check:paper-edit']);
+        Route::post("/", [PaperController::class, 'store'])->name('papers.store');
+        Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
+        Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy')->middleware(['check:paper-delete']);
+    });
+
+    Route::prefix('paper-assignments')->group(function () {
+        Route::get('/', [PaperAssignmentController::class, 'index'])->name('paper-assignments.index')->middleware(['check:paper-assign']);
+        Route::post('/assign', [PaperAssignmentController::class, 'assign'])->name('paper-assignments.assign')->middleware(['check:paper-assign']);
+        Route::post('/unassign', [PaperAssignmentController::class, 'unassign'])->name('paper-assignments.unassign')->middleware(['check:paper-assign']);
+        Route::get('/{paperId}/assignments', [PaperAssignmentController::class, 'getAssignments'])->name('paper-assignments.get')->middleware(['check:paper-assign']);
     });
 });
 
