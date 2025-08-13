@@ -28,6 +28,11 @@ class PermissionSeeder extends Seeder
             'category-create',
             'category-edit',
             'category-delete',
+
+            'agenda-list',
+            'agenda-create',
+            'agenda-edit',
+            'agenda-delete'
         ];
 
         foreach ($permissions as $permission) {

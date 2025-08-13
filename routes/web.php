@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AgendaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,6 +53,15 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [UserController::class, 'update'])->name('users.update');
         Route::delete("/{id}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
     });
+    Route::prefix('agenda')->group(function () {
+        Route::get('/', [AgendaController::class, 'index'])->name('agenda.index')->middleware(['check:agenda-list']);
+        Route::get('/create', [AgendaController::class, 'create'])->name('agenda.create')->middleware(['check:agenda-create']);
+        Route::post('/', [AgendaController::class, 'store'])->name('agenda.store');
+        Route::get('/{id}', [AgendaController::class, 'edit'])->name('agenda.edit')->middleware(['check:agenda-edit']);
+        Route::patch('/{id}', [AgendaController::class, 'update'])->name('agenda.update');
+        Route::delete('/{id}', [AgendaController::class, 'destroy'])->name('agenda.destroy')->middleware(['check:agenda-delete']);
+    });
+    
 });
 
 require __DIR__.'/auth.php';
