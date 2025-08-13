@@ -12,7 +12,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import moment from 'moment';
 import { useState } from 'react';
 
-export default function UserPage({ roles }) {
+export default function RolePage({ roles }) {
     const { auth } = usePage().props;
     const can = auth?.can ?? {}; 
     const datasList = roles.data;
@@ -53,90 +53,114 @@ export default function UserPage({ roles }) {
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />} >
             <Head title={headWeb} />
-            <section className="content">
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="card card-outline card-info">
-                            <div className="card-header">
-                                <h3 className="card-title">
-                                    Datalist Management
-                                </h3>
-                                <div className="card-tools">
-                                    <div className="input-group input-group-sm" style={{ width: '150px' }}>
-                                        <input type="text" name="table_search" className="form-control float-right" placeholder="Search" />
-                                        <div className="input-group-append">
-                                            <button type="submit" className="btn btn-default">
-                                                <i className="fas fa-search"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+            <div className="bg-white min-h-screen font-sans">
+            <div className="max-w-screen-xl mx-auto">
+
+                <div className="p-6">
+                    {/*-- Actions: Search and Create --*/}
+                    <div className="flex items-center justify-between mb-4">
+                        {/* Search Bar */}
+                        <div className="relative w-1/4">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                                </svg>
                             </div>
-                            <div className="card-body table-responsive p-0">
-                                <table className="table table-hover text-nowrap">
-                                    <thead>
-                                        <tr>
-                                            <th>#ID</th>
-                                            <th>Name</th>
-                                            <th>Guard</th>
-                                            <th>Created At</th>
-                                            {can['role-edit' || 'role-delete'] && (
-                                                <th>Action</th>
-                                            )}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {datasList.length > 0 ?
-                                            datasList.map((item, k) => (
-                                                <tr key={k}>
-                                                    <td>{item?.id}</td>
-                                                    <td>{item?.name}</td>
-                                                    <td>{item?.guard_name}</td>
-                                                    <td>{moment(item?.created_at).format("DD/MM/YYYY")}</td>
-                                                    <td width={'170px'}>
+                            <input
+                                type="text"
+                                className="bg-white border border-gray-300 rounded-md py-2 pl-10 pr-4 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Search roles..."
+                            />
+                        </div>
+                        {/* Create Role Button */}
+                        <Link
+                            href={route('roles.create')}
+                            className="bg-[#0000FF] hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-md transition duration-300"
+                        >
+                            Create Role
+                        </Link>
+                    </div>
+
+                    {/*-- Roles Table --*/}
+                    <div className="overflow-x-auto rounded-lg">
+                        <table className="w-full">
+                            <thead className="bg-[#E5E7EB] text-black uppercase text-sm">
+                                <tr>
+                                    <th className="text-left p-4">ID</th>
+                                    <th className="text-left p-4">Role Name</th>
+                                    <th className="text-left p-4">Created At</th>
+                                    {can['role-edit'] || can['role-delete'] ? (
+                                        <th className="text-center p-4">Action</th>
+                                    ) : null}
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white text-gray-700">
+                                {datasList.length > 0 ? (
+                                    datasList.map((item) => (
+                                        <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                            <td className="p-4">{item.id}</td>
+                                            <td className="p-4 font-medium">{item.name}</td>
+                                            <td className="p-4">{moment(item.created_at).format("DD/MM/YYYY")}</td>
+                                            {can['role-edit'] || can['role-delete'] ? (
+                                                <td className="p-4">
+                                                    <div className="flex items-center justify-center space-x-4">
                                                         {can['role-edit'] && (
-                                                            <Link href={route('roles.edit', item.id)} className="btn btn-info btn-xs mr-2">
-                                                                <i className='fas fa-edit'></i> Edit
+                                                            <Link href={route('roles.edit', item.id)} className="text-gray-600 hover:text-blue-600">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                </svg>
                                                             </Link>
                                                         )}
                                                         {can['role-delete'] && (
-                                                        <button onClick={() => confirmDataDeletion(item)} type="button" className="btn btn-danger btn-xs">
-                                                            <i className='fas fa-trash'></i> Delete
-                                                        </button>
+                                                            <button onClick={() => confirmDataDeletion(item)} className="text-gray-600 hover:text-red-600">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                            </button>
                                                         )}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                            :
-                                            <tr>
-                                                <td colSpan={5}>There are no record!</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                                <Modal show={confirmingDataDeletion} onClose={closeModal}>
-                                    <form onSubmit={deleteDataRow} className="p-6">
-                                        <h2 className="text-lg font-medium text-gray-900">
-                                            Confirmation!
-                                        </h2>
-                                        <p className="mt-1 text-sm text-gray-600">
-                                            Are you sure you want to delete <span className='text-lg font-medium'>{deleteData.name}</span>?
-                                        </p>
-                                        <div className="mt-6 flex justify-end">
-                                            <SecondaryButton onClick={closeModal}>No</SecondaryButton>
-                                            <DangerButton className="ms-3" disabled={processing}>Yes</DangerButton>
-                                        </div>
-                                    </form>
-                                </Modal>
-                            </div>
+                                                    </div>
+                                                </td>
+                                            ) : null}
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={can['role-edit'] || can['role-delete'] ? 4 : 3} className="p-4 text-center">
+                                            There are no records!
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                            <div className="card-footer clearfix">
-                                <Pagination links={roles.links} />
-                            </div>
+                    {/*-- Pagination --*/}
+                    <div className="mt-4">
+                        <Pagination links={roles.links} />
+                    </div>
+                </div>
+            </div>
+
+            {/*-- Delete Confirmation Modal --*/}
+            {confirmingDataDeletion && (
+                <div className="fixed inset-0 z-50 bg-opacity-60 flex justify-center items-center">
+                    <div className="bg-white text-black p-8 rounded-lg shadow-xl w-full max-w-md">
+                        <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
+                        <p className="mt-1 text-gray-800">
+                            Are you sure you want to delete the role "<strong>{deleteData.name}</strong>"? This action cannot be undone.
+                        </p>
+                        <div className="mt-6 flex justify-end space-x-4">
+                            <button onClick={closeModal} className="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-md font-medium">
+                                Cancel
+                            </button>
+                            <button onClick={deleteDataRow} disabled={processing} className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium disabled:bg-red-400">
+                                {processing ? 'Deleting...' : 'Delete Role'}
+                            </button>
                         </div>
                     </div>
                 </div>
-            </section>
+            )}
+        </div>
         </AdminLayout>
     );
 }

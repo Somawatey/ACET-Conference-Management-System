@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\PaperAssignmentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,14 +30,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo.update');
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
-
-
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index')->middleware(['check:category-list']);
-    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create')->middleware(['check:category-create']);
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::patch('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::get('/categories/{id}', [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
     Route::prefix('roles')->group(function () {
         Route::get('/', [RolesController::class, 'index'])->name('roles.index')->middleware(['check:role-list']);
@@ -61,7 +55,49 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{id}', [AgendaController::class, 'update'])->name('agenda.update');
         Route::delete('/{id}', [AgendaController::class, 'destroy'])->name('agenda.destroy')->middleware(['check:agenda-delete']);
     });
-    
+    // Submission routes - PERMISSION REQUIRED ✅
+    // Route::prefix('submissions')->group(function () {
+    //     Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index')->middleware(['check:paper-list']);
+    //     Route::get('/create', [SubmissionController::class, 'create'])->name('submissions.create')->middleware(['check:paper-create']);
+    //     Route::get('/{id}', [SubmissionController::class, 'show'])->name('submissions.show')->middleware(['check:paper-list']);
+    //     Route::get('/{id}/edit', [SubmissionController::class, 'edit'])->name('submissions.edit')->middleware(['check:paper-edit']);
+    //     Route::post("/", [SubmissionController::class, 'store'])->name('submissions.store');
+    //     Route::patch("/{id}", [SubmissionController::class, 'update'])->name('submissions.update');
+    //     Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy')->middleware(['check:paper-delete']);
+    // });
+
+       // Submission routes - NO PERMISSION REQUIRED ✅
+    Route::prefix('submissions')->group(function () {
+        Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index'); 
+        Route::get('/create', [SubmissionController::class, 'create'])->name('submissions.create'); 
+        Route::get('/{id}', [SubmissionController::class, 'show'])->name('submissions.show');
+        Route::get('/{id}/edit', [SubmissionController::class, 'edit'])->name('submissions.edit');
+        Route::post("/", [SubmissionController::class, 'store'])->name('submissions.store');
+        Route::patch("/{id}", [SubmissionController::class, 'update'])->name('submissions.update');
+        Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy');
+    });
+
+    //paper
+    Route::prefix('papers')->group(function () {
+        Route::get('/', [PaperController::class, 'index'])->name('papers.index')->middleware(['check:paper-list']);
+        Route::get('/create', [PaperController::class, 'create'])->name('papers.create')->middleware(['check:paper-create']);
+        Route::get('/{id}', [PaperController::class, 'show'])->name('papers.show')->middleware(['check:paper-list']);
+        Route::get('/{id}/edit', [PaperController::class, 'edit'])->name('papers.edit')->middleware(['check:paper-edit']);
+        Route::post("/", [PaperController::class, 'store'])->name('papers.store');
+        Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
+        Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy')->middleware(['check:paper-delete']);
+    });
+
+    Route::prefix('paper-assignments')->group(function () {
+        Route::get('/', [PaperAssignmentController::class, 'index'])->name('paper-assignments.index')->middleware(['check:paper-assign']);
+        Route::get('/create', [PaperAssignmentController::class, 'create'])->name('paper-assignments.create')->middleware(['check:paper-assign']);
+        Route::get('/{id}', [PaperAssignmentController::class, 'show'])->name('paper-assignments.show')->middleware(['check:paper-assign']);
+        Route::get('/{id}/edit', [PaperAssignmentController::class, 'edit'])->name('paper-assignments.edit')->middleware(['check:paper-assign']);
+        Route::post("/", [PaperAssignmentController::class, 'store'])->name('paper-assignments.store');
+        Route::patch("/{id}", [PaperAssignmentController::class, 'update'])->name('paper-assignments.update');
+        Route::delete("/{id}", [PaperAssignmentController::class, 'destroy'])->name('paper-assignments.destroy')->middleware(['check:paper-assign']);
+    });
 });
+
 
 require __DIR__.'/auth.php';

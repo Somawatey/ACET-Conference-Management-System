@@ -7,7 +7,6 @@ export default function MenuSideBar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-
     // Toggle sidebar
     const toggleSidebar = () => {
         setIsSidebarOpen(prev => !prev);
@@ -80,9 +79,9 @@ export default function MenuSideBar() {
                     </button>
 
                     {/* Logo for mobile */}
-                    <div className="sm:hidden flex items-center">
+                    <Link href='/' className="sm:hidden flex items-center">
                         <img src="/images/Logo.png" className="h-10 w-auto" alt="Logo" />
-                    </div>
+                    </Link>
 
                     {/* Right side - Profile dropdown */}
                     <div className="flex items-center justify-end w-full">
@@ -126,7 +125,7 @@ export default function MenuSideBar() {
                             {isDropdownOpen && (
                                 <div className="absolute right-0 z-50 mt-10 w-52 origin-top-right rounded-md 
                                                 shadow-lg ring-1 ring-black ring-opacity-5 
-                                                focus:outline-none dark:bg-gray-100"
+                                                focus:outline-none bg-gray-50 dark:bg-gray-100"
                                 >
                                     <div className='px-4 py-2 mt-2'>
                                         <div className="py-1 border-b dark:border-gray-600">
@@ -143,9 +142,9 @@ export default function MenuSideBar() {
                                             <Link href={route('profile.edit')}>
                                                 <a
                                                     href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 
-                                                           dark:hover:bg-gray-600 dark:text-gray-700 
-                                                           dark:hover:text-white"
+                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-300 
+                                                           dark:hover:bg-blue-300 dark:text-gray-700 ease-in-out duration-300
+                                                           dark:hover:text-black"
                                                 >
                                                     Profile Settings
                                                 </a>
@@ -157,8 +156,8 @@ export default function MenuSideBar() {
                                                 method="post"
                                                 as="button"
                                                 className="block w-full text-left px-4 py-2 text-sm 
-                                                           text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 
-                                                           dark:text-gray-700 dark:hover:text-white"
+                                                           text-gray-700 hover:bg-gray-100 dark:hover:bg-blue-300 
+                                                           dark:text-white-700 dark:hover:text-black ease-in-out duration-300"
                                             >
                                                 Logout
                                             </Link>
@@ -180,13 +179,13 @@ export default function MenuSideBar() {
             >
                 <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-200">
                     <div className="logo w-full flex justify-center items-center">
-                        <a href="#" className="flex items-center ps-2.5 mb-5">
+                        <Link href="/" className="flex items-center ps-2.5 mb-5">
                             <img
                                 src="/images/Logo.png"
                                 className="h-16 w-auto me-3 sm:h-20"
                                 alt="Logo"
                             />
-                        </a>
+                        </Link>
                     </div>
 
                     <ul className="space-y-2 font-medium">
@@ -265,14 +264,46 @@ export default function MenuSideBar() {
                             </li>
                         )}
 
-                        <li>
-                            <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
-                                <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                                    <path d="M16 14V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 0 0 0-2h-1v-2a2 2 0 0 0 2-2ZM4 2h2v12H4V2Zm8 16H3a1 1 0 0 1 0-2h9v2Z" />
-                                </svg>
-                                <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper</span>
-                            </a>
-                        </li>
+                        {/* {can['role-create'] && (
+                            <li>
+                                <Link href={route('roles.create')} className={`nav-link ${route().current('roles.index') && 'active'}`}>
+                                    <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                        <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M19.728 10.686c-2.38 2.256-6.153 3.381-9.875 3.381-3.722 0-7.4-1.126-9.571-3.371L0 10.437V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.6l-.272.286Z" />
+                                            <path d="m.135 7.847 1.542 1.417c3.6 3.712 12.747 3.7 16.635.01L19.605 7.9A.98.98 0 0 1 20 7.652V6a2 2 0 0 0-2-2h-3V3a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v1H2a2 2 0 0 0-2 2v1.765c.047.024.092.051.135.082ZM10 10.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5ZM7 3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1H7V3Z" />
+                                        </svg>
+                                        <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Create Role</span>
+                                        <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+                                    </a>
+                                </Link>
+                            </li>
+                        )} */}
+
+                        {can['paper-list'] && (
+                            <li>
+                                <Link href={route('papers.index')} className={`nav-link ${route().current('papers.index') && 'active'}`}>
+                                    <a href="#" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('papers.index') ? 'bg-gray-100 dark:bg-gray-400' : ''}`}>
+                                        <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                                            <path d="M16 14V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 0 0 0-2h-1v-2a2 2 0 0 0 2-2ZM4 2h2v12H4V2Zm8 16H3a1 1 0 0 1 0-2h9v2Z" />
+                                        </svg>
+                                        <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper</span>
+                                    </a>
+                                </Link>
+                            </li>
+                        )}
+
+                        {can['paper-assign'] && (
+                            <li>
+                                <Link href={route('paper-assignments.index')} className={`nav-link ${route().current('paper-assignments.index') && 'active'}`}>
+                                    <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                        <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Assign Papers</span>
+                                    </a>
+                                </Link>
+                            </li>
+                        )}
 
                         <li>
                             <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
@@ -284,6 +315,7 @@ export default function MenuSideBar() {
                         </li>
 
                         <li>
+                            <Link href={route('submissions.create')} className={`nav-link ${route().current('submissions.create') && 'active'}`}>
                             <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                 <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white ml-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z" />
@@ -292,6 +324,7 @@ export default function MenuSideBar() {
                                 </svg>
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Submit Form</span>
                             </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>
