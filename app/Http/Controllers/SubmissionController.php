@@ -2,64 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Submission;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SubmissionController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
+     * Show the submission form
      */
     public function create()
     {
-        //
+        return Inertia::render('Submission/Submit');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new submission
      */
     public function store(Request $request)
     {
-        //
+        // For now, just return a success message
+        return redirect()->back()->with('success', 'Submission received!');
     }
 
     /**
-     * Display the specified resource.
+     * Show user's submissions
      */
-    public function show(Submission $submission)
+    public function index()
     {
-        //
+        return Inertia::render('Submission/Index', [
+            'submissions' => []
+        ]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show specific submission
      */
-    public function edit(Submission $submission)
+    public function show($id)
     {
-        //
+        return Inertia::render('Submission/Show', [
+            'submission' => []
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Show edit form
      */
-    public function update(Request $request, Submission $submission)
+    public function edit($id)
     {
-        //
+        return Inertia::render('Submission/Edit');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update submission
      */
-    public function destroy(Submission $submission)
+    public function update(Request $request, $id)
     {
-        //
+        return redirect()->back()->with('success', 'Submission updated!');
+    }
+
+    /**
+     * Delete submission
+     */
+    public function destroy($id)
+    {
+        return redirect()->route('submissions.index')->with('success', 'Submission deleted!');
     }
 }

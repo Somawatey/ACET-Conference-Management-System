@@ -6,26 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('author_infos', function (Blueprint $table) {
             $table->id();
             $table->string('author_name');
-            $table->string('position_author')->nullable();
-            $table->string('co_author')->nullable();
-            $table->string('institute')->nullable();
-            $table->string('cores_name')->nullable();
-            $table->string('cores_email')->nullable();
+            $table->string('author_email'); // Add this
+            $table->string('institute'); 
+            $table->string('correspond_name')->nullable(); // Add this
+            $table->string('correspond_email')->nullable(); // Add this
+            $table->text('coauthors')->nullable(); // Rename from co_author
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('author_infos');
