@@ -48,7 +48,7 @@ class AgendaController extends Controller
             'agendas' => $paged,
         ]);
     }
-
+  
     /**
      * Show the form for creating a new resource.
      */
@@ -58,7 +58,15 @@ class AgendaController extends Controller
             'datas' => null,
         ]);
     }
-
+     
+    /**
+     * Display the specified resource.
+     */
+    public function show(Agenda $agenda)
+    {
+        
+    }
+  
     /**
      * Store a newly created resource in storage.
      */
@@ -79,7 +87,7 @@ class AgendaController extends Controller
         return redirect()->route('agenda.index')
             ->with('success', 'Agenda item created successfully.');
     }
-
+      
     /**
      * Show the form for editing the specified resource.
      */
@@ -96,7 +104,7 @@ class AgendaController extends Controller
             'datas' => $agenda,
         ]);
     }
-
+    
     /**
      * Update the specified resource in storage.
      */

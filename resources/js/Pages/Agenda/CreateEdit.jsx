@@ -3,7 +3,6 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
-import "cally"; // Import the cally web component
 
 const AgendaForm = () => {
     const [formData, setFormData] = useState({
@@ -27,7 +26,6 @@ const AgendaForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form Submitted:', formData);
     };
 
     const handleDateChange = (event) => {
@@ -193,7 +191,7 @@ const AgendaForm = () => {
                                             />
                                             <label
                                                 htmlFor={`endTime-${idx}`}
-                                                className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium bg-white border rounded-lg cursor-pointer transition peer-checked:bg-blue-600 peer-checked:text-white"
+                                                className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium bg-white border rounded-sm cursor-pointer transition peer-checked:bg-blue-600 peer-checked:text-white"
                                             >
                                                 {time}
                                             </label>

@@ -55,8 +55,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{id}', [AgendaController::class, 'update'])->name('agenda.update');
         Route::delete('/{id}', [AgendaController::class, 'destroy'])->name('agenda.destroy')->middleware(['check:agenda-delete']);
     });
-    
-
     // Submission routes - PERMISSION REQUIRED ✅
     // Route::prefix('submissions')->group(function () {
     //     Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index')->middleware(['check:paper-list']);
