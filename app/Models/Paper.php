@@ -2,48 +2,57 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Paper extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'title',
+        'paper_title',
+        'url',
+        'topic',
+        'keyword',
         'abstract',
-        'file_path',
-        'status',
-        'author_id',
-        'category_id',
-        'submission_date',
-        'review_deadline',
+        'user_id',
+        'conference_id',
+        'status'
     ];
 
-    protected $casts = [
-        'submission_date' => 'datetime',
-        'review_deadline' => 'datetime',
-    ];
-
-    public function author(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function category(): BelongsTo
+    public function conference(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function assignments(): HasMany
-    {
-        return $this->hasMany(PaperAssignment::class);
+        return $this->belongsTo(Conference::class);
     }
 
     public function reviews(): HasMany
     {
+<<<<<<< HEAD
         return $this->hasMany(PaperReview::class);
     }
 }
+=======
+        return $this->hasMany(Review::class);
+    }
+
+    public function decision(): HasOne
+    {
+        return $this->hasOne(Decision::class);
+    }
+
+    public function submission(): HasOne
+    {
+        return $this->hasOne(Submission::class);
+    }
+
+    public function session(): HasOne
+    {
+        return $this->hasOne(ConferenceSession::class);
+    }
+}
+>>>>>>> e8e97e3942cdde7ebf401243c480e28aa263190c

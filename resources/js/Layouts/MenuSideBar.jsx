@@ -261,7 +261,7 @@ export default function MenuSideBar() {
                             </li>
                         )}
 
-                        {can['role-create'] && (
+                        {/* {can['role-create'] && (
                             <li>
                                 <Link href={route('roles.create')} className={`nav-link ${route().current('roles.index') && 'active'}`}>
                                     <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
@@ -274,18 +274,20 @@ export default function MenuSideBar() {
                                     </a>
                                 </Link>
                             </li>
-                        )}
+                        )} */}
 
-                        <li>
-                            <Link href={route('papers.index')} className={`nav-link ${route().current('papers.index') && 'active'}`}>
-                                <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
-                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                                        <path d="M16 14V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 0 0 0-2h-1v-2a2 2 0 0 0 2-2ZM4 2h2v12H4V2Zm8 16H3a1 1 0 0 1 0-2h9v2Z" />
-                                    </svg>
-                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper</span>
-                                </a>
-                            </Link>
-                        </li>
+                        {can['paper-list'] && (
+                            <li>
+                                <Link href={route('papers.index')} className={`nav-link ${route().current('papers.index') && 'active'}`}>
+                                    <a href="#" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('papers.index') ? 'bg-gray-100 dark:bg-gray-400' : ''}`}>
+                                        <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
+                                            <path d="M16 14V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 0 0 0-2h-1v-2a2 2 0 0 0 2-2ZM4 2h2v12H4V2Zm8 16H3a1 1 0 0 1 0-2h9v2Z" />
+                                        </svg>
+                                        <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper</span>
+                                    </a>
+                                </Link>
+                            </li>
+                        )}
 
                         {can['paper-assign'] && (
                             <li>
@@ -310,6 +312,7 @@ export default function MenuSideBar() {
                         </li>
 
                         <li>
+                            <Link href={route('submissions.create')} className={`nav-link ${route().current('submissions.create') && 'active'}`}>
                             <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                 <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white ml-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z" />
@@ -318,6 +321,7 @@ export default function MenuSideBar() {
                                 </svg>
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Submit Form</span>
                             </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>

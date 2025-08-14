@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaperAssignment extends Model
 {
@@ -14,28 +13,35 @@ class PaperAssignment extends Model
         'paper_id',
         'reviewer_id',
         'assigned_by',
-        'assigned_at',
+        'due_date',
         'status',
-        'notes',
-        'deadline',
+        'notes'
     ];
 
     protected $casts = [
-        'assigned_at' => 'datetime',
-        'deadline' => 'datetime',
+        'due_date' => 'date',
     ];
 
-    public function paper(): BelongsTo
+    /**
+     * Get the paper that is assigned
+     */
+    public function paper()
     {
         return $this->belongsTo(Paper::class);
     }
 
-    public function reviewer(): BelongsTo
+    /**
+     * Get the reviewer assigned to the paper
+     */
+    public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewer_id');
     }
 
-    public function assignedBy(): BelongsTo
+    /**
+     * Get the user who assigned the paper
+     */
+    public function assignedBy()
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }

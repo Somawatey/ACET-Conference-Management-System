@@ -24,11 +24,6 @@ class PermissionSeeder extends Seeder
             'user-edit',
             'user-delete',
 
-            'category-list',
-            'category-create',
-            'category-edit',
-            'category-delete',
-
             'paper-list',
             'paper-create',
             'paper-edit',

@@ -2,97 +2,124 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Paper;
-use App\Models\PaperAssignment;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
+use App\Models\Paper;
+use App\Models\User;
+use App\Models\PaperAssignment;
 
 class PaperAssignmentController extends Controller
 {
-    public function index(): Response
+    /**
+     * Display a listing of paper assignments
+     */
+    public function index()
     {
-        $papers = Paper::with(['author', 'category', 'assignments.reviewer'])
-            ->where('status', 'submitted')
-            ->orWhere('status', 'under_review')
-            ->paginate(10);
+        $assignments = PaperAssignment::with(['paper', 'reviewer', 'assignedBy'])
+                                    ->orderBy('created_at', 'desc')
+                                    ->paginate(10);
 
-        $reviewers = User::role('Reviewer')->get(['id', 'name', 'email']);
+        return Inertia::render('PaperAssignments/Index', [
+            'assignments' => $assignments
+        ]);
+    }
 
-        return Inertia::render('Paper/AssignPaper', [
+    /**
+     * Show the form for creating a new assignment
+     */
+    public function create()
+    {
+        $papers = Paper::with('user')->get();
+        $reviewers = User::role('Reviewer')->get(); // Assuming you have reviewer role
+
+        return Inertia::render('PaperAssignments/Create', [
             'papers' => $papers,
-            'reviewers' => $reviewers,
+            'reviewers' => $reviewers
         ]);
     }
 
-    public function assign(Request $request)
+    /**
+     * Store a newly created assignment
+     */
+    public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'paper_id' => 'required|exists:papers,id',
-            'reviewer_ids' => 'required|array|min:1',
-            'reviewer_ids.*' => 'exists:users,id',
-            'deadline' => 'required|date|after:today',
-            'notes' => 'nullable|string|max:500',
+            'reviewer_id' => 'required|exists:users,id',
+            'due_date' => 'required|date|after:today',
         ]);
 
-        $assignments = [];
-        foreach ($validated['reviewer_ids'] as $reviewerId) {
-            // Check if assignment already exists
-            $existingAssignment = PaperAssignment::where('paper_id', $validated['paper_id'])
-                ->where('reviewer_id', $reviewerId)
-                ->first();
+        PaperAssignment::create([
+            'paper_id' => $request->paper_id,
+            'reviewer_id' => $request->reviewer_id,
+            'assigned_by' => auth()->id(),
+            'due_date' => $request->due_date,
+            'status' => 'pending'
+        ]);
 
-            if (!$existingAssignment) {
-                $assignment = PaperAssignment::create([
-                    'paper_id' => $validated['paper_id'],
-                    'reviewer_id' => $reviewerId,
-                    'assigned_by' => auth()->id(),
-                    'deadline' => $validated['deadline'],
-                    'notes' => $validated['notes'],
-                    'status' => 'assigned',
-                ]);
-
-                $assignments[] = $assignment;
-            }
-        }
-
-        // Update paper status to under_review if it was submitted
-        $paper = Paper::find($validated['paper_id']);
-        if ($paper && $paper->status === 'submitted') {
-            $paper->update(['status' => 'under_review']);
-        }
-
-        return back()->with('success', 'Papers assigned successfully to ' . count($assignments) . ' reviewer(s)');
+        return redirect()->route('paper-assignments.index')
+                        ->with('success', 'Paper assigned successfully.');
     }
 
-    public function unassign(Request $request)
+    /**
+     * Display the specified assignment
+     */
+    public function show($id)
     {
-        $validated = $request->validate([
-            'assignment_id' => 'required|exists:paper_assignments,id',
+        $assignment = PaperAssignment::with(['paper', 'reviewer', 'assignedBy'])
+                                   ->findOrFail($id);
+
+        return Inertia::render('PaperAssignments/Show', [
+            'assignment' => $assignment
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified assignment
+     */
+    public function edit($id)
+    {
+        $assignment = PaperAssignment::with(['paper', 'reviewer'])
+                                   ->findOrFail($id);
+        $papers = Paper::with('user')->get();
+        $reviewers = User::role('Reviewer')->get();
+
+        return Inertia::render('PaperAssignments/Edit', [
+            'assignment' => $assignment,
+            'papers' => $papers,
+            'reviewers' => $reviewers
+        ]);
+    }
+
+    /**
+     * Update the specified assignment
+     */
+    public function update(Request $request, $id)
+    {
+        $assignment = PaperAssignment::findOrFail($id);
+
+        $request->validate([
+            'paper_id' => 'required|exists:papers,id',
+            'reviewer_id' => 'required|exists:users,id',
+            'due_date' => 'required|date',
+            'status' => 'required|in:pending,in_progress,completed,cancelled'
         ]);
 
-        $assignment = PaperAssignment::find($validated['assignment_id']);
+        $assignment->update($request->all());
+
+        return redirect()->route('paper-assignments.index')
+                        ->with('success', 'Assignment updated successfully.');
+    }
+
+    /**
+     * Remove the specified assignment
+     */
+    public function destroy($id)
+    {
+        $assignment = PaperAssignment::findOrFail($id);
         $assignment->delete();
 
-        // Check if paper has any remaining assignments
-        $remainingAssignments = PaperAssignment::where('paper_id', $assignment->paper_id)->count();
-        if ($remainingAssignments === 0) {
-            $paper = Paper::find($assignment->paper_id);
-            if ($paper && $paper->status === 'under_review') {
-                $paper->update(['status' => 'submitted']);
-            }
-        }
-
-        return back()->with('success', 'Reviewer unassigned successfully');
-    }
-
-    public function getAssignments($paperId)
-    {
-        $assignments = PaperAssignment::with(['reviewer', 'assignedBy'])
-            ->where('paper_id', $paperId)
-            ->get();
-
-        return response()->json($assignments);
+        return redirect()->route('paper-assignments.index')
+                        ->with('success', 'Assignment deleted successfully.');
     }
 }
