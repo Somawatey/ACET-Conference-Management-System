@@ -28,6 +28,15 @@ class PermissionSeeder extends Seeder
             'category-create',
             'category-edit',
             'category-delete',
+
+            'paper-list',
+            'paper-create',
+            'paper-edit',
+            'paper-delete',
+            'paper-assign',
+            'paper-review',
+            'paper-approve',
+            'paper-reject',
         ];
 
         foreach ($permissions as $permission) {
