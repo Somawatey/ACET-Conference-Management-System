@@ -6,6 +6,8 @@ use Inertia\Response;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Paper;
+use App\Models\Review;
+use App\Models\Decision;
 
 class PaperController extends Controller
 {
@@ -83,56 +85,99 @@ class PaperController extends Controller
         
         return redirect()->route('papers.index');
     }
+
+	/**
+	 * Display a listing page for paper decisions.
+	 */
+	public function decisions(): Response
+	{
+		$papers = Paper::with(['user', 'conference'])
+			->orderBy('created_at', 'desc')
+			->paginate(10);
+
+		return Inertia::render('Papers/Index', [
+			'papers' => $papers,
+		]);
+	}
+
+	/**
+	 * Show the decision page for a specific paper.
+	 */
+	public function decisionShow($id): Response
+	{
+		$paper = Paper::with(['user', 'conference'])->findOrFail($id);
+
+		$reviews = Review::with('reviewer')
+			->where('paper_id', $id)
+			->get()
+			->map(function ($review) {
+				return [
+					'id' => $review->id,
+					'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
+					'status' => $review->recommendation ?? 'Pending',
+				];
+			});
+
+		$transformedPaper = [
+			'id' => $paper->id,
+			'title' => $paper->paper_title ?? ($paper->title ?? ''),
+			'author' => optional($paper->user)->name ?? '',
+			'track' => is_string($paper->topic)
+				? $paper->topic
+				: (is_array($paper->topic) ? ($paper->topic['name'] ?? '') : ''),
+		];
+
+		return Inertia::render('PaperDecision/Index', [
+			'paper' => $transformedPaper,
+			'reviews' => $reviews,
+		]);
+	}
+
+	/**
+	 * Accept (or finalize) a decision for a paper.
+	 */
+	public function accept(Request $request, $id)
+	{
+		$validated = $request->validate([
+			'decision' => 'nullable|in:Accept,Reject,Revise',
+			'comment' => 'nullable|string',
+		]);
+
+		$finalDecision = $validated['decision'] ?? 'Accept';
+
+		Decision::updateOrCreate(
+			['paper_id' => $id],
+			[
+				'organizer_id' => auth()->id(),
+				'decision' => $finalDecision,
+				'comment' => $validated['comment'] ?? null,
+			]
+		);
+
+		$paper = Paper::findOrFail($id);
+		$statusMap = [
+			'Accept' => 'accepted',
+			'Reject' => 'rejected',
+			'Revise' => 'needs_revision',
+		];
+		$paper->status = $statusMap[$finalDecision] ?? $paper->status;
+		$paper->save();
+
+		return redirect()->route('paper-decisions.show', ['id' => $id])
+			->with('success', 'Decision saved successfully.');
+	}
+
+	/**
+	 * Reject a paper (helper that delegates to accept with Reject default).
+	 */
+	public function reject(Request $request, $id)
+	{
+		$request->merge(['decision' => 'Reject']);
+		return $this->accept($request, $id);
+	}
     /**
      * Display the decisions for papers
      */
     
-    public function decisions(): Response
-    {
-        // For now, we will use sample data for the index page.
-        $paper = (object)[
-            'id' => 1, // Sample ID
-            'title' => 'The Future of AI in Academic Research',
-            'author' => 'Dr. Alex Ray',
-            'track' => 'Artificial Intelligence',
-        ];
-
-        $reviews = [
-            ['id' => 1, 'reviewer' => 'Panha', 'status' => 'Accept'],
-            ['id' => 2, 'reviewer' => 'Ronaldo', 'status' => 'Reject'],
-            ['id' => 3, 'reviewer' => 'Ngorl Ngorl', 'status' => 'Revise'],
-        ];
-
-        // Now, we pass the data to the correct component.
-        return Inertia::render('PaperDecision/Index', [
-            'paper' => $paper,
-            'reviews' => $reviews,
-        ]);
-    }
-    public function decisionShow($id): Response
-    {
-        // In a real app, you would find the specific paper by its $id
-        // $paper = Paper::findOrFail($id);
-        // $reviews = $paper->reviews;
-
-        $paper = (object)[
-            'id' => $id,
-            'title' => 'The Future of AI in Academic Research',
-            'author' => 'Dr. Alex Ray',
-            'track' => 'Artificial Intelligence',
-        ];
-
-        $reviews = [
-            ['id' => 1, 'reviewer' => 'Panha', 'status' => 'Accept'],
-            ['id' => 2, 'reviewer' => 'Ronaldo', 'status' => 'Reject'],
-            ['id' => 3, 'reviewer' => 'Ngorl Ngorl', 'status' => 'Revise'],
-        ];
-
-        // This renders the component for the 'show' page.
-        // It's good to use a different component for this later.
-        return Inertia::render('PaperDecision/ReviewedPaper', [
-            'paper' => $paper,
-            'reviews' => $reviews,
-        ]);
-    }
+    
 }
