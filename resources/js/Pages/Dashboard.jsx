@@ -5,7 +5,7 @@ import Breadcrumb from '@/Components/Breadcrumb';
 
 
 const Dashboard = () => {
-    const headWeb = 'Dashboard'
+    const headWeb = 'Dashboard' 
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
     return (
         <AdminLTELayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb}  style={{ zIndex: 1 }}/>}>
