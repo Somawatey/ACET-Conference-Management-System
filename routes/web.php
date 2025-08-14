@@ -3,7 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\PaperAssignmentController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,27 +47,26 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
     });
 
-    // Submission routes - PERMISSION REQUIRED ✅
-    // Route::prefix('submissions')->group(function () {
-    //     Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index')->middleware(['check:paper-list']);
-    //     Route::get('/create', [SubmissionController::class, 'create'])->name('submissions.create')->middleware(['check:paper-create']);
-    //     Route::get('/{id}', [SubmissionController::class, 'show'])->name('submissions.show')->middleware(['check:paper-list']);
-    //     Route::get('/{id}/edit', [SubmissionController::class, 'edit'])->name('submissions.edit')->middleware(['check:paper-edit']);
-    //     Route::post("/", [SubmissionController::class, 'store'])->name('submissions.store');
-    //     Route::patch("/{id}", [SubmissionController::class, 'update'])->name('submissions.update');
-    //     Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy')->middleware(['check:paper-delete']);
-    // });
-
-       // Submission routes - NO PERMISSION REQUIRED ✅
-    Route::prefix('submissions')->group(function () {
-        Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index'); 
-        Route::get('/create', [SubmissionController::class, 'create'])->name('submissions.create'); 
-        Route::get('/{id}', [SubmissionController::class, 'show'])->name('submissions.show');
-        Route::get('/{id}/edit', [SubmissionController::class, 'edit'])->name('submissions.edit');
-        Route::post("/", [SubmissionController::class, 'store'])->name('submissions.store');
-        Route::patch("/{id}", [SubmissionController::class, 'update'])->name('submissions.update');
-        Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy');
+    Route::prefix('papers')->group(function () {
+        Route::get('/', [PaperController::class, 'index'])->name('papers.index')->middleware(['check:paper-list']);
+        Route::get('/create', [PaperController::class, 'create'])->name('papers.create')->middleware(['check:paper-create']);
+        Route::get('/{id}', [PaperController::class, 'edit'])->name('papers.edit')->middleware(['check:paper-edit']);
+        Route::post("/", [PaperController::class, 'store'])->name('papers.store');
+        Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
+        Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy')->middleware(['check:paper-delete']);
     });
+
+    Route::prefix('paper-assignments')->group(function () {
+        Route::get('/', [PaperAssignmentController::class, 'index'])->name('paper-assignments.index')->middleware(['check:paper-assign']);
+        Route::post('/assign', [PaperAssignmentController::class, 'assign'])->name('paper-assignments.assign')->middleware(['check:paper-assign']);
+        Route::post('/unassign', [PaperAssignmentController::class, 'unassign'])->name('paper-assignments.unassign')->middleware(['check:paper-assign']);
+        Route::get('/{paperId}/assignments', [PaperAssignmentController::class, 'getAssignments'])->name('paper-assignments.get')->middleware(['check:paper-assign']);
+    });
+
+    Route::get('/review', function () {
+        return Inertia::render('Reviews/Review');
+    });
+    Route::get('/review-history', [ReviewController::class, 'index'])->name('reviews.history');
 });
 
 require __DIR__.'/auth.php';
