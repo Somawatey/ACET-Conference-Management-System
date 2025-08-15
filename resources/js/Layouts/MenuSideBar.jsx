@@ -200,13 +200,14 @@ export default function MenuSideBar() {
                                 </a>
                             </Link>
                         </li>
-
-                        <li>
-                            <a href="#" className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
-                                    fill="none"
+                        {can['agenda-list'] && (
+                            <li className={`nav-item ${(route().current('agenda.index') || route().current('agenda.create')) && 'menu-is-opening menu-open'}`}>
+                                <Link href={route('agenda.index')} className={`nav-link ${route().current('agenda.index') && 'active'}`}>
+                                    <a href="#" className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                                            fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
                                     strokeWidth={2}
@@ -222,7 +223,9 @@ export default function MenuSideBar() {
 
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Agenda</span>
                             </a>
+                            </Link>
                         </li>
+                        )}
 
                         {can['user-list'] && (
                             <li className={`nav-item ${(route().current('users.index') || route().current('users.create')) && 'menu-is-opening menu-open'}`}>
