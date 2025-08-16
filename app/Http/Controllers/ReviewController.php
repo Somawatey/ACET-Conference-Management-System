@@ -18,63 +18,85 @@ class ReviewController extends Controller
     {
         $request = request();
 
-        $search = $request->string('search')->toString();
-        $topic = $request->string('topic')->toString();
-        $track = $request->string('track')->toString();
+        // Review filters
+        $reviewer = $request->string('reviewer')->toString();
+        $status = $request->string('status')->toString(); // Accept | Revise | Reject (UI may send lowercase)
+        $rating = $request->string('rating')->toString(); // numeric score
+        $show = $request->string('show')->toString();
 
-        $query = Review::query()
-            ->with(['paper.submission', 'reviewer']);
-
-        if ($search !== '') {
-            $query->whereHas('paper', function ($q) use ($search) {
-                $q->where('paper_title', 'like', "%{$search}%");
-            });
+        // Normalize status to match DB values
+        if ($status !== '') {
+            $status = ucfirst(strtolower($status)); // accept -> Accept, etc.
         }
 
-        if ($topic !== '') {
-            $query->whereHas('paper', function ($q) use ($topic) {
-                $q->where('topic', $topic);
-            });
-        }
-
-        if ($track !== '') {
-            $query->whereHas('paper.submission', function ($q) use ($track) {
-                $q->where('track', $track);
-            });
-        }
-
-        $reviews = $query
+        // Paginate papers: one paper per page
+        $papers = Paper::query()
+            ->with(['submission', 'user'])
             ->orderByDesc('created_at')
-            ->paginate(10)
-            ->appends($request->only(['search', 'topic', 'track']))
-            ->through(function ($review) {
-                return [
-                    'id' => $review->id,
-                    'reviewBy' => optional($review->reviewer)->name,
-                    'reviewDate' => optional($review->created_at)?->toDateString(),
-                    'status' => $review->recommendation, // expect: accept|revise|reject
-                    'comments' => $review->feedback,
-                    'rating' => $review->score,
-                    'paper' => [
-                        'title' => optional($review->paper)->paper_title,
-                        'topic' => optional($review->paper)->topic,
-                        'track' => optional(optional($review->paper)->submission)->track,
-                    ],
-                ];
-            });
+            ->paginate(1)
+            ->appends($request->only(['reviewer', 'status', 'rating', 'show']));
 
-        $topics = Paper::query()->select('topic')->distinct()->pluck('topic');
-        $tracks = Submission::query()->select('track')->distinct()->pluck('track');
+        $currentPaper = collect($papers->items())->first();
+
+        // Build top-level paper payload for UI
+        $paperPayload = null;
+        if ($currentPaper) {
+            $paperPayload = [
+                'id' => $currentPaper->id,
+                'title' => $currentPaper->paper_title,
+                'track' => optional($currentPaper->submission)->track,
+                'abstract' => $currentPaper->abstract,
+                'authors' => optional($currentPaper->user)->name,
+                'submissionDate' => optional($currentPaper->submission?->submitted_at)?->toDateString(),
+            ];
+        }
+
+        // Reviews for current paper (no pagination; paper pagination controls navigation)
+        $items = collect();
+        if ($currentPaper) {
+            $reviewQuery = Review::query()
+                ->with(['reviewer'])
+                ->where('paper_id', $currentPaper->id);
+
+            if ($reviewer !== '') {
+                $reviewQuery->whereHas('reviewer', function ($q) use ($reviewer) {
+                    $q->where('name', 'like', "%{$reviewer}%");
+                });
+            }
+
+            if ($status !== '') {
+                $reviewQuery->where('recommendation', $status);
+            }
+
+            if ($rating !== '') {
+                $reviewQuery->where('score', (int) $rating);
+            }
+
+            $items = $reviewQuery
+                ->orderByDesc('created_at')
+                ->get()
+                ->map(function ($review) {
+                    return [
+                        'id' => $review->id,
+                        'reviewBy' => optional($review->reviewer)->name,
+                        'reviewDate' => optional($review->created_at)?->toDateString(),
+                        'status' => $review->recommendation, // Accept | Revise | Reject
+                        'comments' => $review->feedback,
+                        'rating' => $review->score,
+                    ];
+                });
+        }
 
         return Inertia::render('ReviewHistory/ReviewHistory', [
-            'reviews' => $reviews,
+            'papers' => $papers,
+            'paper' => $paperPayload,
+            'reviews' => $items,
             'filters' => [
-                'search' => $search,
-                'topic' => $topic,
-                'track' => $track,
+                'reviewer' => $reviewer,
+                'status' => $status,
+                'rating' => $rating,
+                'show' => $show,
             ],
-            'topics' => $topics,
-            'tracks' => $tracks,
         ]);
     }
 

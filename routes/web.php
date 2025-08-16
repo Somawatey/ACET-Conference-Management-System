@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -66,6 +67,9 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [SubmissionController::class, 'update'])->name('submissions.update');
         Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy');
     });
+
+    // Review History
+    Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
 });
 
 require __DIR__.'/auth.php';
