@@ -5,6 +5,9 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\PaperAssignmentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,7 +49,29 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
     });
 
-    // Submission routes - PERMISSION REQUIRED ✅
+    // Agenda routes
+    Route::prefix('agenda')->group(function () {
+        Route::get('/', [AgendaController::class, 'index'])->name('agenda.index');
+        Route::get('/create', [AgendaController::class, 'create'])->name('agenda.create');
+        Route::get('/{id}', [AgendaController::class, 'show'])->name('agenda.show');
+        Route::get('/{id}/edit', [AgendaController::class, 'edit'])->name('agenda.edit');
+        Route::post("/", [AgendaController::class, 'store'])->name('agenda.store');
+        Route::patch("/{id}", [AgendaController::class, 'update'])->name('agenda.update');
+        Route::delete("/{id}", [AgendaController::class, 'destroy'])->name('agenda.destroy');
+    });
+
+    // Paper routes
+    Route::prefix('papers')->group(function () {
+        Route::get('/', [PaperController::class, 'index'])->name('papers.index');
+        Route::get('/create', [PaperController::class, 'create'])->name('papers.create');
+        Route::get('/{id}', [PaperController::class, 'show'])->name('papers.show');
+        Route::get('/{id}/edit', [PaperController::class, 'edit'])->name('papers.edit');
+        Route::post("/", [PaperController::class, 'store'])->name('papers.store');
+        Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
+        Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy');
+    });
+
+       // Submission routes - PERMISSION REQUIRED ✅
     // Route::prefix('submissions')->group(function () {
     //     Route::get('/', [SubmissionController::class, 'index'])->name('submissions.index')->middleware(['check:paper-list']);
     //     Route::get('/create', [SubmissionController::class, 'create'])->name('submissions.create')->middleware(['check:paper-create']);
@@ -67,6 +92,29 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [SubmissionController::class, 'update'])->name('submissions.update');
         Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy');
     });
+
+    // Paper Assignment routes
+    Route::prefix('paper-assignments')->group(function () {
+        Route::get('/', [PaperAssignmentController::class, 'index'])->name('paper-assignments.index');
+        Route::get('/create', [PaperAssignmentController::class, 'create'])->name('paper-assignments.create');
+        Route::get('/{id}', [PaperAssignmentController::class, 'show'])->name('paper-assignments.show');
+        Route::get('/{id}/edit', [PaperAssignmentController::class, 'edit'])->name('paper-assignments.edit');
+        Route::post("/", [PaperAssignmentController::class, 'store'])->name('paper-assignments.store');
+        Route::patch("/{id}", [PaperAssignmentController::class, 'update'])->name('paper-assignments.update');
+        Route::delete("/{id}", [PaperAssignmentController::class, 'destroy'])->name('paper-assignments.destroy');
+    });
+
+    // Review routes
+    Route::prefix('reviews')->group(function () {
+        Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
+        Route::get('/create/{paper_id?}', [ReviewController::class, 'create'])->name('reviews.create');
+        Route::get('/{id}', [ReviewController::class, 'show'])->name('reviews.show');
+        Route::get('/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+        Route::post("/", [ReviewController::class, 'store'])->name('reviews.store');
+        Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
+        Route::delete("/{id}", [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    });
+    
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');

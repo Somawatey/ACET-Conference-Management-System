@@ -101,11 +101,33 @@ class ReviewController extends Controller
     }
 
     /**
+     * Display a listing of reviews for reviewer.
+     */
+    public function reviewList()
+    {
+        $reviews = Review::with(['paper', 'reviewer'])
+            ->where('reviewer_id', auth()->id())
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return Inertia::render('Reviews/Index', [
+            'reviews' => $reviews
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($paper_id = null)
     {
-        //
+        $paper = null;
+        if ($paper_id) {
+            $paper = Paper::with(['user', 'submission'])->findOrFail($paper_id);
+        }
+
+        return Inertia::render('Reviews/Review', [
+            'paper' => $paper
+        ]);
     }
 
     /**
@@ -113,7 +135,18 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'paper_id' => 'required|exists:papers,id',
+            'feedback' => 'required|string',
+            'recommendation' => 'required|in:Accept,Revise,Reject',
+            'score' => 'required|integer|min:1|max:5',
+        ]);
+
+        $validated['reviewer_id'] = auth()->id();
+
+        Review::create($validated);
+
+        return redirect()->route('reviews.index')->with('success', 'Review submitted successfully!');
     }
 
     /**
