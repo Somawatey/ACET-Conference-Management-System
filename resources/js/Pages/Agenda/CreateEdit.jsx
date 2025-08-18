@@ -1,218 +1,197 @@
-import React, { useState } from 'react';
-import AdminLayout from '@/Layouts/AdminLayout';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
-import PrimaryButton from '@/Components/PrimaryButton';
+import AdminLayout from "@/Layouts/AdminLayout";
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AgendaForm = () => {
-    const [formData, setFormData] = useState({
-        date: '',
-        place: '',
-        startTime: '', // No default selected time
-        endTime: '',   // No default selected time
-        speaker: '',
-        topic: '',
-    });
-
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-    
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-    };
-
-    const handleDateChange = (event) => {
-        const newDate = event.target.value;
-        setFormData(prevData => ({
-            ...prevData,
-            date: newDate,
-        }));
-        // Hide the calendar after a date is picked
-        setIsCalendarOpen(false);
-    };
-
-    const timeSlots = [
-        '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM',
-        '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM',
-        '03:00 PM', '03:30 PM',
-    ];
+    const [activeTab, setActiveTab] = useState("info");
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const [title, setTitle] = useState("");
+    const [speaker, setSpeaker] = useState("");
+    const [location, setLocation] = useState("");
+    const [description, setDescription] = useState("");
 
     return (
         <AdminLayout>
-            <form
-                onSubmit={handleSubmit}
-                className="p-10 bg-white rounded-2xl shadow-lg max-w-5xl mx-auto my-12 border border-gray-200"
-            >
-                <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-                    Create Agenda
-                </h2>
-                <p className="text-gray-500 text-center mb-8">
-                    Fill in the details to schedule your event.
-                </p>
-
-                {/* Event Place */}
-                <div className='w-full'>
-                    <InputLabel htmlFor="place">
-                        Choose Place
-                    </InputLabel>
-                    <TextInput
-                        type="text"
-                        id="place"
-                        name="place"
-                        placeholder="Ex: Cosmo Hall"
-                        value={formData.place}
-                        onChange={handleChange}
-                        className="w-full"
-                    />
-                </div>
-
-                {/* Speaker Info */}
-                <div className="mt-2 border-t pt-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    <div>
-                        <InputLabel htmlFor="speaker">
-                            Speaker
-                        </InputLabel>
-                        <TextInput
-                            type="text"
-                            id="speaker"
-                            name="speaker"
-                            placeholder="Ex: John Doe"
-                            value={formData.speaker}
-                            onChange={handleChange}
-                            className="w-full"
-                        />
-                    </div>
-
-                    <div>
-                        <InputLabel htmlFor="topic" className="block text-sm font-medium text-gray-700">
-                            Topic
-                        </InputLabel>
-                        <TextInput
-                            type="text"
-                            id="topic"
-                            name="topic"
-                            placeholder="Ex: Natural Language Processing"
-                            value={formData.topic}
-                            onChange={handleChange}
-                            className="w-full"
-                        />
-                    </div>
+            <div className="h-screen px-5 py-10 mt-10">
+                {/* Header */}
+                <div className="">
+                    <h1 className="text-2xl font-bold text-gray-800">Create New Event</h1>
+                    <p className="text-gray-600">Fill out the details to schedule an event on the agenda.</p>
                 </div>
                 
-                {/* Schedule Section */}
-                <div className="mt-2 border-t pt-2">
-                    <h3 className="text-lg font-semibold text-gray-800 ">
-                        Schedule
-                    </h3>
-                    <div className='flex flex-col justify-center gap-5 items-start'>
-                        {/* Calendar Picker */}
-                        <div className="grid grid-cols-2 gap-x-10 w-full">
-                            <label className="form-control">
-                                <div className="label">
-                                    <span className="label-text">Choose Date</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="btn w-full"
-                                    onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                                >
-                                    {formData.date}
-                                </button>
-                            </label>
-                            <p className="text-center text-sm text-gray-600 border rounded-sm py-2">
-                                Selected Date: <span className='font-bold text-blue-600'>{formData.date || 'Not selected'}</span>
-                            </p>
-                            {isCalendarOpen && (
-                                <div className="relative z-10 w-full">
-                                    <div className="absolute rounded-box shadow-lg">
-                                        <calendar-date class="cally bg-white p-3" onchange={handleDateChange}>
-                                            <svg aria-label="Previous" className="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
-                                            <svg aria-label="Next" className="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
-                                            <calendar-month></calendar-month>
-                                        </calendar-date>
+                {/* Card Container */}
+                <div className="bg-white p-8 rounded-lg shadow-md">
+                    {/* Tabs */}
+                    <div className="flex border-b border-gray-200">
+                        {["info", "dateTime", "review"].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`-mb-px mr-1 px-4 py-2 border-b-2 text-sm font-medium transition-colors duration-200 ease-in-out
+                                    ${activeTab === tab 
+                                        ? "border-blue-500 text-blue-600" 
+                                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                    }`
+                                }
+                            >
+                                {tab === "info" ? "1. Information" : tab === "dateTime" ? "2. Date & Time" : "3. Review"}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="pt-6">
+                        {/* Info Tab */}
+                        {activeTab === "info" && (
+                            <div className="space-y-6">
+                                <div className="w-full flex gap-5">
+                                    <div className="flex-1">
+                                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+                                        <input
+                                            id="title"
+                                            type="text"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            placeholder="Enter event title"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label htmlFor="speaker" className="block text-sm font-medium text-gray-700 mb-1">Speaker</label>
+                                        <input
+                                            id="speaker"
+                                            type="text"
+                                            value={speaker}
+                                            onChange={(e) => setSpeaker(e.target.value)}
+                                            placeholder="Enter speaker name"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        />
                                     </div>
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Start and End Time Slots */}
-                        <div className="w-full grid grid-cols-2 gap-10">
-                            {/* Start Time Slots */}
-                            <div>
-                                <InputLabel>Start Time</InputLabel>
-                                <ul className="grid grid-cols-2 gap-3">
-                                    {timeSlots.map((time, idx) => (
-                                        <div key={`start-${idx}`} className='rounded transition hover:scale-105'>
-                                            <input
-                                                type="radio"
-                                                id={`startTime-${idx}`}
-                                                name="startTime"
-                                                value={time}
-                                                checked={formData.startTime === time}
-                                                onChange={(e) => handleChange(e)}
-                                                className="hidden peer"
-                                            />
-
-                                            <label
-                                                htmlFor={`startTime-${idx}`}
-                                                className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium bg-white border rounded-sm"
-                                            >
-                                                {time}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </ul>
-                                <p className="mt-4 text-center text-sm text-gray-600 border rounded-sm py-2">
-                                    Selected Start Time: <span className='font-bold text-blue-600'>{formData.startTime || 'Not selected'}</span>
-                                </p>
+                                <div>
+                                    <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <input
+                                        id="location"
+                                        type="text"
+                                        value={location}
+                                        onChange={(e) => setLocation(e.target.value)}
+                                        placeholder="Enter location"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                    <textarea
+                                        id="description"
+                                        type="text"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        placeholder="Enter event description"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md h-32 resize-none focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    />
+                                </div>
                             </div>
+                        )}
 
-                            {/* End Time Slots */}
-                            <div>
-                                <InputLabel>End Time</InputLabel>
-                                <ul className="grid grid-cols-2 gap-3">
-                                    {timeSlots.map((time, idx) => (
-                                        <div key={`end-${idx}`} className='rounded transition hover:scale-105'>
-                                            <input
-                                                type="radio"
-                                                id={`endTime-${idx}`}
-                                                name="endTime"
-                                                value={time}
-                                                checked={formData.endTime === time}
-                                                onChange={(e) => handleChange(e)}
-                                                className="hidden peer"
-                                            />
-                                            <label
-                                                htmlFor={`endTime-${idx}`}
-                                                className="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium bg-white border rounded-sm cursor-pointer transition peer-checked:bg-blue-600 peer-checked:text-white"
-                                            >
-                                                {time}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </ul>
-                                <p className="mt-4 text-center text-sm text-gray-600 border rounded-sm py-2">
-                                    Selected End Time: <span className='font-bold text-blue-600'>{formData.endTime || 'Not selected'}</span>
-                                </p>
+                        {/* DateTime Tab */}
+                        {activeTab === "dateTime" && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Left: Pickers */}
+                                <div className="flex flex-col space-y-6">
+                                    {/* Date Picker */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
+                                        <DatePicker
+                                            selected={selectedDate}
+                                            onChange={(date) => setSelectedDate(date)}
+                                            dateFormat="PPP"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        />
+                                    </div>
+                                    {/* Start Time */}
+                                    <div>
+                                        <label htmlFor="start-time" className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                                        <input
+                                            id="start-time"
+                                            type="time"
+                                            value={startTime}
+                                            onChange={(e) => setStartTime(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        />
+                                    </div>
+                                    {/* End Time */}
+                                    <div>
+                                        <label htmlFor="end-time" className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                                        <input
+                                            id="end-time"
+                                            type="time"
+                                            value={endTime}
+                                            onChange={(e) => setEndTime(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Right: Preview */}
+                                <div className="bg-gray-50 p-6 rounded-md border border-gray-200">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Date & Time Preview</h3>
+                                    <div className="space-y-2 text-gray-700">
+                                        <p>
+                                            <span className="font-semibold">Date:</span>{" "}
+                                            {selectedDate ? selectedDate.toLocaleDateString() : "Not selected"}
+                                        </p>
+                                        <p>
+                                            <span className="font-semibold">Start Time:</span> {startTime || "Not selected"}
+                                        </p>
+                                        <p>
+                                            <span className="font-semibold">End Time:</span> {endTime || "Not selected"}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Review Tab */}
+                        {activeTab === "review" && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-bold text-gray-800">Review Your Event Details</h2>
+                                <div className="space-y-4 text-gray-700">
+                                    <p>
+                                        <span className="font-semibold">Event Title:</span> {title || "Not provided"}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Event Speaker:</span> {speaker || "Not provided"}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Location:</span> {location || "Not provided"}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Description:</span> {description || "Not provided"}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Date:</span>{" "}
+                                        {selectedDate ? selectedDate.toLocaleDateString() : "Not selected"}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Start Time:</span> {startTime || "Not selected"}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">End Time:</span> {endTime || "Not selected"}
+                                    </p>
+                                </div>
+                                <div className="pt-4">
+                                    <button className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                        Submit Event
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* Submit */}
-                <div className="mt-4 flex justify-center">
-                    <PrimaryButton type="submit">
-                        Submit Agenda
-                    </PrimaryButton>
-                </div>
-            </form>
+            </div>
         </AdminLayout>
     );
 };

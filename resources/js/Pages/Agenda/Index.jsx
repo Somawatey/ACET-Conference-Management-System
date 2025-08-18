@@ -64,11 +64,11 @@ export default function AgendaPage({ agendas }) {
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />} >
             <Head title={headWeb} />
-            <div className="bg-white min-h-screen font-sans">
+            <div className="h-full font-sans">
                 <div className="max-w-screen-xl mx-auto">
                     {/*-- Header --*/}
 
-                    <div className="p-6">
+                    <div className="px-5">
                     
                         {/*-- Create Agenda Section --*/}
                         <div className="flex items-center justify-between mb-4">
@@ -204,7 +204,7 @@ export default function AgendaPage({ agendas }) {
                         </div>
 
                         {/*-- Pagination --*/}
-                        <div className="mt-8">
+                        <div className="p-5">
                             <Pagination links={agendas.links} />
                         </div>
                     </div>
