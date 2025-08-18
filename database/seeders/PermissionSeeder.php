@@ -34,6 +34,9 @@ class PermissionSeeder extends Seeder
             'paper-edit',
             'paper-delete',
             'paper-assign',
+            'paper-review',
+            'paper-approve',
+            'paper-reject',
         ];
 
         foreach ($permissions as $permission) {
