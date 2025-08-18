@@ -5,6 +5,19 @@ import TextArea from '@/Components/TextArea';
 import PaperUpload from './PaperUpload';
 
 export default function PaperInfo({ className = '', data = {}, errors = {}, onChange }) {
+    // Adapter to pass file back to parent as a synthetic change event
+    const handleFileSelect = (file) => {
+        if (typeof onChange === 'function') {
+            onChange({
+                target: {
+                    name: 'paper_file',
+                    value: file,
+                    type: 'file',
+                },
+            });
+        }
+    };
+
     return (
         <section className={className}>
             <header>
@@ -95,7 +108,11 @@ export default function PaperInfo({ className = '', data = {}, errors = {}, onCh
                 </div>
                 {/* Upload */}
                 <div>
-                    <PaperUpload />
+                    <PaperUpload
+                        onChange={handleFileSelect}
+                        file={data.paper_file || null}
+                        error={errors.paper_file}
+                    />
                 </div>
             </div>
         </section>

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Paper extends Model
 {
@@ -13,11 +15,35 @@ class Paper extends Model
         'topic',
         'keyword',
         'abstract',
-        'author_id',
     ];
+
+    // Expose a computed public URL similar to User::profile_photo_url
+    protected $appends = [
+        'file_url',
+    ];
+
+    public function getFileUrlAttribute(): ?string
+    {
+        return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
+    }
 
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function submission(): HasOne
+    {
+        return $this->hasOne(Submission::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function decision(): HasOne
+    {
+        return $this->hasOne(Decision::class);
     }
 }

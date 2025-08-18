@@ -17,21 +17,6 @@ class PaperSeeder extends Seeder
     {
         DB::transaction(function () {
             // Ensure base authors exist
-            $author1 = User::firstOrCreate(
-                ['email' => 'author1@example.com'],
-                [
-                    'name' => 'Author One',
-                    'password' => Hash::make('password'),
-                ]
-            );
-
-            $author2 = User::firstOrCreate(
-                ['email' => 'author2@example.com'],
-                [
-                    'name' => 'Author Two',
-                    'password' => Hash::make('password'),
-                ]
-            );
 
             $topics = ['AI', 'ML', 'Data Science', 'Software Engineering', 'Computer Networks', 'Cybersecurity', 'Other'];
 
@@ -43,7 +28,6 @@ class PaperSeeder extends Seeder
                     'topic' => $topics[array_rand($topics)],
                     'keyword' => 'edge, ai, optimization',
                     'abstract' => 'This paper explores optimization techniques for edge AI.',
-                    'author_id' => $author1->id,
                 ]
             );
 
@@ -54,7 +38,6 @@ class PaperSeeder extends Seeder
                     'topic' => $topics[array_rand($topics)],
                     'keyword' => 'federated, privacy, security',
                     'abstract' => 'We propose a secure framework for federated learning.',
-                    'author_id' => $author2->id,
                 ]
             );
         });

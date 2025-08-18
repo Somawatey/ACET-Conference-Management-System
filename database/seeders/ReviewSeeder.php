@@ -5,9 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use App\Models\User;
-use App\Models\Conference;
 use App\Models\AuthorInfo;
 use App\Models\Paper;
 use App\Models\Submission;
@@ -46,15 +44,6 @@ class ReviewSeeder extends Seeder
                 ]
             );
 
-            // Create a conference if none
-            $conference = Conference::firstOrCreate(
-                ['conf_name' => 'ACET 2025'],
-                [
-                    'topic' => 'Technology',
-                    'date' => now()->toDateString(),
-                    'location' => 'Phnom Penh',
-                ]
-            );
 
             // Author infos
             $ai1 = AuthorInfo::firstOrCreate(

@@ -31,7 +31,7 @@ class ReviewController extends Controller
 
         // Paginate papers: one paper per page
         $papers = Paper::query()
-            ->with(['submission', 'user'])
+            ->with(['submission', 'author'])
             ->orderByDesc('created_at')
             ->paginate(1)
             ->appends($request->only(['reviewer', 'status', 'rating', 'show']));
@@ -46,7 +46,7 @@ class ReviewController extends Controller
                 'title' => $currentPaper->paper_title,
                 'track' => optional($currentPaper->submission)->track,
                 'abstract' => $currentPaper->abstract,
-                'authors' => optional($currentPaper->user)->name,
+                'authors' => optional($currentPaper->author)->name,
                 'submissionDate' => optional($currentPaper->submission?->submitted_at)?->toDateString(),
             ];
         }
@@ -122,7 +122,7 @@ class ReviewController extends Controller
     {
         $paper = null;
         if ($paper_id) {
-            $paper = Paper::with(['user', 'submission'])->findOrFail($paper_id);
+            $paper = Paper::with(['author', 'submission'])->findOrFail($paper_id);
         }
 
         return Inertia::render('Reviews/Review', [
