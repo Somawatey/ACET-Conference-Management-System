@@ -34,7 +34,7 @@ class AgendaController extends Controller
             ['id' => 15, 'title' => 'Networking Reception', 'description' => 'Evening reception with dinner and informal networking opportunities.', 'start_time' => '2025-09-16 18:00:00', 'end_time' => '2025-09-16 20:00:00', 'location' => 'Conference Center Terrace', 'speaker' => null],
         ]);
 
-        $perPage = 15;
+        $perPage = 10;
         $page = (int) ($request->get('page', 1));
         $paged = new LengthAwarePaginator(
             $items->forPage($page, $perPage)->values(),
@@ -48,7 +48,7 @@ class AgendaController extends Controller
             'agendas' => $paged,
         ]);
     }
-  
+
     /**
      * Show the form for creating a new resource.
      */
@@ -58,7 +58,7 @@ class AgendaController extends Controller
             'datas' => null,
         ]);
     }
-     
+
     /**
      * Display the specified resource.
      */
@@ -66,7 +66,7 @@ class AgendaController extends Controller
     {
         
     }
-  
+
     /**
      * Store a newly created resource in storage.
      */
@@ -87,7 +87,7 @@ class AgendaController extends Controller
         return redirect()->route('agenda.index')
             ->with('success', 'Agenda item created successfully.');
     }
-      
+
     /**
      * Show the form for editing the specified resource.
      */
