@@ -108,14 +108,12 @@ export default function PaperPage({ papers = [] }) {
                                                         <Link href="#" className="btn btn-sm btn-secondary">Check Review</Link>
                                                         <button className="btn btn-sm btn-info text-white" onClick={() => setSelectedPaper(paper)}>Assign Reviewer</button>
                                                         <button className="btn btn-sm btn-warning" onClick={() => setShowAssignmentModal(true)}>Bulk Assignment</button>
-                                                        <Link 
+                                                        <Link
                                                             href={route('reviews.create')}
                                                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
                                                         >
                                                             Create New Review
                                                         </Link>
-            
-                                                        <Link href={route('paper-assignments.index')} className="btn btn-sm btn-info text-white">Assign Reviewer</Link>
                                                         <Link href="#" className="btn btn-sm btn-outline-secondary">View History</Link>
                                                         <Link href={typeof route === 'function' ? route('papers.edit', paper.id) : '#'} className="btn btn-sm btn-primary">Edit Decision</Link>
                                                     </div>
