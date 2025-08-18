@@ -210,23 +210,23 @@ export default function MenuSideBar() {
                                             xmlns="http://www.w3.org/2000/svg"
                                             className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
                                             fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                >
-                                    <circle cx="12" cy="12" r="10" className="stroke-current" />
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M12 6v6l4 2"
-                                        className="stroke-current"
-                                    />
-                                </svg>
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            strokeWidth={2}
+                                        >
+                                            <circle cx="12" cy="12" r="10" className="stroke-current" />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M12 6v6l4 2"
+                                                className="stroke-current"
+                                            />
+                                        </svg>
 
-                                <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Agenda</span>
-                            </a>
-                            </Link>
-                        </li>
+                                        <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Agenda</span>
+                                    </a>
+                                </Link>
+                            </li>
                         )}
 
                         {can['user-list'] && (
@@ -308,7 +308,7 @@ export default function MenuSideBar() {
                         )} */}
 
                         <li>
-                            <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper-history.index') && 'active'}`}>
+                            {/* <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper-history.index') && 'active'}`}> */}
                             <Link href={route('reviews.index')} className={`nav-link ${route().current('reviews.index') && 'active'}`}>
                                 <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                     <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -325,8 +325,19 @@ export default function MenuSideBar() {
                                     <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z" />
                                     </svg>
-                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">History</span>
+                                    {/* <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">History</span> */}
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Review History</span>
+                                </a>
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper.history') && 'active'}`}>
+                                <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
+                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z" />
+                                    </svg>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Submission History</span>
                                 </a>
                             </Link>
                         </li>

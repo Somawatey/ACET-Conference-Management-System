@@ -114,6 +114,7 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [PaperHistoryController::class, 'update'])->name('paper-history.update');
         Route::delete("/{id}", [PaperHistoryController::class, 'destroy'])->name('paper-history.destroy')->middleware(['check:paper-history-delete']);
     });
+
     // Review routes
     Route::prefix('reviews')->group(function () {
         Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
@@ -128,6 +129,8 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+     // Paper History
+    Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
 });
 
 require __DIR__.'/auth.php';
