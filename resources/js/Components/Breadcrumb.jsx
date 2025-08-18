@@ -2,7 +2,7 @@ import { Link } from "@inertiajs/react";
 
 export default function Breadcrumb(props) {
     return (
-        <section className="content-header">
+        <section className="mt-16 content-header">
             <div className="container-fluid">
                 <div className="row mb-2">
                     <div className="col-sm-6">

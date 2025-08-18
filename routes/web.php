@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
+use App\Http\Controllers\PaperHistoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -88,6 +89,16 @@ Route::middleware('auth')->group(function () {
         Route::post("/", [PaperAssignmentController::class, 'store'])->name('paper-assignments.store');
         Route::patch("/{id}", [PaperAssignmentController::class, 'update'])->name('paper-assignments.update');
         Route::delete("/{id}", [PaperAssignmentController::class, 'destroy'])->name('paper-assignments.destroy')->middleware(['check:paper-assign']);
+    });
+
+    Route::prefix('paper-history')->group(function () {
+        Route::get('/', [PaperHistoryController::class, 'index'])->name('paper-history.index');
+        Route::get('/create', [PaperHistoryController::class, 'create'])->name('paper-history.create')->middleware(['check:paper-history-create']);
+        Route::get('/{id}', [PaperHistoryController::class, 'show'])->name('paper-history.show')->middleware(['check:paper-history-list']);
+        Route::get('/{id}/edit', [PaperHistoryController::class, 'edit'])->name('paper-history.edit')->middleware(['check:paper-history-edit']);
+        Route::post("/", [PaperHistoryController::class, 'store'])->name('paper-history.store');
+        Route::patch("/{id}", [PaperHistoryController::class, 'update'])->name('paper-history.update');
+        Route::delete("/{id}", [PaperHistoryController::class, 'destroy'])->name('paper-history.destroy')->middleware(['check:paper-history-delete']);
     });
 });
 

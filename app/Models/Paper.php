@@ -32,11 +32,6 @@ class Paper extends Model
 
     public function reviews(): HasMany
     {
-<<<<<<< HEAD
-        return $this->hasMany(PaperReview::class);
-    }
-}
-=======
         return $this->hasMany(Review::class);
     }
 
@@ -55,4 +50,3 @@ class Paper extends Model
         return $this->hasOne(ConferenceSession::class);
     }
 }
->>>>>>> e8e97e3942cdde7ebf401243c480e28aa263190c

@@ -145,9 +145,9 @@ export default function AssignPaperPage() {
 
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
-            <Head title={headWeb} />
             
             <div className="container-fluid">
+                <Head title={headWeb} />    
                 {/* Search and Filter Section */}
                 <div className="row mb-3">
                     <div className="col-md-6">
