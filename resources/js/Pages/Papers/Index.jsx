@@ -4,7 +4,10 @@ import Pagination from '@/Components/Pagination';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function PaperPage({ papers = [] }) {
+import React from 'react';
+import { get } from 'jquery';
+
+export default function PaperPage({ papers }) {
     const headWeb = 'Paper List';
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
@@ -14,17 +17,21 @@ export default function PaperPage({ papers = [] }) {
             ? papers
             : [];
 
-    const fallbackPapers = [
-        { id: 1, title: 'AI for Healthcare', topic: 'Artificial Intelligence', author_name: 'Jane Doe', link: '#', status: 'Published' },
-        { id: 2, title: 'Quantum Computing Advances', topic: 'Quantum Computing', author_name: 'John Smith', link: '#', status: 'Pending' },
-    ];
+    const rows = normalizedPapers;
 
-    const rows = normalizedPapers.length > 0 ? normalizedPapers : fallbackPapers;
+    // const fallbackPapers = [
+    //     { id: 1, title: 'AI for Healthcare', topic: 'Artificial Intelligence', author_name: 'Jane Doe', link: '#', status: 'Published' },
+    //     { id: 2, title: 'Quantum Computing Advances', topic: 'Quantum Computing', author_name: 'John Smith', link: '#', status: 'Pending' },
+    // ];
+
+    // const rows = normalizedPapers.length > 0 ? normalizedPapers : fallbackPapers;
 
     const [openId, setOpenId] = useState(null);
     const toggleRow = (id) => setOpenId((prev) => (prev === id ? null : id));
 
     const getTopicText = (p) => (typeof p?.topic === 'object' ? (p.topic?.name ?? '') : (p?.topic ?? ''));
+    //get paperTitle
+    const getPaperTitle = (p) => (p?.paper_title ?? '');
 
     const statusClass = (status) => {
         const s = (status || '').toString().toLowerCase();
@@ -54,10 +61,10 @@ export default function PaperPage({ papers = [] }) {
                             </thead>
                             <tbody>
                                 {rows.map((paper, idx) => (
-                                    <>
-                                        <tr key={paper.id ?? `row-${idx}`}>
+                                    <React.Fragment key={paper.id ?? `row-${idx}`}>
+                                        <tr>
                                             <td>{paper.id}</td>
-                                            <td className="font-medium">{paper.title}</td>
+                                            <td className="font-medium">{getPaperTitle(paper)}</td>
                                             <td>{getTopicText(paper)}</td>
                                             <td>{paper.author_name}</td>
                                             <td>
@@ -80,9 +87,8 @@ export default function PaperPage({ papers = [] }) {
                                                 </button>
                                             </td>
                                         </tr>
-
                                         {openId === (paper.id ?? idx) && (
-                                            <tr key={`${paper.id ?? idx}-details`} className="bg-light">
+                                            <tr className="bg-light">
                                                 <td colSpan={6} className="p-3">
                                                     <div className="d-flex gap-2 flex-wrap">
                                                         <Link href="#" className="btn btn-sm btn-secondary">Check Review</Link>
@@ -92,7 +98,6 @@ export default function PaperPage({ papers = [] }) {
                                                         >
                                                             Create New Review
                                                         </Link>
-            
                                                         <Link href={route('paper-assignments.index')} className="btn btn-sm btn-info text-white">Assign Reviewer</Link>
                                                         <Link href="#" className="btn btn-sm btn-outline-secondary">View History</Link>
                                                         <Link href={typeof route === 'function' ? route('papers.edit', paper.id) : '#'} className="btn btn-sm btn-primary">Edit Decision</Link>
@@ -100,7 +105,7 @@ export default function PaperPage({ papers = [] }) {
                                                 </td>
                                             </tr>
                                         )}
-                                    </>
+                                    </React.Fragment>
                                 ))}
                                 {rows.length === 0 && (
                                     <tr>
@@ -131,6 +136,7 @@ export default function PaperPage({ papers = [] }) {
                     </div>
                 </div>
             </div>
+            <Pagination links={papers?.links || []} />
         </AdminLayout>
     );
 }

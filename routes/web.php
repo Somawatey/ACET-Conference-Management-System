@@ -8,6 +8,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
+use App\Http\Controllers\DecisionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -114,7 +115,11 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
         Route::delete("/{id}", [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
-    
+
+    // Paper Decision routes
+    Route::prefix('paper-decision')->group(function () {
+        Route::get('/', [DecisionController::class, 'index'])->name('paper-decision.index');
+    });
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');

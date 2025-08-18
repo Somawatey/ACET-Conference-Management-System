@@ -126,6 +126,7 @@ export default function ReviewedPaper({ auth, paper, reviews }) {
                     </div>
                 </div>
             </div>
+            <Pagination links={papers?.links || []} />
         </AdminLayout>
     );
 }
