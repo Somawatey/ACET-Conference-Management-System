@@ -82,4 +82,52 @@ class PaperController extends Controller
         
         return redirect()->route('papers.index');
     }
+
+    /**
+     * Display paper history for reviews
+     */
+    public function paperHistory()
+    {
+        $papers = Paper::with(['user', 'conference', 'reviews.reviewer'])
+                      ->orderBy('created_at', 'desc')
+                      ->get();
+
+        return Inertia::render('PaperHistory/Index', [
+            'papers' => $papers
+        ]);
+    }
+
+    /**
+     * Display papers for decision making
+     */
+    public function decisions()
+    {
+        $papers = Paper::with(['user', 'conference', 'reviews.reviewer'])
+                      ->whereHas('reviews', function($query) {
+                          $query->whereNotNull('rating');
+                      })
+                      ->whereDoesntHave('decision')
+                      ->orderBy('created_at', 'desc')
+                      ->get();
+
+        return Inertia::render('PaperDecision/Index', [
+            'papers' => $papers
+        ]);
+    }
+
+    /**
+     * Show individual paper for decision making
+     */
+    public function showDecision($id)
+    {
+        $paper = Paper::with(['user', 'conference', 'reviews.reviewer'])
+                     ->findOrFail($id);
+        
+        $reviews = $paper->reviews;
+
+        return Inertia::render('PaperDecision/Show', [
+            'paper' => $paper,
+            'reviews' => $reviews
+        ]);
+    }
 }

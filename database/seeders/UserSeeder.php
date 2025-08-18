@@ -22,6 +22,16 @@ class UserSeeder extends Seeder
         //     'email' => 'admin2@gmail.com',
         //     'password' => Hash::make('123456')
         // ]);
+
+        // Create admin user if not exists
+        $user = User::firstOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'admin',
+                'password' => Hash::make('123456'),
+                'email_verified_at' => now()
+            ]
+        );
         
         // Create Admin role with all permissions
         $adminRole = Role::create(['name' => 'Admin']);
