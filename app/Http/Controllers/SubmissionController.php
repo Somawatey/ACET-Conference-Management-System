@@ -11,7 +11,8 @@ class SubmissionController extends Controller
      * Show the submission form
      */
     public function create()
-    {
+    {   
+        $paper = Paper::create();
         return Inertia::render('Submission/Submit');
     }
 

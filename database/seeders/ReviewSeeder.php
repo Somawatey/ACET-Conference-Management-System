@@ -91,9 +91,7 @@ class ReviewSeeder extends Seeder
                     'topic' => $topics[array_rand($topics)],
                     'keyword' => 'edge, ai, optimization',
                     'abstract' => 'This paper explores optimization techniques for edge AI.',
-                    'user_id' => $author1->id,
-                    'conference_id' => $conference->id,
-                    'status' => 'under_review',
+                    'author_id' => $author1->id,
                 ]
             );
 
@@ -117,9 +115,7 @@ class ReviewSeeder extends Seeder
                     'topic' => $topics[array_rand($topics)],
                     'keyword' => 'federated, privacy, security',
                     'abstract' => 'We propose a secure framework for federated learning.',
-                    'user_id' => $author2->id,
-                    'conference_id' => $conference->id,
-                    'status' => 'under_review',
+                    'author_id' => $author2->id,
                 ]
             );
 
