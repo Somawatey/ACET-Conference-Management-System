@@ -52,7 +52,7 @@ export default function MenuSideBar() {
 
     // Check if user has a profile photo
     const hasProfilePhoto = () => {
-        return auth?.user?.profile_photo_url && !auth.user.profile_photo_url.includes('default-avatar');
+        return auth?.user?.profile_photo_url;
     };
 
     return (
@@ -202,13 +202,14 @@ export default function MenuSideBar() {
                                 </a>
                             </Link>
                         </li>
-
-                        <li>
-                            <a href="#" className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
-                                    fill="none"
+                        {can['agenda-list'] && (
+                            <li className={`nav-item ${(route().current('agenda.index') || route().current('agenda.create')) && 'menu-is-opening menu-open'}`}>
+                                <Link href={route('agenda.index')} className={`nav-link ${route().current('agenda.index') && 'active'}`}>
+                                    <a href="#" className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                                            fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
                                     strokeWidth={2}
@@ -224,7 +225,9 @@ export default function MenuSideBar() {
 
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Agenda</span>
                             </a>
+                            </Link>
                         </li>
+                        )}
 
                         {can['user-list'] && (
                             <li className={`nav-item ${(route().current('users.index') || route().current('users.create')) && 'menu-is-opening menu-open'}`}>
@@ -306,11 +309,24 @@ export default function MenuSideBar() {
 
                         <li>
                             <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper-history.index') && 'active'}`}>
+                            <Link href={route('reviews.index')} className={`nav-link ${route().current('reviews.index') && 'active'}`}>
+                                <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Reviews</span>
+                                </a>
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href={route('review.history')} className={`nav-link ${route().current('review.history') && 'active'}`}>
                                 <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                     <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z" />
                                     </svg>
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">History</span>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Review History</span>
                                 </a>
                             </Link>
                         </li>

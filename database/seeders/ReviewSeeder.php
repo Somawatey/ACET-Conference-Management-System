@@ -2,24 +2,26 @@
 
 namespace Database\Seeders;
 
-use App\Models\AuthorInfo;
-use App\Models\Conference;
-use App\Models\Paper;
-use App\Models\Submission;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\Conference;
+use App\Models\AuthorInfo;
+use App\Models\Paper;
+use App\Models\Submission;
+use App\Models\Review;
 
-class PaperSeeder extends Seeder
+class ReviewSeeder extends Seeder
 {
     /**
-     * Seed conferences, authors, papers, and submissions.
+     * Seed the application's database with sample review history.
      */
     public function run(): void
     {
         DB::transaction(function () {
-            // Ensure base users exist
+            // Ensure we have at least 3 users: 1 admin (as reviewer) and 2 authors
             $admin = User::firstOrCreate(
                 ['email' => 'admin@gmail.com'],
                 [
@@ -44,7 +46,7 @@ class PaperSeeder extends Seeder
                 ]
             );
 
-            // Conference
+            // Create a conference if none
             $conference = Conference::firstOrCreate(
                 ['conf_name' => 'ACET 2025'],
                 [
@@ -79,8 +81,9 @@ class PaperSeeder extends Seeder
 
             $topics = ['AI', 'ML', 'Data Science', 'Software Engineering', 'Computer Networks', 'Cybersecurity', 'Other'];
             $tracks = ['Research', 'Industry', 'Student'];
+            $recs = ['Accept', 'Revise', 'Reject'];
 
-            // Papers
+            // Create two papers and their submissions
             $paper1 = Paper::firstOrCreate(
                 ['paper_title' => 'Enhancing Edge AI Systems'],
                 [
@@ -132,6 +135,50 @@ class PaperSeeder extends Seeder
                     'submitted_at' => now()->subDays(10),
                 ]
             );
+
+            // Seed reviews for review history page
+            $reviewsData = [
+                [
+                    'paper_id' => $paper1->id,
+                    'reviewer_id' => $admin->id,
+                    'recommendation' => $recs[array_rand($recs)],
+                    'feedback' => 'Well-written. Consider expanding experimental section.',
+                    'score' => rand(6, 10),
+                    'created_at' => now()->subDays(7),
+                    'updated_at' => now()->subDays(7),
+                ],
+                [
+                    'paper_id' => $paper1->id,
+                    'reviewer_id' => $admin->id,
+                    'recommendation' => $recs[array_rand($recs)],
+                    'feedback' => 'Strong contribution to edge computing community.',
+                    'score' => rand(7, 10),
+                    'created_at' => now()->subDays(3),
+                    'updated_at' => now()->subDays(3),
+                ],
+                [
+                    'paper_id' => $paper2->id,
+                    'reviewer_id' => $admin->id,
+                    'recommendation' => $recs[array_rand($recs)],
+                    'feedback' => 'Privacy implications discussed, add more benchmarks.',
+                    'score' => rand(5, 9),
+                    'created_at' => now()->subDays(5),
+                    'updated_at' => now()->subDays(5),
+                ],
+                [
+                    'paper_id' => $paper2->id,
+                    'reviewer_id' => $admin->id,
+                    'recommendation' => $recs[array_rand($recs)],
+                    'feedback' => 'Solid methodology but needs clarity in threat model.',
+                    'score' => rand(5, 9),
+                    'created_at' => now()->subDays(2),
+                    'updated_at' => now()->subDays(2),
+                ],
+            ];
+
+            foreach ($reviewsData as $data) {
+                Review::create($data);
+            }
         });
     }
 }
