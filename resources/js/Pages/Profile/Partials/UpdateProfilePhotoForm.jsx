@@ -36,7 +36,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
 
     // Check if user has a profile photo
     const hasProfilePhoto = () => {
-        return croppedImage || (currentPhoto && !currentPhoto.includes('default-avatar'));
+        return croppedImage || currentPhoto;
     };
 
     // Initialize Croppie when showing cropper
@@ -134,7 +134,7 @@ export default function UpdateProfilePhotoForm({ className = '' }) {
         }
 
         // If user has an actual profile photo, delete it from server
-        if (hasProfilePhoto() && currentPhoto && !currentPhoto.includes('default-avatar')) {
+        if (hasProfilePhoto() && currentPhoto) {
             setIsDeleting(true);
             
             router.delete(route('profile.photo.delete'), {

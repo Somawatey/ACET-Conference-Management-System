@@ -66,27 +66,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             .join('');
     };
 
-    // Check if user has a profile photo - FIXED VERSION
+  // Check if user has a profile photo - DEFINE THIS FUNCTION
     const hasProfilePhoto = () => {
-        const photoPath = auth?.user?.profile_photo_path;
-        const photoUrl = auth?.user?.profile_photo_url;
-        
-        // Check if profile_photo_path exists and is not empty/null
-        if (photoPath && photoPath.trim() !== '' && photoPath !== null) {
-            return true;
-        }
-        
-        // Check if profile_photo_url exists, is not empty/null, and is not a generated avatar
-        if (photoUrl && 
-            photoUrl.trim() !== '' && 
-            photoUrl !== null && 
-            !photoUrl.includes('ui-avatars.com') &&
-            !photoUrl.includes('gravatar.com/avatar') &&
-            photoUrl !== 'https://www.gravatar.com/avatar/') {
-            return true;
-        }
-        
-        return false;
+        return auth?.user?.profile_photo_path || auth?.user?.profile_photo_url;
     };
 
     // Get profile photo URL
@@ -98,32 +80,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             return auth.user.profile_photo_url;
         }
         return null;
-    };
-
-    // Generate SVG avatar with initials - IMPROVED VERSION
-    const generateSVGAvatar = (name, size = 32) => {
-        const initials = getUserInitials(name);
-        
-        return (
-            <div 
-                className="inline-flex items-center justify-center rounded-full border-2 border-blue-400 hover:ring-2 hover:ring-blue-500 transition-all duration-200"
-                style={{
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
-                }}
-            >
-                <span 
-                    className="text-white font-bold select-none"
-                    style={{
-                        fontSize: `${size * 0.4}px`,
-                        lineHeight: 1,
-                    }}
-                >
-                    {initials}
-                </span>
-            </div>
-        );
     };
 
 
@@ -160,7 +116,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 className="w-8 h-8 rounded-full object-cover border-2 border-blue-400 group-hover:ring-2 group-hover:ring-blue-500 transition-all"
                                             />
                                         ) : (
-                                            generateSVGAvatar(auth.user.name)
+                                            <div 
+                                                className="w-8 h-8 rounded-full border-2 border-blue-400 group-hover:ring-2 group-hover:ring-blue-500 transition-all duration-200 flex items-center justify-center text-white font-bold text-sm"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
+                                                }}
+                                            >
+                                                {getUserInitials(auth.user.name)}
+                                            </div>
                                         )}
                                         
                                         {/* User Info - Hidden on mobile */}
@@ -195,34 +158,23 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 {/* User Info in Mobile */}
                                                 <div className="md:hidden px-4 py-3 border-b border-gray-100">
                                                     <div className="flex items-center space-x-3">
-                                                        {hasProfilePhoto() ? (
+                                                         {hasProfilePhoto() ? (
                                                             <img
                                                                 src={getProfilePhotoUrl()}
                                                                 alt={auth.user.name}
                                                                 className="w-10 h-10 rounded-full object-cover border-2 border-blue-400"
                                                             />
                                                         ) : (
-                                                            <div className="w-10 h-10">
-                                                                <svg 
-                                                                    className="w-full h-full rounded-full border-2 border-blue-400" 
-                                                                    viewBox="0 0 40 40"
-                                                                >
-                                                                    <rect width="40" height="40" rx="20" fill="#3B82F6" />
-                                                                    <text
-                                                                        x="20"
-                                                                        y="25"
-                                                                        textAnchor="middle"
-                                                                        fill="white"
-                                                                        fontSize="14"
-                                                                        fontWeight="bold"
-                                                                        fontFamily="system-ui, -apple-system, sans-serif"
-                                                                    >
-                                                                        {getUserInitials(auth.user.name)}
-                                                                    </text>
-                                                                </svg>
+                                                            <div 
+                                                                className="w-10 h-10 rounded-full border-2 border-blue-400 flex items-center justify-center text-white font-bold"
+                                                                style={{
+                                                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
+                                                                }}
+                                                            >
+                                                                {getUserInitials(auth.user.name)}
                                                             </div>
                                                         )}
-                                                        <div>
+                                                                                                            <div>
                                                             <p className="text-sm font-medium text-gray-900 truncate">{auth.user.name}</p>
                                                             <p className="text-xs text-gray-500 truncate">{auth.user.email}</p>
                                                         </div>

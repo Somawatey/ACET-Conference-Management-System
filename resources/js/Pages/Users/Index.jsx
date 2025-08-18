@@ -37,9 +37,7 @@ export default function UserPage({ users }) {
 
     // Check if user has a profile photo
     const hasProfilePhoto = (user) => {
-        return user?.profile_photo_url && 
-               !user.profile_photo_url.includes('default-avatar') &&
-               user.profile_photo_url !== null;
+        return user?.profile_photo_url;
     };
 
     const confirmDataDeletion = (data) => {

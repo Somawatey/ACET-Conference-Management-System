@@ -42,7 +42,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->profile_photo_path 
             ? asset('storage/' . $this->profile_photo_path)
-            : asset('images/default-avatar.png');
+            : null;
     }
 
 
