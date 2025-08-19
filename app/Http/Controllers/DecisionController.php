@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Inertia\Inertia;
 use App\Models\Decision;
 use Illuminate\Http\Request;
+use App\Models\Paper;
+use resources\js\Pages\PaperDecision\index;
 
 class DecisionController extends Controller
 {
@@ -12,15 +14,41 @@ class DecisionController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+        $papers = Paper::where('user_id', $user->id)->get();
+        return Inertia::render('PaperDecision/Index', [
+            'papers' => $papers
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function decisionshow($id)
     {
-        //
+        $paper = Paper::with(['user', 'topic', 'reviews.reviewer'])->findOrFail($id);
+
+        $transformedPaper = [
+            'id' => $paper->id,
+            'title' => $paper->paper_title ?? $paper->title ?? '',
+            'author' => optional($paper->user)->name ?? '',
+            'track' => is_string($paper->topic)
+                ? $paper->topic
+                : (is_object($paper->topic) ? ($paper->topic->name ?? '') : ''),
+        ];
+
+        $reviews = $paper->reviews->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
+                'status' => $review->recommendation ?? 'Pending',
+            ];
+        });
+
+        return inertia('PaperDecision/Index', [
+            'paper' => $transformedPaper,
+            'reviews' => $reviews,
+        ]);
     }
 
     /**

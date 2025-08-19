@@ -8,7 +8,11 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
+<<<<<<< HEAD
 use App\Http\Controllers\PaperHistoryController;
+=======
+use App\Http\Controllers\DecisionController;
+>>>>>>> 0e14f0aad5bd3f92fe7bc78de7f985519067a928
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -105,6 +109,7 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [PaperAssignmentController::class, 'destroy'])->name('paper-assignments.destroy');
     });
 
+<<<<<<< HEAD
     Route::prefix('paper-history')->group(function () {
         Route::get('/', [PaperHistoryController::class, 'index'])->name('paper-history.index');
         Route::get('/create', [PaperHistoryController::class, 'create'])->name('paper-history.create')->middleware(['check:paper-history-create']);
@@ -115,6 +120,8 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [PaperHistoryController::class, 'destroy'])->name('paper-history.destroy')->middleware(['check:paper-history-delete']);
     });
 
+=======
+>>>>>>> 0e14f0aad5bd3f92fe7bc78de7f985519067a928
     // Review routes
     Route::prefix('reviews')->group(function () {
         Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
@@ -125,11 +132,18 @@ Route::middleware('auth')->group(function () {
         Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
         Route::delete("/{id}", [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
-    
+
+    // Paper Decision routes
+    Route::prefix('paper-decision')->group(function () {
+        Route::get('/', [DecisionController::class, 'index'])->name('paper-decision.index');
+    });
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+<<<<<<< HEAD
    
+=======
+>>>>>>> 0e14f0aad5bd3f92fe7bc78de7f985519067a928
 });
 
 require __DIR__.'/auth.php';

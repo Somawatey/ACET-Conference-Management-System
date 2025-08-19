@@ -13,7 +13,8 @@ class PaperController extends Controller
      */
     public function index()
     {
-        $papers = Paper::with(['author', 'submission'])
+        $papers = Paper::with(['user', 'conference'])
+						
                       ->orderBy('created_at', 'desc')
                       ->paginate(10);
 
