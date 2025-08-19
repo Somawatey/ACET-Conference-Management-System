@@ -3,7 +3,34 @@ import { useState } from "react";
 import PaperInfo from "./Partial/PaperInfo";
 import ReviewerBlock from "./Partial/Feedback";
 import ReviewSummary from "./Partial/Summary";
-import Pagination from "@/Components/Pagination";
+import Pagination from '@/Components/Pagination';
+
+function getCustomLinks(links) {
+    // Find the active page
+    const activeIndex = links.findIndex(link => link.active);
+    let start = Math.max(0, activeIndex - 2);
+    let end = Math.min(links.length, start + 5);
+
+    // Adjust start if we're at the end
+    if (end - start < 5) {
+        start = Math.max(0, end - 5);
+    }
+
+    // Only keep page number links (not prev/next)
+    const pageLinks = links.filter(link => !isNaN(Number(link.label)));
+    const customLinks = pageLinks.slice(start, end);
+
+    // Optionally, add prev/next if you want
+    const prev = links.find(link => link.label.includes('&laquo;'));
+    const next = links.find(link => link.label.includes('&raquo;'));
+
+    let result = [];
+    if (prev) result.push(prev);
+    result = result.concat(customLinks);
+    if (next) result.push(next);
+
+    return result;
+}
 
 export default function ReviewHistory({ paper, papers, reviews, filters }) {
     const items = reviews ?? [];
@@ -159,7 +186,7 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                     )}
                     {/* Pagination */}
                     <div className="mt-6 flex justify-end">
-                        <Pagination links={papers?.links} />
+                        <Pagination links={getCustomLinks(papers?.links)} />
                     </div>
                 </main>
             </section>
