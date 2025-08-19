@@ -13,10 +13,9 @@ import moment from 'moment';
 import { useState } from 'react';
 
 export default function AgendaPage({ agendas }) {
+    const dataList = agendas.data ?? [];
     const { auth } = usePage().props;
     const can = auth?.can ?? {}; 
-    
-    const datasList = agendas.data;
     const [confirmingDataDeletion, setConfirmingDataDeletion] = useState(false);
     const [dataEdit, setDataEdit] = useState({})
     const { data: deleteData, setData: setDeleteData, delete: destroy, processing, reset, errors, clearErrors } =
@@ -48,22 +47,22 @@ export default function AgendaPage({ agendas }) {
         });
     };
 
-    const formatTime = (datetime) => {
-        return moment(datetime).format("hh:mm A");
-    };
-
+    
     const formatDate = (datetime) => {
         return moment(datetime).format("DD/MM/YYYY");
     };
     
+    const formatTime = (time) => {
+        return moment(time, "HH:mm:ss").format("hh:mm A");
+    };
+
     const headWeb = 'Agenda List'
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
     const th = (text) => <th className='text-left p-4'>{text}</th>;
-    const td = (text) => <td className='p-4'>{text}</td>;
 
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />} >
-            <Head title={headWeb} />
+            {/* <Head title={headWeb} /> */}
             <div className="h-full font-sans">
                 <div className="max-w-screen-xl mx-auto">
                     {/*-- Header --*/}
@@ -115,8 +114,8 @@ export default function AgendaPage({ agendas }) {
                                 </thead>
                                 {/*-- Table Body --*/}
                                 <tbody className="bg-white text-gray-700">
-                                    {datasList.length > 0 ? 
-                                        datasList.map((agenda) => (
+                                    {dataList.length > 0 ? (
+                                        dataList.map((agenda) => (
                                             <tr key={agenda.id} className="border-b border-gray-200 hover:bg-gray-50">
                                                 <td className="p-4">{agenda.id}</td>
                                                 <td className="p-4 font-medium">
@@ -132,7 +131,7 @@ export default function AgendaPage({ agendas }) {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="p-2">{formatDate(agenda.start_time)}</td>
+                                                <td className="p-2">{formatDate(agenda.date)}</td>
                                                 <td className="p-2">
                                                     <div className="flex flex-col text-sm">
                                                         <span className="text-green-600">{formatTime(agenda.start_time)}</span>
@@ -165,7 +164,7 @@ export default function AgendaPage({ agendas }) {
                                                     )}
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex items-center justify-center space-x-4">
+                                                    <div className="flex items-center justify-start space-x-4">
                                                         {/*-- Edit Button --*/}
                                                         {can['agenda-edit'] && (
                                                             <Link href={route('agenda.edit', agenda.id)} className="text-gray-600 hover:text-blue-600">
@@ -186,7 +185,7 @@ export default function AgendaPage({ agendas }) {
                                                 </td>
                                             </tr>
                                         ))
-                                        :
+                                    ) : (
                                         <tr>
                                             <td colSpan={7} className="text-center p-8">
                                                 <div className="flex flex-col items-center">
@@ -198,13 +197,13 @@ export default function AgendaPage({ agendas }) {
                                                 </div>
                                             </td>
                                         </tr>
-                                    }
+                                    )}
                                 </tbody>
                             </table>
                         </div>
 
                         {/*-- Pagination --*/}
-                        <div className="p-5">
+                        <div className="py-5">
                             <Pagination links={agendas.links} />
                         </div>
                     </div>
@@ -212,7 +211,7 @@ export default function AgendaPage({ agendas }) {
 
                 {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (
-                    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center">
+                    <div className="fixed inset-0 z-50 bg-black/50 flex justify-center items-center">
                         <div className="bg-white text-black p-8 rounded-lg shadow-xl w-full max-w-md">
                             <div className="flex items-center mb-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
