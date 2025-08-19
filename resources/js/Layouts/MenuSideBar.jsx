@@ -138,18 +138,12 @@ export default function MenuSideBar() {
                                         </div>
                                     </div>
                                     <ul className="py-1">
-                                        <li>
-                                            <Link href={route('profile.edit')}>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-300 
-                                                           dark:hover:bg-blue-300 dark:text-gray-700 ease-in-out duration-300
-                                                           dark:hover:text-black"
-                                                >
-                                                    Profile Settings
-                                                </a>
-                                            </Link>
-                                        </li>
+                                    
+                                    <li>
+                                        <Link href={route('profile.edit')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-300 dark:hover:bg-blue-300 dark:text-gray-700 ease-in-out duration-300 dark:hover:text-black">
+                                                Profile Settings
+                                        </Link>
+                                    </li>
                                         <li>
                                             <Link
                                                 href={route('logout')}

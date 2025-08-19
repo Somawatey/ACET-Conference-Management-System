@@ -16,6 +16,24 @@ const StatusBadge = ({ status }) => {
 
 export default function ReviewedPaper({ auth, paper, reviews }) {
     // Using Inertia's form helper for the final decision
+         if (!paper) {
+        console.error("The 'paper' prop is missing. Received props:", { auth, paper, reviews });
+        return (
+            <AdminLayout>
+                <Head title="Error" />
+                <div className="py-15" style={{ marginTop: '75px' }}>
+                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                        <div className="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                            <h3 className="text-lg font-medium text-red-700">Error: Paper data not found.</h3>
+                            <p className="mt-2 text-gray-600">
+                                The page failed to load the required paper information. Please check the browser's developer console for more details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </AdminLayout>
+        ); 
+    }
     const { data, setData, post, processing, errors } = useForm({
         decision: '',
         comment: '',
@@ -126,7 +144,7 @@ export default function ReviewedPaper({ auth, paper, reviews }) {
                     </div>
                 </div>
             </div>
-            <Pagination links={papers?.links || []} />
+
         </AdminLayout>
     );
 }

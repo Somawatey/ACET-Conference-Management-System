@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Inertia\Inertia;
+use App\Models\Review;
 use App\Models\Decision;
 use Illuminate\Http\Request;
 use App\Models\Paper;
@@ -16,8 +17,20 @@ class DecisionController extends Controller
     {
         $user = auth()->user();
         $papers = Paper::where('user_id', $user->id)->get();
+        // Define the $reviews variable by fetching data from the Paper model
+        $reviews = Review::whereIn('paper_id', $papers->pluck('id'))->get();
+        // Transform the reviews to include only necessary fields
+        $transformedReviews = $reviews->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'paper_id' => $review->paper_id,
+                'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
+                'status' => $review->recommendation ?? 'Pending',
+            ];
+        });
         return Inertia::render('PaperDecision/Index', [
-            'papers' => $papers
+            'papers' => $papers,
+            'reviews' => $transformedReviews,
         ]);
     }
 
@@ -26,8 +39,10 @@ class DecisionController extends Controller
      */
     public function decisionshow($id)
     {
+        // 1. Find the paper by its ID or fail with a 404 error if not found.
+        $paper = Paper::findOrFail($id);
         $paper = Paper::with(['user', 'topic', 'reviews.reviewer'])->findOrFail($id);
-
+        $reviews = $paper->reviews()->get();
         $transformedPaper = [
             'id' => $paper->id,
             'title' => $paper->paper_title ?? $paper->title ?? '',
@@ -43,9 +58,10 @@ class DecisionController extends Controller
                 'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
                 'status' => $review->recommendation ?? 'Pending',
             ];
+
         });
 
-        return inertia('PaperDecision/Index', [
+        return Inertia::render('PaperDecision/Index', [
             'paper' => $transformedPaper,
             'reviews' => $reviews,
         ]);
