@@ -121,7 +121,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/create/{paper_id?}', [ReviewController::class, 'create'])->name('reviews.create');
         Route::get('/{id}', [ReviewController::class, 'show'])->name('reviews.show');
         Route::get('/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
-        Route::post("/", [ReviewController::class, 'store'])->name('reviews.store');
+        Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
         Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
         Route::delete("/{id}", [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
