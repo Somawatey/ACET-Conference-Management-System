@@ -137,16 +137,22 @@ class ReviewController extends Controller
     {
         $validated = $request->validate([
             'paper_id' => 'required|exists:papers,id',
-            'feedback' => 'required|string',
-            'recommendation' => 'required|in:Accept,Revise,Reject',
-            'score' => 'required|integer|min:1|max:5',
+            'reviewer_id' => 'required|exists:users,id',
+            'score' => 'required|integer|min:1|max:10',
+            'comments' => 'nullable|string|max:2000',
         ]);
 
-        $validated['reviewer_id'] = auth()->id();
+        $review = Review::create([
+            'paper_id' => $validated['paper_id'],
+            'reviewer_id' => $validated['reviewer_id'],
+            'score' => $validated['score'],
+            'comments' => $validated['comments'] ?? '',
+        ]);
 
-        Review::create($validated);
-
-        return redirect()->route('reviews.index')->with('success', 'Review submitted successfully!');
+        return response()->json([
+            'message' => 'Review submitted successfully.',
+            'review' => $review,
+        ]);
     }
 
     /**
