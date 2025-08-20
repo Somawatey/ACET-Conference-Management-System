@@ -28,12 +28,15 @@ class PermissionSeeder extends Seeder
             'agenda-create',
             'agenda-edit',
             'agenda-delete',
-          
+
             'paper-list',
             'paper-create',
             'paper-edit',
             'paper-delete',
             'paper-assign',
+            'paper-review',
+            'paper-approve',
+            'paper-reject',
         ];
 
         foreach ($permissions as $permission) {

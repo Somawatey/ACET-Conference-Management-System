@@ -46,4 +46,18 @@ class Paper extends Model
     {
         return $this->hasOne(Decision::class);
     }
+
+    public function session(): HasOne
+    {
+        return $this->hasOne(ConferenceSession::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function conference(): BelongsTo
+    {
+        return $this->belongsTo(Conference::class);
+    }
 }
