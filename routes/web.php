@@ -109,7 +109,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('reviews')->group(function () {
         Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
         Route::get('/create/{paper_id?}', [ReviewController::class, 'create'])->name('reviews.create');
-        Route::get('/{id}', [ReviewController::class, 'show'])->name('reviews.show');
+        //for viewing feedback in paperDecision
+        Route::get('/{review}', [ReviewController::class, 'show'])->name('reviews.show');
         Route::get('/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
         Route::post("/", [ReviewController::class, 'store'])->name('reviews.store');
         Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
@@ -120,6 +121,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('paper-decision')->group(function () {
         Route::get('/', [DecisionController::class, 'index'])->name('paper-decision.index');
         Route::get('/{id}', [DecisionController::class, 'decisionshow'])->name('paper-decision.show');
+        
     });
 
     // Review History

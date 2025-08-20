@@ -26,6 +26,7 @@ class DecisionController extends Controller
                 'paper_id' => $review->paper_id,
                 'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
                 'status' => $review->recommendation ?? 'Pending',
+                'author' => optional($review->paper->user)->name ?? 'Unknown',
             ];
         });
         return Inertia::render('PaperDecision/Index', [
@@ -70,10 +71,21 @@ class DecisionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-    }
+    // public function feedback($id){
+    //     //get comment and score from reviewers
+    //     $paper = Paper::findOrFail($id);
+    //     $feedback = $feedback->map(function ($review) {
+    //         return [
+    //             'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
+    //             'comment' => $review->comment ?? 'No comment provided',
+    //             'score' => $review->score ?? 'No score provided',
+    //         ];
+    //     });
+
+    //     return Inertia::render('PaperDecision/viewFeedback', [
+    //         'feedback' => $feedback
+    //     ]);
+    // }
 
     /**
      * Display the specified resource.

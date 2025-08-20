@@ -1,6 +1,6 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Assuming you have a main layout
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 // A simple component for status badges
@@ -89,7 +89,11 @@ export default function ReviewedPaper({ auth, paper, reviews }) {
                                                     <StatusBadge status={review.status} />
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <a href="#" className="text-indigo-600 hover:text-indigo-900">View Details</a>
+                                                    <Link
+                                                        href={route('reviews.show', { id: review.id })}
+                                                        className="text-indigo-600 hover:text-indigo-900">
+                                                            View Details
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         ))}

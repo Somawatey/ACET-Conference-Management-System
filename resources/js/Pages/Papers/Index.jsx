@@ -66,7 +66,7 @@ export default function PaperPage({ papers }) {
                                             <td>{paper.id}</td>
                                             <td className="font-medium">{getPaperTitle(paper)}</td>
                                             <td>{getTopicText(paper)}</td>
-                                            <td>{paper.author_name}</td>
+                                            <td>{paper.user?.name}</td>
                                             <td>
                                                 <span className={statusClass(paper.status)}>
                                                     {paper.status || 'Pending'}
