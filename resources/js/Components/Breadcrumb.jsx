@@ -4,7 +4,7 @@ export default function Breadcrumb(props) {
     return (
         <section className="mt-16 content-header">
             <div className="container-fluid">
-                <div className="row mb-2">
+                <div className="row mb-2 px-10">
                     <div className="col-sm-6">
                         <h1>{props?.header}</h1>
                     </div>

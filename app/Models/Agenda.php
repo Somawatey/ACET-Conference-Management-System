@@ -12,7 +12,6 @@ class Agenda extends Model
 
     protected $fillable = [
         'conference_id',
-        'session_id',
         'title',
         'description',
         'type',
@@ -22,7 +21,8 @@ class Agenda extends Model
         'location',
         'speaker',
         'order_index',
-        'is_active'
+        'is_active',
+        'session'
     ];
 
     /**
@@ -31,13 +31,5 @@ class Agenda extends Model
     public function conference(): BelongsTo
     {
         return $this->belongsTo(Conference::class);
-    }
-    
-    /**
-     * Get the session that owns the agenda item.
-     */
-    public function session(): BelongsTo
-    {
-        return $this->belongsTo(ConferenceSession::class, 'session_id');
     }
 }

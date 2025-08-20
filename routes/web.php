@@ -60,8 +60,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [AgendaController::class, 'create'])->name('agenda.create');
         Route::get('/{id}', [AgendaController::class, 'show'])->name('agenda.show');
         Route::get('/{id}/edit', [AgendaController::class, 'edit'])->name('agenda.edit');
+        Route::put("/{id}", [AgendaController::class, 'update'])->name('agenda.update');
         Route::post("/", [AgendaController::class, 'store'])->name('agenda.store');
-        Route::patch("/{id}", [AgendaController::class, 'update'])->name('agenda.update');
         Route::delete("/{id}", [AgendaController::class, 'destroy'])->name('agenda.destroy');
     });
 

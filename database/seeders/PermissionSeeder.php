@@ -28,7 +28,7 @@ class PermissionSeeder extends Seeder
             'agenda-create',
             'agenda-edit',
             'agenda-delete',
-          
+
             'paper-list',
             'paper-create',
             'paper-edit',
