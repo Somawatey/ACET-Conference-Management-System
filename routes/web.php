@@ -10,6 +10,7 @@ use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
 use App\Http\Controllers\PaperHistoryController;
 use App\Http\Controllers\DecisionController;
+use App\Http\Controllers\ConferenceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -134,6 +135,17 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+
+     // Conference routes
+    Route::prefix('conferences')->group(function () {
+        Route::get('/', [ConferenceController::class, 'index'])->name('conferences.index')->middleware(['check:conference-list']);
+        Route::get('/create', [ConferenceController::class, 'create'])->name('conferences.create')->middleware(['check:conference-create']);
+        Route::get('/{conference}', [ConferenceController::class, 'show'])->name('conferences.show');
+        Route::get('/{conference}/edit', [ConferenceController::class, 'edit'])->name('conferences.edit')->middleware(['check:conference-edit']);
+        Route::post('/', [ConferenceController::class, 'store'])->name('conferences.store');
+        Route::patch('/{conference}', [ConferenceController::class, 'update'])->name('conferences.update');
+        Route::delete('/{conference}', [ConferenceController::class, 'destroy'])->name('conferences.destroy')->middleware(['check:conference-delete']);
+    });
    
 });
 

@@ -21,8 +21,11 @@ class AgendaController extends Controller
         // Fetch all agenda items, ordered by date and start time
         $pagination = $request->input('pagination', 10);
         $totalAgendas = Agenda::count();
-        $agendas = Agenda::orderBy('id', 'asc')
+
+        $agendas = Agenda::with('conference') // <- This loads the conference data
+            ->orderBy('id', 'asc')
             ->paginate($pagination);
+        
         return Inertia::render('Agenda/Index', [
             'agendas' => $agendas,
         ]);

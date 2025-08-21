@@ -58,15 +58,12 @@ export default function AgendaPage({ agendas }) {
 
     const headWeb = 'Agenda List'
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
-    const th = (text) => <th className='text-left p-4'>{text}</th>;
 
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />} >
-            {/* <Head title={headWeb} /> */}
+            <Head title={headWeb} />
             <div className="h-full font-sans">
                 <div className="max-w-screen-xl mx-auto">
-                    {/*-- Header --*/}
-
                     <div className="px-5">
                     
                         {/*-- Create Agenda Section --*/}
@@ -103,13 +100,14 @@ export default function AgendaPage({ agendas }) {
                                 {/*-- Table Header --*/}
                                 <thead className="bg-[#E5E7EB] text-black uppercase text-sm">
                                     <tr>
-                                        {th('ID')}
-                                        {th('Title')}
-                                        {th('Date')}
-                                        {th('Time')}
-                                        {th('Location')}
-                                        {th('Speaker')}
-                                        {th('Actions')}
+                                        <th className='text-left p-4'>ID</th>
+                                        <th className='text-left p-4'>Title</th>
+                                        <th className='text-left p-4'>Conference</th>
+                                        <th className='text-left p-4'>Date</th>
+                                        <th className='text-left p-4'>Time</th>
+                                        <th className='text-left p-4'>Location</th>
+                                        <th className='text-left p-4'>Speaker</th>
+                                        <th className='text-left p-4'>Actions</th>
                                     </tr>
                                 </thead>
                                 {/*-- Table Body --*/}
@@ -131,8 +129,17 @@ export default function AgendaPage({ agendas }) {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="p-2">{formatDate(agenda.date)}</td>
-                                                <td className="p-2">
+                                                <td className="p-4">
+                                                    {agenda.conference ? (
+                                                        <Link href={route('conferences.show', agenda.conference.id)} className="text-blue-600 hover:underline">
+                                                            {agenda.conference.conf_name || agenda.conference.title}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="text-gray-400 text-sm">No conference</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-4">{formatDate(agenda.date)}</td>
+                                                <td className="p-4">
                                                     <div className="flex flex-col text-sm">
                                                         <span className="text-green-600">{formatTime(agenda.start_time)}</span>
                                                         <span className="text-red-600">{formatTime(agenda.end_time)}</span>
@@ -167,7 +174,7 @@ export default function AgendaPage({ agendas }) {
                                                     <div className="flex items-center justify-start space-x-4">
                                                         {/*-- Edit Button --*/}
                                                         {can['agenda-edit'] && (
-                                                            <Link href={route('agenda.edit', agenda.id)} className="text-gray-600 hover:text-blue-600">
+                                                            <Link href={route('agenda.edit', agenda.id)} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                                 </svg>
@@ -175,7 +182,7 @@ export default function AgendaPage({ agendas }) {
                                                         )}
                                                         {/*-- Delete Button --*/}
                                                         {can['agenda-delete'] && (
-                                                            <button onClick={() => confirmDataDeletion(agenda)} className="text-gray-600 hover:text-red-600">
+                                                            <button onClick={() => confirmDataDeletion(agenda)} className="text-gray-600 hover:text-red-600 transition-colors duration-200">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                                 </svg>
@@ -187,7 +194,7 @@ export default function AgendaPage({ agendas }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={7} className="text-center p-8">
+                                            <td colSpan={8} className="text-center p-8">
                                                 <div className="flex flex-col items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

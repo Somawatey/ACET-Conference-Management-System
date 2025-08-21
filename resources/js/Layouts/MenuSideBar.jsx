@@ -228,13 +228,29 @@ export default function MenuSideBar() {
                                 </Link>
                             </li>
                         )}
+                        {can['conference-list'] && (
+                            <li className={`nav-item ${(route().current('conferences.index') || route().current('conferences.create')) && 'menu-is-opening menu-open'}`}>
+                                <Link
+                                    href={route('conferences.index')} className={`nav-link ${route().current('conferences.index') && 'active'}`}>
+                                    <a
+                                        href="#"
+                                        className={`${(route().current('conferences.index') || route().current('conferences.create')) && 'active'} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group`}
+                                    >
+                                        <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Conferences</span>
+                                    </a>
+                                </Link>
+                            </li>
+                        )}
 
                         {can['user-list'] && (
                             <li className={`nav-item ${(route().current('users.index') || route().current('users.create')) && 'menu-is-opening menu-open'}`}>
                                 <Link href={route('users.index')} className={`nav-link ${route().current('users.index') && 'active'}`}>
                                     <a
                                         href="#"
-                                        className={`${(route().current('roles.index') || route().current('roles.create')) && 'active'} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group`}
+                                        className={`${(route().current('users.index') || route().current('users.create')) && 'active'} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group`}
                                     >
                                         <svg
                                             className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -252,9 +268,9 @@ export default function MenuSideBar() {
                         )}
 
                         {can['role-list'] && (
-                            <li>
+                            <li className={`nav-item ${(route().current('roles.index') || route().current('roles.create')) && 'menu-is-opening menu-open'}`}>
                                 <Link href={route('roles.index')} className={`nav-link ${route().current('roles.index') && 'active'}`}>
-                                    <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                    <a href="#" className={`${(route().current('roles.index') || route().current('roles.create')) && 'active'} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group`}>
                                         <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M19.728 10.686c-2.38 2.256-6.153 3.381-9.875 3.381-3.722 0-7.4-1.126-9.571-3.371L0 10.437V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.6l-.272.286Z" />
                                             <path d="m.135 7.847 1.542 1.417c3.6 3.712 12.747 3.7 16.635.01L19.605 7.9A.98.98 0 0 1 20 7.652V6a2 2 0 0 0-2-2h-3V3a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v1H2a2 2 0 0 0-2 2v1.765c.047.024.092.051.135.082ZM10 10.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5ZM7 3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1H7V3Z" />
@@ -327,7 +343,7 @@ export default function MenuSideBar() {
                                 </a>
                             </Link>
                         </li>
-                        
+
 
                         <li>
                             <Link href={route('review.history')} className={`nav-link ${route().current('review.history') && 'active'}`}>
