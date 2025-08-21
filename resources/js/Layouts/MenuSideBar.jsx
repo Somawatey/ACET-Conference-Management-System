@@ -307,7 +307,7 @@ export default function MenuSideBar() {
                             </li>
                         )} */}
 
-                        <li>
+                        {/* <li>
                             <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper-history.index') && 'active'}`}>
                                 <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                     <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -316,7 +316,7 @@ export default function MenuSideBar() {
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper History</span>
                                 </a>
                             </Link>
-                        </li>
+                        </li> */}
                         <li>
                             <Link href={route('reviews.index')} className={`nav-link ${route().current('reviews.index') && 'active'}`}>
                                 <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
@@ -340,7 +340,7 @@ export default function MenuSideBar() {
                             </Link>
                         </li>
 
-                        <li>
+                        {/* <li>
                             <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper.history') && 'active'}`}>
                                 <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
                                     <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
@@ -349,7 +349,7 @@ export default function MenuSideBar() {
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Submission History</span>
                                 </a>
                             </Link>
-                        </li>
+                        </li> */}
 
                         <li>
                             <Link href={route('submissions.create')} className={`nav-link ${route().current('submissions.create') && 'active'}`}>

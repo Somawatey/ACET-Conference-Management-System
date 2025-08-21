@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Agenda;
 use App\Models\Paper;
 use App\Models\Conference;
@@ -14,17 +15,69 @@ use Illuminate\Validation\Rule;
 class AgendaController extends Controller
 {
     /**
+     * Download agenda as PDF.
+     */
+    public function downloadAgenda() {
+
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): Response
     {
-        // Fetch all agenda items, ordered by date and start time
         $pagination = $request->input('pagination', 10);
-        $totalAgendas = Agenda::count();
-        $agendas = Agenda::orderBy('id', 'asc')
-            ->paginate($pagination);
+        $sortBy = $request->input('sort_by', 'date'); // Default sort by date
+        $sortOrder = $request->input('sort_order', 'asc'); // Default ascending
+        $filterId = $request->input('filter_id'); // Filter by ID
+        $search = $request->input('search'); // General search
+
+        $query = Agenda::with('conference', 'paper');
+
+        // Filter by ID if provided
+        if ($filterId) {
+            $query->where('id', $filterId);
+        }
+        
+        // General search in title, speaker, location
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('speaker', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply sorting
+        switch ($sortBy) {
+            case 'id':
+                $query->orderBy('id', $sortOrder);
+                break;
+            case 'title':
+                $query->orderBy('title', $sortOrder);
+                break;
+            case 'date':
+                $query->orderBy('date', $sortOrder)
+                    ->orderBy('start_time', $sortOrder);
+                break;
+            case 'speaker':
+                $query->orderBy('speaker', $sortOrder);
+                break;
+            default:
+                $query->orderBy('date', 'asc')
+                    ->orderBy('start_time', 'asc');
+        }
+        
+        $agendas = $query->paginate($pagination);
+        
         return Inertia::render('Agenda/Index', [
             'agendas' => $agendas,
+            'filters' => [
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+                'filter_id' => $filterId,
+                'search' => $search,
+                'pagination' => $pagination,
+            ]
         ]);
     }
     /**
@@ -69,6 +122,7 @@ class AgendaController extends Controller
     {
         $validated = $request->validate([
             'conference_id' => 'required|integer|exists:conferences,id',
+            'paper_id' => 'required|integer|exists:papers,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => [

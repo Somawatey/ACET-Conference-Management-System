@@ -22,7 +22,8 @@ class Agenda extends Model
         'speaker',
         'order_index',
         'is_active',
-        'session'
+        'session',
+        'paper_id'
     ];
 
     /**
@@ -31,5 +32,9 @@ class Agenda extends Model
     public function conference(): BelongsTo
     {
         return $this->belongsTo(Conference::class);
+    }
+    public function paper(): BelongsTo
+    {
+        return $this->belongsTo(Paper::class);
     }
 }
