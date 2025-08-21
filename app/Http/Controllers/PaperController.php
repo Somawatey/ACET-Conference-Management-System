@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Paper;
+use App\Models\User;
+
 
 class PaperController extends Controller
 {
@@ -13,12 +15,14 @@ class PaperController extends Controller
      */
     public function index()
     {
+        $users = User::with('roles')->paginate(10)->appends(request()->query());
         $papers = Paper::with(['user', 'conference'])
                       ->orderBy('created_at', 'desc')
                       ->paginate(10);
 
         return Inertia::render('Papers/Index', [
-            'papers' => $papers
+            'users' => $users,
+            'papers' => $papers,
         ]);
     }
 

@@ -1,9 +1,22 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import Breadcrumb from '@/Components/Breadcrumb';
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function PaperPage({ papers = [] }) {
+export default function PaperPage({ users, papers }) {
+    const userList = users.data;
+
+    const [reviews, setReviews] = useState([]); // reviewers state
+
+    useEffect(() => {
+        if (userList && Array.isArray(userList)) {
+            const reviewersData = userList.filter((user) =>
+                user.roles.some((role) => role.name.toLowerCase() === "reviewer")
+            );
+            setReviews(reviewersData); // ✅ store in state
+        }
+    }, [userList]);
+
     const headWeb = 'Paper List';
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
@@ -13,12 +26,7 @@ export default function PaperPage({ papers = [] }) {
             ? papers
             : [];
 
-    const fallbackPapers = [
-        { id: 1, title: 'AI for Healthcare', topic: 'Artificial Intelligence', author_name: 'Jane Doe', status: 'Published' },
-        { id: 2, title: 'Quantum Computing Advances', topic: 'Quantum Computing', author_name: 'John Smith', status: 'Pending' },
-    ];
-
-    const rows = normalizedPapers.length > 0 ? normalizedPapers : fallbackPapers;
+    const rows = normalizedPapers.length > 0 ? normalizedPapers : [];
 
     const [openId, setOpenId] = useState(null);
     const [selectedPaper, setSelectedPaper] = useState(null);
@@ -37,15 +45,6 @@ export default function PaperPage({ papers = [] }) {
         return 'badge badge-secondary';
     };
 
-    const reviewers = [
-        { id: 1, name: "Dr. Alice Thompson", institution: "MIT", expertise: ["AI", "Machine Learning"], rating: 4.8, papers_reviewed: 45 },
-        { id: 2, name: "Prof. Robert Wilson", institution: "Stanford University", expertise: ["Quantum Computing", "Cryptography"], rating: 4.9, papers_reviewed: 67 },
-        { id: 3, name: "Dr. Maria Garcia", institution: "UC Berkeley", expertise: ["Renewable Energy", "Materials Science"], rating: 4.7, papers_reviewed: 38 },
-        { id: 4, name: "Prof. James Lee", institution: "Harvard University", expertise: ["Blockchain", "Distributed Systems"], rating: 4.6, papers_reviewed: 52 },
-        { id: 5, name: "Dr. Lisa Anderson", institution: "Johns Hopkins", expertise: ["AI", "Healthcare"], rating: 4.8, papers_reviewed: 41 },
-        { id: 6, name: "Prof. Thomas Brown", institution: "Caltech", expertise: ["Quantum Computing", "Physics"], rating: 4.9, papers_reviewed: 58 },
-    ];
-
     const getAssignedReviewers = (paperId) => assignedReviewers[paperId] || [];
 
     const isReviewerAssigned = (paperId, reviewerId) =>
@@ -56,7 +55,7 @@ export default function PaperPage({ papers = [] }) {
             alert("You can only assign up to 4 reviewers.");
             return;
         }
-        const reviewer = reviewers.find(r => r.id === reviewerId);
+        const reviewer = reviews.find(r => r.id === reviewerId);
         setAssignedReviewers(prev => ({
             ...prev,
             [paperId]: [...(prev[paperId] || []), reviewer]
@@ -142,19 +141,13 @@ export default function PaperPage({ papers = [] }) {
                                 <p className="text-muted mb-0">Author: {selectedPaper.author_name}</p>
                                 <p className="text-muted">Topic: {selectedPaper.topic}</p>
                                 <div className="row">
-                                    {reviewers.map(reviewer => (
+                                    {reviews.map(reviewer => (
                                         <div key={reviewer.id} className="col-md-6 mb-2">
                                             <div className={`card ${isReviewerAssigned(selectedPaper.id, reviewer.id) ? 'border-success' : ''}`}>
                                                 <div className="card-body p-3">
                                                     <div className="d-flex justify-content-between">
                                                         <div>
                                                             <h6 className="mb-1">{reviewer.name}</h6>
-                                                            <p className="text-muted mb-1">{reviewer.institution}</p>
-                                                            {getExpertiseTags(reviewer.expertise)}
-                                                            <div className="mt-1">
-                                                                <small>Rating: ★ {reviewer.rating}</small><br />
-                                                                <small>Reviewed: {reviewer.papers_reviewed}</small>
-                                                            </div>
                                                         </div>
                                                         <div>
                                                             {isReviewerAssigned(selectedPaper.id, reviewer.id) ? (
@@ -162,7 +155,6 @@ export default function PaperPage({ papers = [] }) {
                                                             ) : (
                                                                 <button className="btn btn-sm btn-outline-primary" onClick={() => assignReviewer(selectedPaper.id, reviewer.id)} disabled={getAssignedReviewers(selectedPaper.id).length >= 4}><i className="fas fa-plus"></i> Assign</button>
                                                             )}
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -201,7 +193,7 @@ export default function PaperPage({ papers = [] }) {
                                                         if (val.length > 4) { alert("Max 4 reviewers per paper."); return; }
                                                         setAssignments(prev => ({ ...prev, [paper.id]: val }));
                                                     }}>
-                                                        {reviewers.map(r => <option key={r.id} value={r.id}>{r.name} ({r.institution})</option>)}
+                                                        {reviews.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                                                     </select>
                                                 </td>
                                             </tr>

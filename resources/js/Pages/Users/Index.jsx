@@ -14,8 +14,8 @@ import { useState } from 'react';
 
 export default function UserPage({ users }) {
     const { auth } = usePage().props;
-    const can = auth?.can ?? {}; 
-    
+    const can = auth?.can ?? {};
+
     const datasList = users.data;
     const [confirmingDataDeletion, setConfirmingDataDeletion] = useState(false);
     const [dataEdit, setDataEdit] = useState({})
@@ -46,7 +46,7 @@ export default function UserPage({ users }) {
         setDeleteData('name', data.name)
         setConfirmingDataDeletion(true);
     };
-    
+
     const closeModal = () => {
         setConfirmingDataDeletion(false);
         setDataEdit({})
@@ -62,7 +62,7 @@ export default function UserPage({ users }) {
             onFinish: () => reset(),
         });
     };
-    
+
     const headWeb = 'User List'
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
@@ -74,7 +74,7 @@ export default function UserPage({ users }) {
                     {/*-- Header --*/}
 
                     <div className="p-6">
-                    
+
                         {/*-- Create User Section --*/}
                         <div className="flex items-center justify-between mb-4">
                             {/* Input container with relative positioning */}
@@ -91,7 +91,7 @@ export default function UserPage({ users }) {
                                     placeholder="Search users..."
                                 />
                             </div>
-    
+
                             {/* This can be a Link to a create page or trigger a modal */}
                             {can['user-create'] && (
                                 <Link
@@ -119,20 +119,20 @@ export default function UserPage({ users }) {
                                 </thead>
                                 {/*-- Table Body --*/}
                                 <tbody className="bg-white text-gray-700">
-                                    {datasList.length > 0 ? 
+                                    {datasList.length > 0 ?
                                         datasList.map((user) => (
                                             <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
                                                 <td className="p-4">{user.id}</td>
                                                 <td className="p-4 font-medium">
                                                     <div className="flex items-center">
                                                         {hasProfilePhoto(user) ? (
-                                                            <img 
-                                                                src={user.profile_photo_url} 
-                                                                className="w-8 h-8 rounded-full mr-3 object-cover border-2 border-gray-200" 
+                                                            <img
+                                                                src={user.profile_photo_url}
+                                                                className="w-8 h-8 rounded-full mr-3 object-cover border-2 border-gray-200"
                                                                 alt="User Profile"
                                                             />
                                                         ) : (
-                                                            <div 
+                                                            <div
                                                                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3"
                                                                 style={{
                                                                     background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)'
@@ -153,8 +153,8 @@ export default function UserPage({ users }) {
                                                     {user?.roles && user.roles.length > 0 ? (
                                                         <div className="flex flex-wrap gap-1">
                                                             {user.roles.map((role) => (
-                                                                <span 
-                                                                    key={role.id} 
+                                                                <span
+                                                                    key={role.id}
                                                                     className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                                                                 >
                                                                     {role.name}
@@ -212,7 +212,7 @@ export default function UserPage({ users }) {
                         </div>
                     </div>
                 </div>
-                
+
                 {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (
                     <div className="fixed inset-0 z-50 bg-opacity-60 flex justify-center items-center">
