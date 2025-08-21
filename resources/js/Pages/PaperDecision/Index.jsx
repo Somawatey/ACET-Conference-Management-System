@@ -35,15 +35,14 @@ export default function ReviewedPaper({ auth, paper, reviews }) {
         ); 
     }
     const { data, setData, post, processing, errors } = useForm({
-        decision: '',
+        decision: paper.status || '',
         comment: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
         // The 'post' helper will submit the form to this URL.
-        // Replace {paper.id} with the actual paper's ID.
-        post(route('paper-decisions.accept', { id: paper.id }));
+        post(route('paper-decisions.store', { paper: paper.id }));
     };
     const headWeb = 'Paper decision';
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];

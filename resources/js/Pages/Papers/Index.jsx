@@ -100,7 +100,7 @@ export default function PaperPage({ papers }) {
                                                         </Link>
                                                         <Link href={route('paper-assignments.index')} className="btn btn-sm btn-info text-white">Assign Reviewer</Link>
                                                         <Link href="#" className="btn btn-sm btn-outline-secondary">View History</Link>
-                                                        <Link href={route('paper-decision.show', { id: paper.id })} className="btn btn-sm btn-primary">
+                                                        <Link href={route('paper-decision.show', { paper: paper.id })} className="btn btn-sm btn-primary">
                                                             Edit Decision
                                                         </Link>
                                                     </div>

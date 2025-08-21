@@ -38,19 +38,15 @@ class DecisionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function decisionshow($id)
+    public function decisionshow(Paper $paper)
     {
         // 1. Find the paper by its ID or fail with a 404 error if not found.
-        $paper = Paper::findOrFail($id);
-        $paper = Paper::with(['user', 'topic', 'reviews.reviewer'])->findOrFail($id);
-        $reviews = $paper->reviews()->get();
+        $paper->load(['user', 'topic', 'reviews.reviewer']);
         $transformedPaper = [
             'id' => $paper->id,
             'title' => $paper->paper_title ?? $paper->title ?? '',
             'author' => optional($paper->user)->name ?? '',
-            'track' => is_string($paper->topic)
-                ? $paper->topic
-                : (is_object($paper->topic) ? ($paper->topic->name ?? '') : ''),
+            'track' => $paper->topic,
         ];
 
         $reviews = $paper->reviews->map(function ($review) {
@@ -90,9 +86,26 @@ class DecisionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Decision $decision)
+    public function store(Request $request, Paper $paper)
     {
-        //
+        $validated = $request->validate([
+            'decision' => ['required', 'in:Accept,Reject,Revise'],
+            'comment' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $paper->status = $validated['decision'];
+        $paper->save();
+
+        // Create a new Decision record
+        Decision::create([
+            'paper_id' => $paper->id,
+            'organizer_id' => auth()->id(), // Assumes the logged-in user is making the decision
+            'decision' => $validated['decision'],
+            'comment' => $validated['comment'],
+        ]);
+
+        return redirect()->route('papers.index')
+                         ->with('success', 'Decision submitted successfully!');
     }
 
     /**
