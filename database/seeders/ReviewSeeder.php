@@ -102,7 +102,6 @@ class ReviewSeeder extends Seeder
                 [
                     'user_id' => $author1->id,
                     'author_info_id' => $ai1->id,
-                    'decision_id' => null,
                     'track' => $tracks[array_rand($tracks)],
                     'submitted_elsewhere' => false,
                     'original_submission' => true,
@@ -128,7 +127,6 @@ class ReviewSeeder extends Seeder
                 [
                     'user_id' => $author2->id,
                     'author_info_id' => $ai2->id,
-                    'decision_id' => null,
                     'track' => $tracks[array_rand($tracks)],
                     'submitted_elsewhere' => false,
                     'original_submission' => true,

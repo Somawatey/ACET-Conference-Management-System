@@ -29,8 +29,32 @@ class SubmissionController extends Controller
      */
     public function index()
     {
+    // Fetch submissions with related paper (incl. decision), author info, and user (submitter)
+    $submissions = \App\Models\Submission::with(['paper.decision', 'authorInfo', 'user'])
+            ->latest('submitted_at')
+            ->get()
+            ->map(function ($s) {
+                $paperTitle = $s->paper->paper_title ?? ($s->paper->title ?? '');
+                $authorName = $s->authorInfo->author_name ?? optional($s->paper->user)->name ?? '';
+                $correspondingEmail = $s->authorInfo->correspond_email ?? $s->authorInfo->author_email ?? '';
+                $submittedBy = optional($s->user)->name ?? '';
+                $createdAt = optional($s->created_at)->toDateTimeString() ?? optional($s->submitted_at)->toDateTimeString();
+        // Prefer final decision from decisions table via paper_id; fallback to paper status
+        $status = optional(optional($s->paper)->decision)->decision ?? ($s->paper->status ?? 'Pending');
+
+                return [
+                    'id' => $s->id,
+                    'paper_title' => $paperTitle,
+                    'author_name' => $authorName,
+                    'corresponding_email' => $correspondingEmail,
+                    'submitted_by' => $submittedBy,
+                    'created_at' => $createdAt,
+                    'status' => $status,
+                ];
+            });
+
         return Inertia::render('Submission/Index', [
-            'submissions' => []
+            'submissions' => $submissions,
         ]);
     }
 
