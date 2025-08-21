@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::put("/{id}", [AgendaController::class, 'update'])->name('agenda.update');
         Route::post("/", [AgendaController::class, 'store'])->name('agenda.store');
         Route::delete("/{id}", [AgendaController::class, 'destroy'])->name('agenda.destroy');
+        Route::get("/download-pdf", [AgendaController::class, 'downloadPdf'])->name('agenda.downloadPdf');
     });
 
     // Paper routes
