@@ -155,62 +155,62 @@ export default function PaperPage({ users, papers }) {
                                                             ) : (
                                                                 <button className="btn btn-sm btn-outline-primary" onClick={() => assignReviewer(selectedPaper.id, reviewer.id)} disabled={getAssignedReviewers(selectedPaper.id).length >= 4}><i className="fas fa-plus"></i> Assign</button>
                                                             )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
                                     ))}
+                                        </div>
+                            </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setSelectedPaper(null)}>Close</button>
                                 </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setSelectedPaper(null)}>Close</button>
-                            </div>
                         </div>
                     </div>
-                </div>
             )}
 
-            {/* Bulk Assignment Modal */}
-            {showAssignmentModal && (
-                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-                    <div className="modal-dialog modal-xl">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Bulk Assignment</h5>
-                                <button type="button" className="close" onClick={() => setShowAssignmentModal(false)}><span>&times;</span></button>
-                            </div>
-                            <div className="modal-body">
-                                <table className="table table-bordered">
-                                    <thead><tr><th>Paper</th><th>Current Reviewers</th><th>Add Reviewers</th></tr></thead>
-                                    <tbody>
-                                        {rows.map(paper => (
-                                            <tr key={paper.id}>
-                                                <td><strong>{paper.title}</strong><br /><small>{paper.author_name}</small></td>
-                                                <td>{getAssignedReviewers(paper.id).map(r => <span key={r.id} className="badge badge-success mr-1">{r.name}</span>)}</td>
-                                                <td>
-                                                    <select className="form-control" multiple value={assignments[paper.id] || []} onChange={(e) => {
-                                                        const val = Array.from(e.target.selectedOptions, o => parseInt(o.value));
-                                                        if (val.length > 4) { alert("Max 4 reviewers per paper."); return; }
-                                                        setAssignments(prev => ({ ...prev, [paper.id]: val }));
-                                                    }}>
-                                                        {reviews.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={() => setShowAssignmentModal(false)}>Cancel</button>
-                                <button className="btn btn-primary" onClick={() => { alert('Bulk assignment applied.'); setShowAssignmentModal(false); }}>Apply Assignments</button>
+                    {/* Bulk Assignment Modal */}
+                    {showAssignmentModal && (
+                        <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+                            <div className="modal-dialog modal-xl">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Bulk Assignment</h5>
+                                        <button type="button" className="close" onClick={() => setShowAssignmentModal(false)}><span>&times;</span></button>
+                                    </div>
+                                    <div className="modal-body">
+                                        <table className="table table-bordered">
+                                            <thead><tr><th>Paper</th><th>Current Reviewers</th><th>Add Reviewers</th></tr></thead>
+                                            <tbody>
+                                                {rows.map(paper => (
+                                                    <tr key={paper.id}>
+                                                        <td><strong>{paper.title}</strong><br /><small>{paper.author_name}</small></td>
+                                                        <td>{getAssignedReviewers(paper.id).map(r => <span key={r.id} className="badge badge-success mr-1">{r.name}</span>)}</td>
+                                                        <td>
+                                                            <select className="form-control" multiple value={assignments[paper.id] || []} onChange={(e) => {
+                                                                const val = Array.from(e.target.selectedOptions, o => parseInt(o.value));
+                                                                if (val.length > 4) { alert("Max 4 reviewers per paper."); return; }
+                                                                setAssignments(prev => ({ ...prev, [paper.id]: val }));
+                                                            }}>
+                                                                {reviews.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button className="btn btn-secondary" onClick={() => setShowAssignmentModal(false)}>Cancel</button>
+                                        <button className="btn btn-primary" onClick={() => { alert('Bulk assignment applied.'); setShowAssignmentModal(false); }}>Apply Assignments</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                    )}
 
-            {(selectedPaper || showAssignmentModal) && <div className="modal-backdrop fade show"></div>}
-        </AdminLayout>
-    );
+                    {(selectedPaper || showAssignmentModal) && <div className="modal-backdrop fade show"></div>}
+                </AdminLayout>
+            );
 }
