@@ -5,7 +5,7 @@ import Declare from "./Partial/Declare";
 import PrimaryButton from "@/Components/PrimaryButton";
 
 export default function Submit() {
-    const { data, setData, errors, post, processing } = useForm({
+    const { data, setData, errors, post, processing, reset } = useForm({
         // Author Info
         author_name: "",
         author_institute: "",
@@ -19,6 +19,7 @@ export default function Submit() {
         paper_title: "",
         abstract: "",
         keyword: "",
+        paper_file: null,
         // Declaration
         submitted_elsewhere: "",
         original_submission: "",
@@ -28,12 +29,23 @@ export default function Submit() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        // File comes in as a File object via synthetic event from PaperInfo
         setData(name, type === "checkbox" ? checked : value);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("submission.store"));
+        // Ensure multipart/form-data is used when sending a File
+        post(route("submissions.store"), {
+            forceFormData: true,
+            preserveScroll: false,
+            onSuccess: () => {
+                // Clear all inputs after successful upload
+                reset();
+                // Optional: scroll to top after reset
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            },
+        });
     };
 
     return (
