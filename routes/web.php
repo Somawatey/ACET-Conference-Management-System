@@ -9,6 +9,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
 use App\Http\Controllers\DecisionController;
+use App\Http\Controllers\PaperHistoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -123,6 +124,9 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+
+    // Paper History
+    Route::get('/paper-history', [PaperHistoryController::class, 'index'])->name('paper-history.index');
 });
 
 require __DIR__.'/auth.php';
