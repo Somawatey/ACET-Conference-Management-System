@@ -18,14 +18,15 @@ class Conference extends Model
         'date' => 'date'
     ];
 
+    // Add this accessor to format date for forms
+    public function getDateAttribute($value)
+    {
+        return $value ? \Carbon\Carbon::parse($value)->format('Y-m-d') : null;
+    }
+
     public function papers(): HasMany
     {
         return $this->hasMany(Paper::class);
-    }
-
-    public function sessions(): HasMany
-    {
-        return $this->hasMany(ConferenceSession::class);
     }
 
     public function agendas(): HasMany

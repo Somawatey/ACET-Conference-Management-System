@@ -74,7 +74,7 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
 
     return (
         <AdminLayout>
-            <div className="h-screen px-5 py-10 mt-10">
+            <div className="min-h-screen px-5 py-10 mt-10">
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800 mb-2">

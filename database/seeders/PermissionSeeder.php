@@ -37,6 +37,11 @@ class PermissionSeeder extends Seeder
             'paper-review',
             'paper-approve',
             'paper-reject',
+
+            'conference-list',
+            'conference-create', 
+            'conference-edit',
+            'conference-delete',
         ];
 
         foreach ($permissions as $permission) {
