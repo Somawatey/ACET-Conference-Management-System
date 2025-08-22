@@ -9,6 +9,9 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
 use App\Http\Controllers\DecisionController;
+use App\Http\Controllers\PaperHistoryController;
+use App\Http\Controllers\DecisionController;
+use App\Http\Controllers\ConferenceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -59,6 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::put("/{id}", [AgendaController::class, 'update'])->name('agenda.update');
         Route::post("/", [AgendaController::class, 'store'])->name('agenda.store');
         Route::delete("/{id}", [AgendaController::class, 'destroy'])->name('agenda.destroy');
+        Route::get("/download-pdf", [AgendaController::class, 'downloadPdf'])->name('agenda.downloadPdf');
     });
 
     // Paper routes
@@ -105,6 +109,16 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [PaperAssignmentController::class, 'destroy'])->name('paper-assignments.destroy');
     });
 
+    Route::prefix('paper-history')->group(function () {
+        Route::get('/', [PaperHistoryController::class, 'index'])->name('paper-history.index');
+        Route::get('/create', [PaperHistoryController::class, 'create'])->name('paper-history.create')->middleware(['check:paper-history-create']);
+        Route::get('/{id}', [PaperHistoryController::class, 'show'])->name('paper-history.show')->middleware(['check:paper-history-list']);
+        Route::get('/{id}/edit', [PaperHistoryController::class, 'edit'])->name('paper-history.edit')->middleware(['check:paper-history-edit']);
+        Route::post("/", [PaperHistoryController::class, 'store'])->name('paper-history.store');
+        Route::patch("/{id}", [PaperHistoryController::class, 'update'])->name('paper-history.update');
+        Route::delete("/{id}", [PaperHistoryController::class, 'destroy'])->name('paper-history.destroy')->middleware(['check:paper-history-delete']);
+    });
+
     // Review routes
     Route::prefix('reviews')->group(function () {
         Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
@@ -123,6 +137,22 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+     // Paper History
+    Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
+
+    Route::get('/reviewers', [UserController::class, 'reviewers']);
+
+     // Conference routes
+    Route::prefix('conferences')->group(function () {
+        Route::get('/', [ConferenceController::class, 'index'])->name('conferences.index')->middleware(['check:conference-list']);
+        Route::get('/create', [ConferenceController::class, 'create'])->name('conferences.create')->middleware(['check:conference-create']);
+        Route::get('/{conference}', [ConferenceController::class, 'show'])->name('conferences.show');
+        Route::get('/{conference}/edit', [ConferenceController::class, 'edit'])->name('conferences.edit')->middleware(['check:conference-edit']);
+        Route::post('/', [ConferenceController::class, 'store'])->name('conferences.store');
+        Route::patch('/{conference}', [ConferenceController::class, 'update'])->name('conferences.update');
+        Route::delete('/{conference}', [ConferenceController::class, 'destroy'])->name('conferences.destroy')->middleware(['check:conference-delete']);
+    });
+   
 });
 
 require __DIR__.'/auth.php';

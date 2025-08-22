@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('agendas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conference_id')->constrained('conferences')->onDelete('cascade'); // Fixed
+            $table->foreignId('paper_id')->constrained('papers')->onDelete('cascade'); // Fixed
             $table->enum('session', ['morning', 'afternoon', 'evening']);
             $table->string('title');
             $table->text('description')->nullable();
