@@ -85,4 +85,13 @@ class UserController extends Controller
 
         return to_route('users.index')->with("success", "User Deleted successfully");
     }
+
+public function reviewers()
+{
+    $reviewers = User::whereHas('roles', function($q) {
+        $q->where('name', 'reviewer');
+    })->select('id', 'name')->get();
+
+    return response()->json($reviewers);
+}
 }

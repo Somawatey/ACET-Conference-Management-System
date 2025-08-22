@@ -31,13 +31,41 @@ class PaperSeeder extends Seeder
                 ]
             );
 
-            Paper::firstOrCreate(
-                ['paper_title' => 'Secure Federated Learning Framework'],
+            Submission::firstOrCreate(
+                ['paper_id' => $paper1->id],
                 [
-                    'url' => 'https://example.com/papers/federated-learning.pdf',
-                    'topic' => $topics[array_rand($topics)],
-                    'keyword' => 'federated, privacy, security',
-                    'abstract' => 'We propose a secure framework for federated learning.',
+                    'user_id' => $author1->id,
+                    'author_info_id' => $ai1->id,
+                    'track' => $tracks[array_rand($tracks)],
+                    'submitted_elsewhere' => false,
+                    'original_submission' => true,
+                    'submitted_at' => now()->subDays(15),
+                ]
+            );
+
+            // $paper2 = Paper::firstOrCreate(
+            // Paper::firstOrCreate(
+            //     ['paper_title' => 'Secure Federated Learning Framework'],
+            //     [
+            //         'url' => 'https://example.com/papers/federated-learning.pdf',
+            //         'topic' => $topics[array_rand($topics)],
+            //         'keyword' => 'federated, privacy, security',
+            //         'abstract' => 'We propose a secure framework for federated learning.',
+            //         'user_id' => $author2->id,
+            //         'conference_id' => $conference->id,
+            //         'status' => 'under_review',
+            //     ]
+            // );
+
+            Submission::firstOrCreate(
+                ['paper_id' => $paper2->id],
+                [
+                    'user_id' => $author2->id,
+                    'author_info_id' => $ai2->id,
+                    'track' => $tracks[array_rand($tracks)],
+                    'submitted_elsewhere' => false,
+                    'original_submission' => true,
+                    'submitted_at' => now()->subDays(10),
                 ]
             );
         });
