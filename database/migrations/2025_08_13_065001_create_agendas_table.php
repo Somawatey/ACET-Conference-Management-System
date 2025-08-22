@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('agendas', function (Blueprint $table) {
-             $table->id();
+            $table->id();
             $table->foreignId('conference_id')->constrained('conferences')->onDelete('cascade'); // Fixed
-            $table->foreignId('session_id')->nullable()->constrained('conference_sessions')->onDelete('set null'); // Fixed
+            $table->foreignId('paper_id')->constrained('papers')->onDelete('cascade'); // Fixed
+            $table->enum('session', ['morning', 'afternoon', 'evening']);
             $table->string('title');
             $table->text('description')->nullable();
             $table->enum('type', ['session', 'keynote', 'break', 'lunch', 'networking', 'workshop']);

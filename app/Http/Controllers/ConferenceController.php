@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Conference;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ConferenceController extends Controller
 {
@@ -12,7 +13,11 @@ class ConferenceController extends Controller
      */
     public function index()
     {
-        //
+        $conferences = Conference::orderBy('date', 'desc')->paginate(10);
+        
+        return Inertia::render('Conferences/Index', [
+            'conferences' => $conferences
+        ]);
     }
 
     /**
@@ -20,7 +25,7 @@ class ConferenceController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Conferences/CreateEdit');
     }
 
     /**
@@ -28,7 +33,17 @@ class ConferenceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'conf_name' => 'required|string|max:255',
+            'topic' => 'required|string|max:255',
+            'date' => 'required|date|after_or_equal:today',
+            'location' => 'required|string|max:255',
+        ]);
+
+        Conference::create($validated);
+
+        return redirect()->route('conferences.index')
+            ->with('success', 'Conference created successfully.');
     }
 
     /**
@@ -36,7 +51,9 @@ class ConferenceController extends Controller
      */
     public function show(Conference $conference)
     {
-        //
+        return Inertia::render('Conferences/Show', [
+            'conference' => $conference
+        ]);
     }
 
     /**
@@ -44,7 +61,9 @@ class ConferenceController extends Controller
      */
     public function edit(Conference $conference)
     {
-        //
+        return Inertia::render('Conferences/CreateEdit', [
+            'conference' => $conference
+        ]);
     }
 
     /**
@@ -52,7 +71,17 @@ class ConferenceController extends Controller
      */
     public function update(Request $request, Conference $conference)
     {
-        //
+        $validated = $request->validate([
+            'conf_name' => 'required|string|max:255',
+            'topic' => 'required|string|max:255',
+            'date' => 'required|date',
+            'location' => 'required|string|max:255',
+        ]);
+
+        $conference->update($validated);
+
+        return redirect()->route('conferences.index')
+            ->with('success', 'Conference updated successfully.');
     }
 
     /**
@@ -60,6 +89,9 @@ class ConferenceController extends Controller
      */
     public function destroy(Conference $conference)
     {
-        //
+        $conference->delete();
+
+        return redirect()->route('conferences.index')
+            ->with('success', 'Conference deleted successfully.');
     }
 }

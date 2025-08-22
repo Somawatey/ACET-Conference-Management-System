@@ -17,6 +17,7 @@ class PaperController extends Controller
     {
         $users = User::with('roles')->paginate(10)->appends(request()->query());
         $papers = Paper::with(['user', 'conference'])
+						
                       ->orderBy('created_at', 'desc')
                       ->paginate(10);
 
@@ -48,7 +49,7 @@ class PaperController extends Controller
      */
     public function show($id)
     {
-        $paper = Paper::with(['user', 'conference', 'reviews', 'decision'])->findOrFail($id);
+        $paper = Paper::with(['author', 'submission', 'reviews', 'decision'])->findOrFail($id);
         
         return Inertia::render('Papers/Show', [
             'paper' => $paper

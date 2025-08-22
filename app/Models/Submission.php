@@ -14,6 +14,7 @@ class Submission extends Model
         'user_id',
         'paper_id',
         'author_info_id',
+        'decision_id',
         'track',
         'submitted_elsewhere',
         'original_submission',
@@ -24,11 +25,21 @@ class Submission extends Model
     {
         return $this->belongsTo(User::class);
     }
+    protected $casts = [
+        'submitted_elsewhere' => 'boolean',
+        'original_submission' => 'boolean',
+        'submitted_at' => 'datetime',
+    ];
 
     public function paper(): BelongsTo
     {
         return $this->belongsTo(Paper::class);
     }
+
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
 
     public function authorInfo(): BelongsTo
     {
@@ -36,4 +47,8 @@ class Submission extends Model
     }
 
     // Decision is associated to Paper via paper_id; access via $this->paper->decision
+    public function decision(): BelongsTo
+    {
+        return $this->belongsTo(Decision::class);
+    }
 }
