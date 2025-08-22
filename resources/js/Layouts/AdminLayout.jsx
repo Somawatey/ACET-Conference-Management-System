@@ -6,9 +6,15 @@ import $ from 'jquery';
 import { Link, usePage } from '@inertiajs/react';
 
 const AdminLayout = ({ breadcrumb, children }) => {
+    const { flash } = usePage().props;
 
     return (
         <div className="wrapper">
+            {flash.success && (
+                <div className="absolute top-20 right-5 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded" role="alert">
+                    <span className="block sm:inline">{flash.success}</span>
+                </div>
+            )}
 
             {/* nav & sidebar */}
             <MenuSideBar />

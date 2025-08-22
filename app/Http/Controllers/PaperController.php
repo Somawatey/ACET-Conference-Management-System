@@ -16,11 +16,11 @@ class PaperController extends Controller
     public function index()
     {
         $users = User::with('roles')->paginate(10)->appends(request()->query());
+		
         $papers = Paper::with(['user', 'conference'])
 						
                       ->orderBy('created_at', 'desc')
                       ->paginate(10);
-
         return Inertia::render('Papers/Index', [
             'users' => $users,
             'papers' => $papers,

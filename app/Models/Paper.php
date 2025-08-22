@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -17,12 +17,21 @@ class Paper extends Model
         'abstract',
     ];
 
+<<<<<<< HEAD
     // Expose a computed public URL similar to User::profile_photo_url
     protected $appends = [
         'file_url',
     ];
 
     public function getFileUrlAttribute(): ?string
+=======
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class);
+    }
+
+    public function user(): BelongsTo
+>>>>>>> Ith_Youdy
     {
         return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
     }
