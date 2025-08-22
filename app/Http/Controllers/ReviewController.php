@@ -196,6 +196,10 @@ class ReviewController extends Controller
     public function show(Review $review)
     {
         //
+        $review->load(['paper', 'reviewer']);
+        return Inertia::render('Reviews/show', [
+            'review' => $review
+        ]);
     }
 
     /**
