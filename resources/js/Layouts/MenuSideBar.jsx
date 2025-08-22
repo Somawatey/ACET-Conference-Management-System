@@ -273,6 +273,21 @@ export default function MenuSideBar() {
                             </li>
                         )}
 
+                        {can['conference-list'] && (
+                            <li>
+                                <Link 
+                                    href={route('conferences.index')} 
+                                    className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('conferences.index') ? 'bg-gray-100 dark:bg-gray-400' : ''} ${route().current('conferences.index') && 'active'}`}
+                                >
+                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 0C4.612 0 0 4.336 0 9.667c0 2.76 1.333 5.21 3.391 6.69C3.94 18.667 6.894 20 10 20s6.06-1.333 6.609-3.643C18.667 14.877 20 12.427 20 9.667 20 4.336 15.388 0 10 0zm0 16c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6z"/>
+                                        <path d="M13.5 8.5h-3v-3a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1z"/>
+                                    </svg>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Conferences</span>
+                                </Link>
+                            </li>
+                        )}
+
                         {can['paper-assign'] && (
                             <li>
                                 <Link 
