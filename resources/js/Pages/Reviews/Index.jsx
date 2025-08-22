@@ -1,9 +1,26 @@
 import { Head, Link } from "@inertiajs/react";
 import { useState } from "react";
 import Pagination from "@/Components/Pagination";
-
+import PaperList from "./Partial/PaperList";
 export default function ReviewsIndex({ reviews }) {
+    // Extract unique papers from reviews
+    // Deduplicate papers by id
+    const papers = Array.isArray(reviews.data)
+        ? Object.values(
+            reviews.data
+                .map(r => r.paper)
+                .filter(Boolean)
+                .reduce((acc, paper) => {
+                    if (paper && paper.id && !acc[paper.id]) {
+                        acc[paper.id] = paper;
+                    }
+                    return acc;
+                }, {})
+        )
+        : [];
     const [searchTerm, setSearchTerm] = useState("");
+
+    console.log(papers);
 
     // Filter reviews based on search term
     const filteredReviews = reviews.data?.filter(review => 
@@ -87,75 +104,8 @@ export default function ReviewsIndex({ reviews }) {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Reviews List */}
-                    <div className="space-y-6">
-                        {filteredReviews.length === 0 ? (
-                            <div className="bg-white shadow rounded-lg p-8 text-center">
-                                <div className="text-gray-500 mb-4">
-                                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
-                                <p className="text-gray-600 mb-4">
-                                    {searchTerm ? 'No reviews match your search criteria.' : 'You haven\'t submitted any reviews yet.'}
-                                </p>
-                                <Link 
-                                    href={route('reviews.create')}
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
-                                >
-                                    Create Your First Review
-                                </Link>
-                            </div>
-                        ) : (
-                            filteredReviews.map((review) => (
-                                <div key={review.id} className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-200">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                                {review.paper?.paper_title || 'Untitled Paper'}
-                                            </h3>
-                                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                                <span>Review Date: {new Date(review.created_at).toLocaleDateString()}</span>
-                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(review.recommendation)}`}>
-                                                    {review.recommendation || 'No Recommendation'}
-                                                </span>
-                                                <div className="flex items-center gap-1">
-                                                    <span>Rating:</span>
-                                                    <div className="flex">
-                                                        {getStarRating(review.score || 0)}
-                                                    </div>
-                                                    <span className="ml-1">({review.score || 0}/5)</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <Link 
-                                                href={route('reviews.show', review.id)}
-                                                className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
-                                            >
-                                                View
-                                            </Link>
-                                            <Link 
-                                                href={route('reviews.edit', review.id)}
-                                                className="px-3 py-1 text-green-600 hover:text-green-800 text-sm font-medium"
-                                            >
-                                                Edit
-                                            </Link>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="border-t pt-4">
-                                        <h4 className="text-sm font-medium text-gray-900 mb-2">Feedback:</h4>
-                                        <p className="text-gray-700 text-sm line-clamp-3">
-                                            {review.feedback || 'No feedback provided'}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                        {/* Paper List Table below search bar */}
+                        <PaperList papers={papers} />
                     </div>
 
                     {/* Pagination */}

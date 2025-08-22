@@ -112,7 +112,6 @@ class SubmissionController extends Controller
      */
     public function index()
     {
-<<<<<<< HEAD
     // Fetch submissions with related paper (incl. decision), author info, and user (submitter)
     $submissions = \App\Models\Submission::with(['paper.decision', 'authorInfo', 'user'])
             ->latest('submitted_at')
@@ -136,12 +135,10 @@ class SubmissionController extends Controller
                     'status' => $status,
                 ];
             });
-=======
         $submissions = Submission::with(['paper'])
             ->where('user_id', Auth::id())
             ->latest('submitted_at')
             ->get();
->>>>>>> 6a12ba84db35fcf5d866dc942a2f4646da6cd558
 
         return Inertia::render('Submission/Index', [
             'submissions' => $submissions,

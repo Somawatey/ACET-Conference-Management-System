@@ -1,12 +1,14 @@
 import { Head, usePage, Link } from "@inertiajs/react";
 import PaperInfo from "./Partial/PaperInfo";
+import PaperList from "./Partial/PaperList";
 import TextArea from "@/Components/TextArea";
 import Suggestion from "./Partial/Suggest";
 import PrimaryButton from "@/Components/PrimaryButton";
 import ReviewFormat from "./Partial/ReviewFormat";
 import { useState, useEffect } from "react";
+import { useForm } from '@inertiajs/react';
 
-export default function Review() {
+export default function Review({ papers = [], review }) {
     const { auth } = usePage().props;
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -36,7 +38,67 @@ export default function Review() {
         return auth?.user?.profile_photo_url;
     };
 
-    // Fake data for display
+    // Paper list: get from props or usePage
+    const pageProps = usePage().props;
+    const paperRows = papers.length ? papers : (pageProps.papers?.data || pageProps.papers || []);
+
+    // Collect review data from child components (assume you have state or props for these)
+    // For demonstration, use dummy state. Replace with actual state from your components.
+    const [feedback, setFeedback] = useState(''); // review comment
+    const [score, setScore] = useState(''); // rating
+    const [recommendation, setRecommendation] = useState(''); // comment
+
+    const { post, processing, errors, reset } = useForm({});
+
+    // Handle review submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route('reviews.store'), {
+            data: {
+                paper_id: papers[0]?.id || '',
+                feedback,
+                score,
+                recommendation,
+            },
+            onSuccess: () => {
+                reset();
+                alert('Review submitted successfully!');
+            },
+            onError: () => {
+                alert('Failed to submit review.');
+            }
+        });
+    };
+
+    // Assume 'review' prop is passed if user has already submitted a review for this paper
+    // If not, show submit form. If yes, show review info and edit button.
+    if (review) {
+        return (
+            <div className="bg-gradient-to-br from-blue-50 to-white min-h-screen">
+                <Head title="Review Paper" />
+                <section>
+                    <header className="bg-[#12284B] shadow">
+                        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
+                            <h2 className="text-white text-2xl font-bold tracking-wide drop-shadow">
+                                Review Paper
+                            </h2>
+                        </div>
+                    </header>
+                    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        <div className="mb-8">
+                            <h1 className="text-3xl font-semibold text-blue-900 mb-2">Your Review</h1>
+                            <div className="bg-white shadow rounded-lg p-6">
+                                <div className="mb-2"><b>Feedback:</b> {review.feedback}</div>
+                                <div className="mb-2"><b>Score:</b> {review.score}</div>
+                                <div className="mb-2"><b>Recommendation:</b> {review.recommendation}</div>
+                                <Link href={route('reviews.edit', review.id)} className="btn btn-primary mt-4">Edit Review</Link>
+                            </div>
+                        </div>
+                    </main>
+                </section>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-white min-h-screen">
@@ -144,24 +206,26 @@ export default function Review() {
                             Review the submitted paper information and provide your evaluation. All paper details are displayed below for your reference during the review process.
                         </p>
                     </div>
-                    <div className="space-y-8 bg-white shadow rounded-lg p-6">
-                        <div>
-                            <PaperInfo className="" />
+                    {/* Review submission form */}
+                    <form onSubmit={handleSubmit}>
+                        <PaperList papers={paperRows} />
+                        <div className="space-y-8 bg-white shadow rounded-lg p-6 mt-8">
+                            <div>
+                                <PaperInfo className="" />
+                            </div>
+                            <div className="mt-8">
+                                <ReviewFormat className="mt-8" />
+                            </div>
+                            <div className="mt-8">
+                                <Suggestion className="mt-8" />
+                            </div>
+                            <div className="flex justify-end">
+                                <PrimaryButton className="mt-4" type="submit" disabled={processing}>
+                                    Submit Review
+                                </PrimaryButton>
+                            </div>
                         </div>
-                        <div className="mt-8">
-                            <ReviewFormat className="mt-8" />
-                        </div>
-
-                        <div className="mt-8">
-                            <Suggestion className="mt-8" />
-                        </div>
-                        <div className="flex justify-end">
-                            <PrimaryButton className="mt-4">
-                                Submit Review
-                            </PrimaryButton>
-                        </div>
-                    </div>
-
+                    </form>
                 </main>
             </section>
         </div>

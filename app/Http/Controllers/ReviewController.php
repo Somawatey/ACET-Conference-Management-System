@@ -105,10 +105,36 @@ class ReviewController extends Controller
      */
     public function reviewList()
     {
-        $reviews = Review::with(['paper', 'reviewer'])
-            ->where('reviewer_id', auth()->id())
-            ->orderByDesc('created_at')
-            ->paginate(10);
+        $reviews = Review::with([
+            'paper.user',
+            'paper.submission.authorInfo',
+            'paper.submission',
+            'reviewer'
+        ])
+        ->where('reviewer_id', auth()->id())
+        ->orderByDesc('created_at')
+        ->paginate(10);
+
+        // Add author_name to each review's paper using Submission and AuthorInfo
+        $reviews->getCollection()->transform(function ($review) {
+            if ($review->paper) {
+                // Try AuthorInfo from Submission
+                $authorName = null;
+                if ($review->paper->submission && $review->paper->submission->authorInfo) {
+                    $authorName = $review->paper->submission->authorInfo->author_name;
+                }
+                // Fallback to authorInfo directly on paper
+                if (!$authorName && $review->paper->authorInfo) {
+                    $authorName = $review->paper->authorInfo->author_name;
+                }
+                // Fallback to user name
+                if (!$authorName && $review->paper->user) {
+                    $authorName = $review->paper->user->name;
+                }
+                $review->paper->author_name = $authorName ?? '';
+            }
+            return $review;
+        });
 
         return Inertia::render('Reviews/Index', [
             'reviews' => $reviews
@@ -139,20 +165,29 @@ class ReviewController extends Controller
             'paper_id' => 'required|exists:papers,id',
             'reviewer_id' => 'required|exists:users,id',
             'score' => 'required|integer|min:1|max:10',
-            'comments' => 'nullable|string|max:2000',
+            'feedback' => 'nullable|string|max:2000',
+            'recommendation' => 'nullable|string|max:255',
         ]);
+
+        // Check if review already exists for this user and paper
+        $existing = Review::where('paper_id', $validated['paper_id'])
+            ->where('reviewer_id', $validated['reviewer_id'])
+            ->first();
+        if ($existing) {
+            // Redirect to edit page for this review
+            return redirect()->route('reviews.edit', $existing->id)
+                ->with('info', 'You have already submitted a review for this paper. You can edit your review.');
+        }
 
         $review = Review::create([
             'paper_id' => $validated['paper_id'],
             'reviewer_id' => $validated['reviewer_id'],
             'score' => $validated['score'],
-            'comments' => $validated['comments'] ?? '',
+            'feedback' => $validated['feedback'] ?? '',
+            'recommendation' => $validated['recommendation'] ?? '',
         ]);
 
-        return response()->json([
-            'message' => 'Review submitted successfully.',
-            'review' => $review,
-        ]);
+        return redirect()->back()->with('success', 'Review submitted successfully.');
     }
 
     /**

@@ -132,6 +132,7 @@ Route::middleware('auth')->group(function () {
     // Paper Decision routes
     Route::prefix('paper-decision')->group(function () {
         Route::get('/', [DecisionController::class, 'index'])->name('paper-decision.index');
+        Route::get('/{paper}', [DecisionController::class, 'show'])->name('paper-decision.show');
     });
 
     // Review History
