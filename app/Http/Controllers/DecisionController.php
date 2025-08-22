@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Paper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\PaperDecisionMade;
 
 class DecisionController extends Controller
 {
@@ -199,6 +200,12 @@ class DecisionController extends Controller
             $paper->status = $statusMap[$validated['decision']] ?? $paper->status;
             $paper->save();
 
+            //Notify the author of the decision
+            $author = $paper->user;
+            if ($author) {
+                $author->notify(new PaperDecisionMade($paper, $validated['decision'], $validated['comment']));
+            }
+
             // Redirect to show page so the saved decision is visible
             return redirect()
                 ->route('paper-decision.show', ['paper' => $paper->id])
@@ -206,6 +213,7 @@ class DecisionController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error submitting paper decision: ' . $e->getMessage());
+
 
             return redirect()->back()
                 ->withInput()

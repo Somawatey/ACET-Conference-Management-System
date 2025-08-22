@@ -127,6 +127,8 @@ Route::middleware('auth')->group(function () {
         Route::post("/{paper}", [DecisionController::class, 'store'])->name('paper-decision.store');
     // update existing decision
         Route::patch('/{paper}', [DecisionController::class, 'update'])->name('paper-decision.update');
+        //send notification to author after decision is made
+        Route::post('/notify/{paper}', [DecisionController::class, 'notifyAuthor'])->name('paper-decision.notify');
     });
 
     // Review History
