@@ -10,7 +10,6 @@ use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
 use App\Http\Controllers\DecisionController;
 use App\Http\Controllers\PaperHistoryController;
-use App\Http\Controllers\DecisionController;
 use App\Http\Controllers\ConferenceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
