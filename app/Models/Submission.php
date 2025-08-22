@@ -14,7 +14,6 @@ class Submission extends Model
         'user_id',
         'paper_id',
         'author_info_id',
-        'decision_id',
         'track',
         'submitted_elsewhere',
         'original_submission',
@@ -44,11 +43,5 @@ class Submission extends Model
     public function authorInfo(): BelongsTo
     {
         return $this->belongsTo(AuthorInfo::class);
-    }
-
-    // Decision is associated to Paper via paper_id; access via $this->paper->decision
-    public function decision(): BelongsTo
-    {
-        return $this->belongsTo(Decision::class);
     }
 }

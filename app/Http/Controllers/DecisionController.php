@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Models\Paper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\PaperDecisionMade;
 
 class DecisionController extends Controller
 {
@@ -20,9 +19,11 @@ class DecisionController extends Controller
         try {
             $user = Auth::user();
 
-            // Get papers that belong to the current user with existing decision (if any)
-            $papers = Paper::with('decision')
-                ->where('user_id', $user->id)
+            // Get papers through submissions that belong to the current user with existing decision (if any)
+            $papers = Paper::with(['decision', 'submission.authorInfo'])
+                ->whereHas('submission', function($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
                 ->orderByDesc('created_at')
                 ->get();
             
@@ -130,11 +131,11 @@ class DecisionController extends Controller
     public function show(Paper $paper)
     {
         // Load relationships
-        $paper->load(['user', 'topic', 'reviews.reviewer']);
+        $paper->load(['submission.authorInfo', 'topic', 'reviews.reviewer']);
         $transformedPaper = [
             'id' => $paper->id,
             'title' => $paper->paper_title ?? $paper->title ?? '',
-            'author' => optional($paper->user)->name ?? '',
+            'author' => optional($paper->submission?->authorInfo)->author_name ?? '',
             'track' => $paper->topic,
             'status' => $paper->status ?? 'Pending',
         ];
@@ -175,6 +176,12 @@ class DecisionController extends Controller
      */
     public function store(Request $request, Paper $paper)
     {
+        Log::info('DecisionController@store called', [
+            'paper_id' => $paper->id,
+            'user_id' => auth()->id(),
+            'request_data' => $request->all()
+        ]);
+
         // Validate the request data
         $validated = $request->validate([
             'decision' => ['required', 'in:Accept,Reject,Revise'],
@@ -182,8 +189,11 @@ class DecisionController extends Controller
         ]);
 
         try {
+            // Check if paper exists and load relationships
+            $paper->load(['submission.authorInfo', 'decision']);
+
             // Save decision (create or update if exists)
-            Decision::updateOrCreate(
+            $decision = Decision::updateOrCreate(
                 ['paper_id' => $paper->id],
                 [
                     'organizer_id' => auth()->id(),
@@ -203,12 +213,6 @@ class DecisionController extends Controller
             $paper->status = $statusMap[$validated['decision']] ?? $paper->status;
             $paper->save();
 
-            //Notify the author of the decision
-            $author = $paper->user;
-            if ($author) {
-                $author->notify(new PaperDecisionMade($paper, $validated['decision'], $validated['comment']));
-            }
-
             // Redirect to show page so the saved decision is visible
             return redirect()
                 ->route('paper-decision.show', ['paper' => $paper->id])
@@ -216,7 +220,6 @@ class DecisionController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error submitting paper decision: ' . $e->getMessage());
-
 
             return redirect()->back()
                 ->withInput()

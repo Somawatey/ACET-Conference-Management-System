@@ -36,10 +36,26 @@ export default function PaperPage({ users, papers }) {
     // Dummy implementations for missing functions
     const getPaperTitle = (paper) => paper.title || '';
     const getTopicText = (paper) => paper.topic || '';
-    const statusClass = (status) => status === 'Accepted' ? 'badge badge-success' : 'badge badge-secondary';
+    const getAuthorName = (paper) => paper.author_name || '';
+    const getDecision = (paper) => paper.decision || 'Pending';
+    const decisionClass = (decision) => {
+        switch (decision) {
+            case 'Accept':
+            case 'Accepted':
+                return 'px-3 py-1 text-sm font-medium text-white bg-green-500 rounded-full shadow-sm';
+            case 'Reject':
+            case 'Rejected':
+                return 'px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-full shadow-sm';
+            case 'Revise':
+            case 'Needs Revision':
+                return 'px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-full shadow-sm';
+            default:
+                return 'px-3 py-1 text-sm font-medium text-gray-600 bg-gray-200 rounded-full shadow-sm';
+        }
+    };
     const isReviewerAssigned = (paperId, reviewerId) => false;
     const getAssignedReviewers = (paperId) => [];
-    const assignReviewer = (paperId, reviewerId) => {};
+    const assignReviewer = (paperId, reviewerId) => { };
 
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
@@ -54,7 +70,6 @@ export default function PaperPage({ users, papers }) {
                                     <th>Paper Title</th>
                                     <th>Topic</th>
                                     <th>Author Name</th>
-                                    <th>Review Status</th>
                                     <th>Decision</th>
                                     <th>Action</th>
                                 </tr>
@@ -66,17 +81,8 @@ export default function PaperPage({ users, papers }) {
                                             <td>{paper.id}</td>
                                             <td className="font-medium">{getPaperTitle(paper)}</td>
                                             <td>{getTopicText(paper)}</td>
-                                            <td>{paper.user?.name}</td>
-                                            <td>
-                                                <span className={statusClass(paper.status)}>
-                                                    {paper.status || 'Pending'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span className={statusClass(paper.status)}>
-                                                    {paper.status || 'Pending'}
-                                                </span>
-                                            </td>
+                                            <td>{getAuthorName(paper)}</td>
+                                            <td><span className={decisionClass(getDecision(paper))}>{getDecision(paper)}</span></td>
                                             <td className="space-x-2">
                                                 <button
                                                     type="button"

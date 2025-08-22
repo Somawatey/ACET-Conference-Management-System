@@ -13,6 +13,7 @@ use App\Http\Controllers\PaperHistoryController;
 use App\Http\Controllers\ConferenceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -135,13 +136,27 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [DecisionController::class, 'index'])->name('paper-decision.index');
         Route::get('/create/{paper}', [DecisionController::class, 'create'])->name('paper-decision.create');
         Route::get('/{paper}/edit', [DecisionController::class, 'edit'])->name('paper-decision.edit');
-        Route::get('/{paper}', [DecisionController::class, 'decisionshow'])->name('paper-decision.show');
-        //store
-        Route::post("/{paper}", [DecisionController::class, 'store'])->name('paper-decision.store');
-    // update existing decision
+        Route::get('/{paper}', [DecisionController::class, 'show'])->name('paper-decision.show');
+        Route::post('/{paper}', [DecisionController::class, 'store'])->name('paper-decision.store');
         Route::patch('/{paper}', [DecisionController::class, 'update'])->name('paper-decision.update');
-        //send notification to author after decision is made
         Route::post('/notify/{paper}', [DecisionController::class, 'notifyAuthor'])->name('paper-decision.notify');
+    });
+
+    // Debug routes
+    Route::get('/debug/paper/{paper}', function(App\Models\Paper $paper) {
+        return response()->json([
+            'paper_id' => $paper->id,
+            'paper_title' => $paper->paper_title,
+            'status' => $paper->status ?? 'no status'
+        ]);
+    });
+    
+    Route::post('/debug/paper/{paper}', function(Request $request, App\Models\Paper $paper) {
+        return response()->json([
+            'message' => 'POST request received',
+            'paper_id' => $paper->id,
+            'request_data' => $request->all()
+        ]);
     });
 
     // Review History

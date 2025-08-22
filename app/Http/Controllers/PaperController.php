@@ -16,11 +16,39 @@ class PaperController extends Controller
     public function index()
     {
         $users = User::with('roles')->paginate(10)->appends(request()->query());
-		
-        $papers = Paper::with(['user', 'conference'])
-						
-                      ->orderBy('created_at', 'desc')
-                      ->paginate(10);
+
+        $papers = Paper::with(['user', 'conference', 'reviews', 'decision', 'submission.authorInfo'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        // Transform papers for frontend table
+        $transformedPapers = $papers->getCollection()->map(function ($paper) {
+            $authorName = optional($paper->submission?->authorInfo)->author_name
+                ?? optional($paper->user)->name
+                ?? '';
+            $submissionInfo = $paper->submission ? [
+                'submitted_at' => optional($paper->submission->submitted_at)->toDateTimeString(),
+                'track' => $paper->submission->track ?? '',
+            ] : null;
+            return [
+                'id' => $paper->id,
+                'title' => $paper->paper_title ?? $paper->title ?? '',
+                'topic' => $paper->topic,
+                'author_name' => $authorName,
+                'review_status' => $paper->reviews && $paper->reviews->count() > 0
+                    ? $paper->reviews->map(function ($review) {
+                        return $review->recommendation ?? 'Pending';
+                    })->implode(', ')
+                    : 'Pending',
+                'decision' => optional($paper->decision)->decision ?? 'Pending',
+                'status' => $paper->status ?? 'Pending',
+                'submission' => $submissionInfo,
+            ];
+        });
+
+        // Replace the paginator's collection with the transformed data
+        $papers->setCollection($transformedPapers);
+
         return Inertia::render('Papers/Index', [
             'users' => $users,
             'papers' => $papers,

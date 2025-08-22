@@ -123,6 +123,8 @@ export default function ReviewedPaper({ auth, paper, papers = [], reviews = [], 
             patch(updateUrl, options);
         } else {
             const storeUrl = resolveRoute('paper-decision.store', { paper: paper.id }, `/paper-decision/${paper.id}`);
+            console.log('Submitting to URL:', storeUrl);
+            console.log('Form data:', data);
             post(storeUrl, options);
         }
     };
