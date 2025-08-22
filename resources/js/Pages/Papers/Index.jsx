@@ -101,7 +101,7 @@ export default function PaperPage({ users, papers }) {
                                                             Create New Review
                                                         </Link>
                                                         <Link href="#" className="btn btn-sm btn-outline-secondary">View History</Link>
-                                                        <Link href={typeof route === 'function' ? route('papers.edit', paper.id) : '#'} className="btn btn-sm btn-primary">Edit Decision</Link>
+                                                        <Link href={typeof route === 'function' ? route('paper-decision.show', { paper: paper.id }) : '#'} className="btn btn-sm btn-primary">Edit Decision</Link>
                                                     </div>
                                                 </td>
                                             </tr>

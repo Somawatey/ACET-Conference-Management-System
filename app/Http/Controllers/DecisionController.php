@@ -122,18 +122,20 @@ class DecisionController extends Controller
         }
     }
 
+
     /**
-     * Display the specified resource for decision making.
+     * Display the specified resource for decision making (show method).
      */
-    public function decisionshow(Paper $paper)
+    public function show(Paper $paper)
     {
-        // 1. Find the paper by its ID or fail with a 404 error if not found.
+        // Load relationships
         $paper->load(['user', 'topic', 'reviews.reviewer']);
         $transformedPaper = [
             'id' => $paper->id,
             'title' => $paper->paper_title ?? $paper->title ?? '',
             'author' => optional($paper->user)->name ?? '',
             'track' => $paper->topic,
+            'status' => $paper->status ?? 'Pending',
         ];
 
         $reviews = $paper->reviews->map(function ($review) {
@@ -141,8 +143,9 @@ class DecisionController extends Controller
                 'id' => $review->id,
                 'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
                 'status' => $review->recommendation ?? 'Pending',
+                'comment' => $review->comment ?? '',
+                'score' => $review->score ?? null,
             ];
-
         });
 
         // Include existing decision if present

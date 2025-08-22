@@ -17,24 +17,16 @@ class Paper extends Model
         'abstract',
     ];
 
-<<<<<<< HEAD
-    // Expose a computed public URL similar to User::profile_photo_url
-    protected $appends = [
-        'file_url',
-    ];
-
-    public function getFileUrlAttribute(): ?string
-=======
     public function topic(): BelongsTo
     {
         return $this->belongsTo(Topic::class);
     }
 
     public function user(): BelongsTo
->>>>>>> Ith_Youdy
     {
-        return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
+        return $this->belongsTo(User::class);
     }
+
 
     public function author(): BelongsTo
     {
@@ -60,13 +52,14 @@ class Paper extends Model
     {
         return $this->hasOne(ConferenceSession::class);
     }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    
     public function conference(): BelongsTo
     {
         return $this->belongsTo(Conference::class);
+    }
+    
+    public function getPdfUrlAttribute()
+    {
+        return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
     }
 }
