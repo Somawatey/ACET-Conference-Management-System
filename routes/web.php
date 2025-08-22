@@ -136,6 +136,10 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+     // Paper History
+    Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
+
+    Route::get('/reviewers', [UserController::class, 'reviewers']);
 
      // Conference routes
     Route::prefix('conferences')->group(function () {

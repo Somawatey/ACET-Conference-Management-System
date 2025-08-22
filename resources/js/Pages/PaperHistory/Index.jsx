@@ -16,15 +16,8 @@ export default function PaperHistoryPage({ histories = [] }) {
         : Array.isArray(histories)
             ? histories
             : [];
-
-    // Fallback sample histories
-    const fallbackHistories = [
-        { id: 1, paper_id: 101, title: 'AI for Healthcare', author: 'Jane Doe', version: 1, status: 'Submitted', submitted_at: '2025-07-10' },
-        { id: 2, paper_id: 101, title: 'AI for Healthcare', author: 'Jane Doe', version: 2, status: 'Revised', submitted_at: '2025-07-25' },
-        { id: 3, paper_id: 102, title: 'Quantum Computing Advances', author: 'John Smith', version: 1, status: 'Accepted', submitted_at: '2025-08-02' },
-    ];
-
-    const rows = normalizedHistories.length > 0 ? normalizedHistories : fallbackHistories;
+    console.log(normalizedHistories);
+    const rows = normalizedHistories;
 
     const statusClass = (status) => {
         const s = (status || '').toLowerCase();
@@ -46,22 +39,29 @@ export default function PaperHistoryPage({ histories = [] }) {
                                     <th>ID</th>
                                     <th>Paper Title</th>
                                     <th>Author</th>
-                                    <th>Version</th>
+                                    <th>Corresponding Email</th>
+                                    <th>Submitted By</th>
                                     <th>Status</th>
-                                    <th>Submitted At</th>
+                                    <th>Created At</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {rows.map((h, idx) => (
                                     <tr key={h.id ?? `history-${idx}`}>
                                         <td>{h.id}</td>
-                                        <td>{h.title}</td>
-                                        <td>{h.author}</td>
-                                        <td>v{h.version}</td>
+                                        <td>{h.paper_title}</td>
+                                        <td>{h.author_name}</td>
+                                        <td>{h.corresponding_email || '—'}</td>
+                                        <td>{h.submitted_by || '—'}</td>
                                         <td><span className={statusClass(h.status)}>{h.status}</span></td>
-                                        <td>{h.submitted_at}</td>
+                                        <td>{h.created_at}</td>
                                     </tr>
                                 ))}
+                                {rows.length === 0 && (
+                                    <tr>
+                                        <td colSpan={7} className="text-center text-muted py-3">No submission history found.</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
