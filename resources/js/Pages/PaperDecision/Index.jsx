@@ -223,7 +223,11 @@ export default function ReviewedPaper({ auth, paper, papers = [], reviews = [], 
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     <Link
-                                                        href={route('reviews.show', { id: review.id })}
+                                                        href={route('review.history', { 
+                                                            paper_id: review.paper_id || paper.id,
+                                                            review_id: review.id,
+                                                            source: 'paper-decision'
+                                                        })}
                                                         className="text-indigo-600 hover:text-indigo-900">
                                                         View Details
                                                     </Link>

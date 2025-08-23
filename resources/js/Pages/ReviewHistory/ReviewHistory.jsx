@@ -35,7 +35,36 @@ function getCustomLinks(links) {
 export default function ReviewHistory({ paper, papers, reviews, filters }) {
     const { auth } = usePage().props;
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedReviewId, setSelectedReviewId] = useState(null);
     const items = reviews ?? [];
+
+    // Get review_id from URL parameters
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const reviewId = params.get('review_id');
+            if (reviewId) {
+                setSelectedReviewId(parseInt(reviewId));
+                // Scroll to the review after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    const reviewElement = document.getElementById(`review-${reviewId}`);
+                    if (reviewElement) {
+                        reviewElement.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                    }
+                }, 100);
+            }
+        }
+    }, []);
+
+    // Check if user came from Paper Decision page
+    const isFromPaperDecision = () => {
+        if (typeof window === 'undefined') return false;
+        const params = new URLSearchParams(window.location.search);
+        return params.get('source') === 'paper-decision' && params.get('paper_id');
+    };
 
     // Initialize show/hide from query param (?show=1|0), default to show
     const initialShow = (() => {
@@ -48,6 +77,18 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
     })();
     const [showHistory, setShowHistory] = useState(initialShow);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // Handle scroll detection
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsScrolled(scrollTop > 100); // Show enhanced button after scrolling 100px
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -172,7 +213,42 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                         </div>
                     </div>
                 </header>
+                
+                {/* Sticky Back Button when coming from Paper Decision */}
+                {isFromPaperDecision() && (
+                    <div className={`sticky top-0 z-40 transition-all duration-300 ${
+                        isScrolled 
+                            ? '-translate-x-24 mr-5' 
+                            : ''
+                    }`}>
+                        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+                            <div className={`inline-block transition-all duration-300 ${
+                                isScrolled 
+                                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-2 border border-blue-200 shadow-sm' 
+                                    : ''
+                            }`}>
+                                <Link
+                                    href={route('paper-decision.show', { paper: filters.paper_id })}
+                                    className={`inline-flex items-center text-sm font-medium transition-all duration-200 ${
+                                        isScrolled 
+                                            ? 'text-blue-700 hover:text-blue-900' 
+                                            : 'text-indigo-600 hover:text-indigo-800'
+                                    }`}
+                                >
+                                    <svg className={`mr-2 transition-all duration-200 ${
+                                        isScrolled ? 'w-5 h-5' : 'w-4 h-4'
+                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    </svg>
+                                    <span className="whitespace-nowrap">{isScrolled ? 'Back' : 'Back to Paper Decision'}</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
                 <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+
                     {/* Paper Information */}
                     {paper && (
                         <div className="mb-8">
@@ -284,7 +360,14 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                         <>
                             <div className="space-y-6 mb-8">
                                 {items.map((review) => (
-                                    <ReviewerBlock key={review.id} review={review} />
+                                    <ReviewerBlock 
+                                        key={review.id} 
+                                        review={review}
+                                        isSelected={selectedReviewId === review.id}
+                                        onToggle={(reviewId) => {
+                                            setSelectedReviewId(selectedReviewId === reviewId ? null : reviewId);
+                                        }}
+                                    />
                                 ))}
                                 {items.length === 0 && (
                                     <div className="bg-white shadow rounded-lg p-6 text-gray-600">

@@ -1,14 +1,12 @@
 import { Head, usePage, Link } from "@inertiajs/react";
-import PaperInfo from "./Partial/PaperInfo";
-import PaperList from "./Partial/PaperList";
-import TextArea from "@/Components/TextArea";
-import Suggestion from "./Partial/Suggest";
 import PrimaryButton from "@/Components/PrimaryButton";
-import ReviewFormat from "./Partial/ReviewFormat";
+import PaperInfoSection from "./Partial/PaperInfoSection";
+import ReviewDetailsSection from "./Partial/ReviewDetailsSection";
+import ReviewFormSection from './Partial/ReviewFormSection';
 import { useState, useEffect } from "react";
 import { useForm } from '@inertiajs/react';
 
-export default function Review({ papers = [], review }) {
+export default function Review({ paper, review }) {
     const { auth } = usePage().props;
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -38,37 +36,84 @@ export default function Review({ papers = [], review }) {
         return auth?.user?.profile_photo_url;
     };
 
-    // Paper list: get from props or usePage
-    const pageProps = usePage().props;
-    const paperRows = papers.length ? papers : (pageProps.papers?.data || pageProps.papers || []);
+    // Paper list: get from props
+    const paperRows = paper ? [paper] : [];
 
-    // Collect review data from child components (assume you have state or props for these)
-    // For demonstration, use dummy state. Replace with actual state from your components.
-    const [feedback, setFeedback] = useState(''); // review comment
-    const [score, setScore] = useState(''); // rating
-    const [recommendation, setRecommendation] = useState(''); // comment
+    // Initialize form with paper data
+    const { data, setData, post, processing, errors, reset } = useForm({
+        paper_id: paper?.id || '',
+        reviewer_id: auth?.user?.id || '',
+        feedback: '',
+        score: '',
+        recommendation: '',
+    });
 
-    const { post, processing, errors, reset } = useForm({});
+    // Handle form field changes
+    const handleFeedbackChange = (value) => {
+        setData('feedback', value);
+    };
+
+    const handleScoreChange = (value) => {
+        setData('score', value);
+    };
+
+    const handleRecommendationChange = (value) => {
+        setData('recommendation', value);
+    };
 
     // Handle review submission
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Validate required fields
+        if (!data.paper_id) {
+            alert('Paper ID is required');
+            return;
+        }
+        if (!data.score || data.score < 1 || data.score > 10) {
+            alert('Score must be between 1 and 10');
+            return;
+        }
+
         post(route('reviews.store'), {
-            data: {
-                paper_id: papers[0]?.id || '',
-                feedback,
-                score,
-                recommendation,
-            },
             onSuccess: () => {
                 reset();
                 alert('Review submitted successfully!');
+                // Redirect back to reviews list
+                window.location.href = route('reviews.reviewList');
             },
-            onError: () => {
-                alert('Failed to submit review.');
+            onError: (errors) => {
+                console.error('Review submission errors:', errors);
+                alert('Failed to submit review. Please check your input.');
             }
         });
     };
+
+    // If no paper is provided, show error message
+    if (!paper) {
+        return (
+            <div className="bg-gradient-to-br from-blue-50 to-white min-h-screen">
+                <Head title="Review Paper" />
+                <section>
+                    <header className="bg-[#12284B] shadow">
+                        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                            <h2 className="text-white text-2xl font-bold tracking-wide drop-shadow">
+                                Review Paper
+                            </h2>
+                        </div>
+                    </header>
+                    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                            <p>No paper found for review. Please select a paper from the assignments list.</p>
+                            <Link href={route('reviews.reviewList')} className="text-red-800 underline">
+                                Back to Assignments
+                            </Link>
+                        </div>
+                    </main>
+                </section>
+            </div>
+        );
+    }
 
     // Assume 'review' prop is passed if user has already submitted a review for this paper
     // If not, show submit form. If yes, show review info and edit button.
@@ -86,14 +131,27 @@ export default function Review({ papers = [], review }) {
                     </header>
                     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                         <div className="mb-8">
-                            <h1 className="text-3xl font-semibold text-blue-900 mb-2">Your Review</h1>
-                            <div className="bg-white shadow rounded-lg p-6">
-                                <div className="mb-2"><b>Feedback:</b> {review.feedback}</div>
-                                <div className="mb-2"><b>Score:</b> {review.score}</div>
-                                <div className="mb-2"><b>Recommendation:</b> {review.recommendation}</div>
-                                <Link href={route('reviews.edit', review.id)} className="btn btn-primary mt-4">Edit Review</Link>
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h1 className="text-3xl font-semibold text-blue-900 mb-2">Your Review</h1>
+                                    <p className="text-gray-700">
+                                        Review details for this paper
+                                    </p>
+                                </div>
+                                <Link 
+                                    href={route('reviews.reviewList')} 
+                                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition duration-200"
+                                >
+                                    ← Back to Assignments
+                                </Link>
                             </div>
                         </div>
+
+                        {/* Paper Information Section */}
+                        <PaperInfoSection paper={paper} className="mb-6" />
+
+                        {/* Review Details Section */}
+                        <ReviewDetailsSection review={review} />
                     </main>
                 </section>
             </div>
@@ -199,31 +257,37 @@ export default function Review({ papers = [], review }) {
                 <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                     {/* Custom Header and Description */}
                     <div className="mb-8">
-                        <h1 className="text-3xl font-semibold text-blue-900 mb-2">
-                            Paper Review Details
-                        </h1>
-                        <p className="text-medium text-gray-700">
-                            Review the submitted paper information and provide your evaluation. All paper details are displayed below for your reference during the review process.
-                        </p>
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h1 className="text-3xl font-semibold text-blue-900 mb-2">
+                                    Paper Review Details
+                                </h1>
+                                <p className="text-medium text-gray-700">
+                                    Review the submitted paper information and provide your evaluation.
+                                </p>
+                            </div>
+                            <Link 
+                                href={route('reviews.reviewList')} 
+                                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition duration-200"
+                            >
+                                ← Back to Assignments
+                            </Link>
+                        </div>
                     </div>
                     {/* Review submission form */}
                     <form onSubmit={handleSubmit}>
-                        <PaperList papers={paperRows} />
-                        <div className="space-y-8 bg-white shadow rounded-lg p-6 mt-8">
-                            <div>
-                                <PaperInfo className="" />
-                            </div>
-                            <div className="mt-8">
-                                <ReviewFormat className="mt-8" />
-                            </div>
-                            <div className="mt-8">
-                                <Suggestion className="mt-8" />
-                            </div>
-                            <div className="flex justify-end">
-                                <PrimaryButton className="mt-4" type="submit" disabled={processing}>
-                                    Submit Review
-                                </PrimaryButton>
-                            </div>
+                        {/* Paper Information Section */}
+                        <PaperInfoSection paper={paper} className="mb-6" />
+                        
+                        <div className="space-y-8">
+                            <ReviewFormSection
+                                data={data}
+                                setData={setData}
+                                errors={errors}
+                                processing={processing}
+                                onCancel={() => window.history.back()}
+                                className=""
+                            />
                         </div>
                     </form>
                 </main>

@@ -121,12 +121,13 @@ Route::middleware('auth')->group(function () {
 
     // Review routes
     Route::prefix('reviews')->group(function () {
-        Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
-        Route::get('/create/{paper_id?}', [ReviewController::class, 'create'])->name('reviews.create');
+        Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.reviewList');
+        Route::get('/index', [ReviewController::class, 'reviewList'])->name('reviews.index');
+        Route::get('/create/{paper?}', [ReviewController::class, 'create'])->name('reviews.create');
         //for viewing feedback in paperDecision
         Route::get('/{review}', [ReviewController::class, 'show'])->name('reviews.show');
         Route::get('/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
-        Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::post('/', [ReviewController::class, 'store'])->name('reviews.store');
         Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
         Route::delete("/{id}", [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });

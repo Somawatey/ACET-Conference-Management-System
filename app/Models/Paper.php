@@ -17,11 +17,6 @@ class Paper extends Model
         'abstract',
     ];
 
-    public function topic(): BelongsTo
-    {
-        return $this->belongsTo(Topic::class);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
