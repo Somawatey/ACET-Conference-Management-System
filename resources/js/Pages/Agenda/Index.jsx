@@ -12,6 +12,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import moment from 'moment';
 import { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
+import { AgendaPdfGenerator } from '@/Pages/Agenda/Utils/PdfGenerator';
 
 export default function AgendaPage({ agendas, filters }) {
     const dataList = agendas.data ?? [];
@@ -34,6 +35,32 @@ export default function AgendaPage({ agendas, filters }) {
         });
     const [viewingSchedule, setViewingSchedule] = useState(false);
     const [selectedAgenda, setSelectedAgenda] = useState(null);
+
+    // PDF Export Functions
+    const exportAllAgendas = () => {
+        try {
+            const pdfGenerator = new AgendaPdfGenerator();
+            pdfGenerator.generateAllAgendasPDF(dataList, {
+                search: searchTerm,
+                filter_id: filterId,
+                sort_by: sortBy,
+                sort_order: sortOrder,
+            });
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+        }
+    };
+
+    const exportSingleAgenda = (agenda) => {
+        try {
+            const pdfGenerator = new AgendaPdfGenerator();
+            pdfGenerator.generateSingleAgendaPDF(agenda);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+        }
+    };
 
     // Add this function to handle opening the view modal
     const viewScheduleDetails = (agendaDetail) => {
@@ -87,6 +114,33 @@ export default function AgendaPage({ agendas, filters }) {
             preserveScroll: true,
         });
     };
+
+    // Function to confirm data deletion
+    const confirmDataDeletion = (agenda) => {
+        setDeleteData({
+            id: agenda.id,
+            title: agenda.title
+        });
+        setConfirmingDataDeletion(true);
+    };
+
+    // Function to close modal
+    const closeModal = () => {
+        setConfirmingDataDeletion(false);
+        reset();
+        clearErrors();
+    };
+
+    // Function to delete data row
+    const deleteDataRow = () => {
+        destroy(route('agenda.destroy', deleteData.id), {
+            preserveScroll: true,
+            onSuccess: () => closeModal(),
+            onError: () => console.log('Error deleting agenda'),
+            onFinish: () => reset(),
+        });
+    };
+
     const formatDate = (datetime) => {
         return moment(datetime).format("DD/MM/YYYY");
     };
@@ -94,6 +148,7 @@ export default function AgendaPage({ agendas, filters }) {
     const formatTime = (time) => {
         return moment(time, "HH:mm:ss").format("hh:mm A");
     };
+    
     const headWeb = 'Agenda List'
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
@@ -188,7 +243,7 @@ export default function AgendaPage({ agendas, filters }) {
 
                         {/*-- Create Agenda Section --*/}
                         <div className="w-full flex gap-5 mb-4">
-                            {/* This can be a Link to a create page or trigger a modal */}
+                            {/* Create Agenda Button */}
                             {can['agenda-create'] && (
                                 <Link
                                     href={route('agenda.create')}
@@ -197,13 +252,16 @@ export default function AgendaPage({ agendas, filters }) {
                                     Create Agenda
                                 </Link>
                             )}
+                            
+                            {/* Export All PDF Button */}
                             <button 
-                                className="bg-green-500 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-md transition duration-300 inline-flex items-center"
+                                onClick={exportAllAgendas}
+                                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 inline-flex items-center"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>
-                                Download All
+                                Export All PDF
                             </button>
                         </div>
 
@@ -294,6 +352,17 @@ export default function AgendaPage({ agendas, filters }) {
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                        </button>
+                                                        
+                                                        {/* PDF Export Single Button */}
+                                                        <button 
+                                                            onClick={() => exportSingleAgenda(agenda)}
+                                                            className="text-gray-600 hover:text-red-600 transition-colors duration-200"
+                                                            title="Export PDF"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                             </svg>
                                                         </button>
                                                         
@@ -389,6 +458,7 @@ export default function AgendaPage({ agendas, filters }) {
                         </div>
                     </div>
                 )}
+
                 {/* View Schedule Modal */}
                 {viewingSchedule && selectedAgenda && (
                     <div className="fixed inset-0 z-50 bg-black/50 flex justify-center items-center overflow-y-auto py-10">
@@ -546,13 +616,15 @@ export default function AgendaPage({ agendas, filters }) {
                             {/* Modal Footer */}
                             <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between">
                                 <div className='flex space-x-3'>
+                                    {/* Export Single PDF from Modal */}
                                     <button 
-                                        className="bg-green-500 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-md transition duration-300 inline-flex items-center"
+                                        onClick={() => exportSingleAgenda(selectedAgenda)}
+                                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 inline-flex items-center"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                         </svg>
-                                        Download All
+                                        Export PDF
                                     </button>
                                     <div className="flex items-center text-gray-500 text-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
