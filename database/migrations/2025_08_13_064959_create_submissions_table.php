@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('paper_id')->constrained('papers');
             $table->foreignId('author_info_id')->constrained('author_infos'); // Link to author_infos
-            $table->foreignId('decision_id')->nullable()->constrained('decisions');
             
             // Only submission-specific fields
             $table->string('track');
