@@ -16,8 +16,7 @@ class PaperController extends Controller
     public function index()
     {
         $users = User::with('roles')->paginate(10)->appends(request()->query());
-        $papers = Paper::with(['user', 'conference'])
-						
+        $papers = Paper::with(['user', 'conference', 'authorInfo', 'submission'])
                       ->orderBy('created_at', 'desc')
                       ->paginate(10);
 

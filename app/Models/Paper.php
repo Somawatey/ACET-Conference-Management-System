@@ -37,6 +37,18 @@ class Paper extends Model
         return $this->hasOne(Submission::class);
     }
 
+    public function authorInfo()
+    {
+        return $this->hasOneThrough(
+            AuthorInfo::class,
+            Submission::class,
+            'paper_id', // Foreign key on submissions table
+            'id', // Foreign key on author_infos table
+            'id', // Local key on papers table
+            'author_info_id' // Local key on submissions table
+        );
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
