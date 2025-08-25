@@ -1,7 +1,3 @@
-import { Fragment, useState, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
-import Pagination from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Breadcrumb from '@/Components/Breadcrumb';
 import Pagination from '@/Components/Pagination';
@@ -160,7 +156,7 @@ export default function PaperPage({ users, papers }) {
                                                     onAssignReviewer={() => openAssignReviewerModal(paper)}
                                                 >
                                                     <StatusBadge status={paper.status} />
-                                                    <PaperActions paper={paper} onAssignReviewer={() => openAssignReviewerModal(paper)} />
+                                                    <PaperActions paper={paper} onManageReviewers={() => openAssignReviewerModal(paper)} />
                                                 </PaperRow>
                                             )) : (
                                                 <tr>
