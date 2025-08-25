@@ -102,6 +102,9 @@ Route::middleware('auth')->group(function () {
 
     // Your Submissions alias route
     Route::get('/your-submissions', [SubmissionController::class, 'index'])->name('your-submissions.index');
+    
+    // Submission History route
+    Route::get('/submission-history', [SubmissionController::class, 'history'])->name('submissions.history');
 
     // Paper Assignment routes
     Route::prefix('paper-assignments')->group(function () {

@@ -1,56 +1,58 @@
+import React, { useState, useEffect, Fragment } from 'react';
+import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Breadcrumb from '@/Components/Breadcrumb';
 import Pagination from '@/Components/Pagination';
-import { Head, Link } from '@inertiajs/react';
-import { useState, Fragment } from 'react';
 
-export default function PaperHistoryPage({ histories = [] }) {
+export default function SubmissionHistoryPage({ submissions }) {
     const [openId, setOpenId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
-    const headWeb = 'Paper Submission History';
-    const linksBreadcrumb = [
-        { title: 'Home', url: '/' },
-        { title: 'Papers', url: '/papers' },
-        { title: headWeb, url: '' }
-    ];
+    const headWeb = 'Submission History';
+    const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
-    // Normalize data
-    const normalizedHistories = Array.isArray(histories?.data)
-        ? histories.data
-        : Array.isArray(histories)
-            ? histories
+    const normalizedSubmissions = Array.isArray(submissions?.data) 
+        ? submissions.data 
+        : Array.isArray(submissions) 
+            ? submissions 
             : [];
     
-    // Filter histories based on search term and status
-    const filteredHistories = normalizedHistories.filter(history => {
-        const matchesSearch = history?.paper_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            history?.author_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            history?.corresponding_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            history?.status?.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filter submissions based on search term and status
+    const filteredSubmissions = normalizedSubmissions.filter(submission => {
+        const matchesSearch = submission?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            submission?.topic?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            submission?.author_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            submission?.status?.toLowerCase().includes(searchTerm.toLowerCase());
         
         const matchesStatus = filterStatus === 'all' || 
-            history?.status?.toLowerCase() === filterStatus.toLowerCase();
+            submission?.status?.toLowerCase() === filterStatus.toLowerCase();
         
         return matchesSearch && matchesStatus;
     });
 
-    const rows = searchTerm || filterStatus !== 'all' ? filteredHistories : normalizedHistories;
+    const rows = searchTerm || filterStatus !== 'all' ? filteredSubmissions : normalizedSubmissions;
+
+    // Helper functions
+    const getPaperTitle = (submission) => submission.title || '';
+    const getTopicText = (submission) => submission.topic || '';
+    const getAuthorName = (submission) => submission.author_name || '';
+    const getStatus = (submission) => submission.status || 'Pending';
 
     const statusClass = (status) => {
-        const s = (status || '').toLowerCase();
+        const s = (status || '').toString().toLowerCase();
         if (s.includes('accept') || s === 'accepted') return 'bg-green-100 text-green-800';
-        if (s.includes('revise') || s.includes('resubmit')) return 'bg-yellow-100 text-yellow-800';
+        if (s.includes('pend') || s === 'pending') return 'bg-yellow-100 text-yellow-800';
         if (s.includes('reject') || s === 'rejected') return 'bg-red-100 text-red-800';
-        if (s.includes('pend') || s === 'pending') return 'bg-blue-100 text-blue-800';
+        if (s.includes('revise') || s === 'revision') return 'bg-blue-100 text-blue-800';
+        if (s.includes('submit') || s === 'submitted') return 'bg-indigo-100 text-indigo-800';
         return 'bg-gray-100 text-gray-800';
     };
 
     const toggleRow = (id) => setOpenId((prev) => (prev === id ? null : id));
 
     // Get unique statuses for filter
-    const uniqueStatuses = [...new Set(normalizedHistories.map(h => h.status).filter(Boolean))];
+    const uniqueStatuses = [...new Set(normalizedSubmissions.map(s => s.status).filter(Boolean))];
 
     return (
         <AdminLayout>
@@ -70,34 +72,34 @@ export default function PaperHistoryPage({ histories = [] }) {
                                     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
                                         <div>
                                             <h1 className="text-2xl sm:text-3xl font-semibold text-blue-900 mb-2">
-                                                Paper Submission History
+                                                Submission History
                                             </h1>
                                             <p className="text-gray-700 text-sm sm:text-base">
-                                                Complete history of all paper submissions and their current status
+                                                Complete history of all your paper submissions and their progress
                                             </p>
                                         </div>
                                         
                                         {/* Stats */}
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                             <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                                <div className="text-xl sm:text-2xl font-bold text-blue-600">{normalizedHistories.length}</div>
-                                                <div className="text-xs sm:text-sm text-gray-600">Total Papers</div>
+                                                <div className="text-xl sm:text-2xl font-bold text-blue-600">{normalizedSubmissions.length}</div>
+                                                <div className="text-xs sm:text-sm text-gray-600">Total Submissions</div>
                                             </div>
                                             <div className="text-center p-3 bg-green-50 rounded-lg">
                                                 <div className="text-xl sm:text-2xl font-bold text-green-600">
-                                                    {normalizedHistories.filter(h => ['accept', 'accepted'].includes(h.status?.toLowerCase())).length}
+                                                    {normalizedSubmissions.filter(s => ['accept', 'accepted'].includes(s.status?.toLowerCase())).length}
                                                 </div>
                                                 <div className="text-xs sm:text-sm text-gray-600">Accepted</div>
                                             </div>
                                             <div className="text-center p-3 bg-yellow-50 rounded-lg">
                                                 <div className="text-xl sm:text-2xl font-bold text-yellow-600">
-                                                    {normalizedHistories.filter(h => ['pending', 'revise', 'resubmit'].includes(h.status?.toLowerCase())).length}
+                                                    {normalizedSubmissions.filter(s => ['pending', 'submitted'].includes(s.status?.toLowerCase())).length}
                                                 </div>
-                                                <div className="text-xs sm:text-sm text-gray-600">In Review</div>
+                                                <div className="text-xs sm:text-sm text-gray-600">In Progress</div>
                                             </div>
                                             <div className="text-center p-3 bg-red-50 rounded-lg">
                                                 <div className="text-xl sm:text-2xl font-bold text-red-600">
-                                                    {normalizedHistories.filter(h => ['reject', 'rejected'].includes(h.status?.toLowerCase())).length}
+                                                    {normalizedSubmissions.filter(s => ['reject', 'rejected'].includes(s.status?.toLowerCase())).length}
                                                 </div>
                                                 <div className="text-xs sm:text-sm text-gray-600">Rejected</div>
                                             </div>
@@ -126,7 +128,7 @@ export default function PaperHistoryPage({ histories = [] }) {
                                     />
                                 </div>
 
-                                {/* Status Filter and Results */}
+                                {/* Status Filter */}
                                 <div className="flex items-center gap-4">
                                     <select
                                         value={filterStatus}
@@ -141,8 +143,9 @@ export default function PaperHistoryPage({ histories = [] }) {
                                         ))}
                                     </select>
 
+                                    {/* Results count */}
                                     <span className="text-sm text-gray-600 whitespace-nowrap">
-                                        {rows.length} record{rows.length !== 1 ? 's' : ''} found
+                                        {rows.length} submission{rows.length !== 1 ? 's' : ''} found
                                     </span>
                                 </div>
                             </div>
@@ -157,115 +160,109 @@ export default function PaperHistoryPage({ histories = [] }) {
                                             <tr>
                                                 <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">ID</th>
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Paper Title</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Author</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Corresponding Email</th>
+                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Topic</th>
+                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Author Name</th>
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Created At</th>
+                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Submitted</th>
                                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sr-only">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200 bg-white">
-                                            {rows.length > 0 ? rows.map((history, idx) => (
-                                                <Fragment key={history.id ?? `history-${idx}`}>
+                                            {rows.length > 0 ? rows.map((submission, idx) => (
+                                                <Fragment key={submission.id ?? `row-${idx}`}>
                                                     <tr className="hover:bg-gray-50 transition-colors duration-200">
                                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                                                            {history.id}
+                                                            {submission.id}
                                                         </td>
                                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 font-medium max-w-xs truncate">
-                                                            {history.paper_title}
+                                                            {getPaperTitle(submission)}
+                                                        </td>
+                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                            <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                                                                {getTopicText(submission)}
+                                                            </span>
                                                         </td>
                                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                                                            {history.author_name}
+                                                            {getAuthorName(submission)}
                                                         </td>
                                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {history.corresponding_email || '—'}
-                                                        </td>
-                                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClass(history.status)}`}>
-                                                                {history.status}
+                                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClass(getStatus(submission))}`}>
+                                                                {getStatus(submission)}
                                                             </span>
                                                         </td>
                                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                            {history.created_at ? new Date(history.created_at).toLocaleDateString() : '—'}
+                                                            {submission.submitted_at ? new Date(submission.submitted_at).toLocaleDateString() : 'N/A'}
                                                         </td>
                                                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
                                                             <button
                                                                 type="button"
                                                                 className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                                                                onClick={() => toggleRow(history.id)}
+                                                                onClick={() => toggleRow(submission.id)}
                                                             >
-                                                                {openId === history.id ? 'Hide Details' : 'View Details'}
+                                                                {openId === submission.id ? 'Hide Details' : 'View Details'}
                                                             </button>
                                                         </td>
                                                     </tr>
-                                                    {openId === (history.id ?? idx) && (
+                                                    {openId === (submission.id ?? idx) && (
                                                         <tr className="bg-gray-50">
                                                             <td colSpan={7} className="px-4 py-6">
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                                     <div>
-                                                                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Submission Details</h4>
+                                                                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Submission Timeline</h4>
                                                                         <div className="space-y-3">
-                                                                            <div>
-                                                                                <span className="text-sm font-medium text-gray-600">Submitted By:</span>
-                                                                                <span className="ml-2 text-sm text-gray-900">{history.submitted_by || '—'}</span>
-                                                                            </div>
-                                                                            <div>
-                                                                                <span className="text-sm font-medium text-gray-600">Email:</span>
-                                                                                <span className="ml-2 text-sm text-gray-900">{history.corresponding_email || '—'}</span>
-                                                                            </div>
-                                                                            <div>
-                                                                                <span className="text-sm font-medium text-gray-600">Submission Date:</span>
-                                                                                <span className="ml-2 text-sm text-gray-900">
-                                                                                    {history.created_at ? new Date(history.created_at).toLocaleDateString() : '—'}
-                                                                                </span>
-                                                                            </div>
-                                                                            <div>
-                                                                                <span className="text-sm font-medium text-gray-600">Current Status:</span>
-                                                                                <span className={`ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClass(history.status)}`}>
-                                                                                    {history.status}
-                                                                                </span>
-                                                                            </div>
-                                                                            {history.institute && (
+                                                                            <div className="flex items-center">
+                                                                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                                                                                 <div>
-                                                                                    <span className="text-sm font-medium text-gray-600">Institute:</span>
-                                                                                    <span className="ml-2 text-sm text-gray-900">{history.institute}</span>
+                                                                                    <span className="text-sm font-medium text-gray-600">Submitted:</span>
+                                                                                    <span className="ml-2 text-sm text-gray-900">
+                                                                                        {submission.submitted_at ? new Date(submission.submitted_at).toLocaleDateString() : 'N/A'}
+                                                                                    </span>
                                                                                 </div>
-                                                                            )}
+                                                                            </div>
+                                                                            <div className="flex items-center">
+                                                                                <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
+                                                                                <div>
+                                                                                    <span className="text-sm font-medium text-gray-600">Under Review:</span>
+                                                                                    <span className="ml-2 text-sm text-gray-900">
+                                                                                        {submission.review_started_at ? new Date(submission.review_started_at).toLocaleDateString() : 'Pending'}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="flex items-center">
+                                                                                <div className={`w-2 h-2 rounded-full mr-3 ${
+                                                                                    submission.decision_made_at ? 'bg-green-500' : 'bg-gray-300'
+                                                                                }`}></div>
+                                                                                <div>
+                                                                                    <span className="text-sm font-medium text-gray-600">Decision Made:</span>
+                                                                                    <span className="ml-2 text-sm text-gray-900">
+                                                                                        {submission.decision_made_at ? new Date(submission.decision_made_at).toLocaleDateString() : 'Pending'}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                     <div>
-                                                                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Available Actions</h4>
+                                                                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Actions</h4>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             <Link
-                                                                                href={route('papers.show', { id: history.paper_id || history.id })}
+                                                                                href={route('review.history', { paper_id: submission.paper_id })}
                                                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                                                                            >
-                                                                                <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                                                </svg>
-                                                                                View Paper
-                                                                            </Link>
-                                                                            <Link
-                                                                                href={route('review.history', { paper_id: history.paper_id || history.id })}
-                                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                                                                             >
                                                                                 <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                                 </svg>
                                                                                 Review History
                                                                             </Link>
-                                                                            {['pending', 'revise', 'resubmit'].includes(history.status?.toLowerCase()) && (
-                                                                                <Link
-                                                                                    href={route('submissions.edit', { id: history.submission_id || history.id })}
-                                                                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
-                                                                                >
-                                                                                    <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                                                    </svg>
-                                                                                    Edit Submission
-                                                                                </Link>
-                                                                            )}
+                                                                            <Link
+                                                                                href={route('submissions.show', { id: submission.id })}
+                                                                                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                                                                            >
+                                                                                <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                                </svg>
+                                                                                View Details
+                                                                            </Link>
                                                                             <button
                                                                                 className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-400 bg-white cursor-not-allowed"
                                                                                 disabled
@@ -273,19 +270,8 @@ export default function PaperHistoryPage({ histories = [] }) {
                                                                                 <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                                                 </svg>
-                                                                                Download PDF
+                                                                                Download Certificate
                                                                             </button>
-                                                                            {['accepted', 'published'].includes(history.status?.toLowerCase()) && (
-                                                                                <Link
-                                                                                    href={`#certificate-${history.id}`}
-                                                                                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-                                                                                >
-                                                                                    <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                    </svg>
-                                                                                    Download Certificate
-                                                                                </Link>
-                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -299,14 +285,14 @@ export default function PaperHistoryPage({ histories = [] }) {
                                                         <div className="flex flex-col items-center">
                                                             <div className="rounded-full bg-gray-100 p-3 mb-4">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                 </svg>
                                                             </div>
                                                             <h3 className="text-sm font-medium text-gray-900">No submission history found</h3>
                                                             <p className="mt-1 text-sm text-gray-500">
                                                                 {searchTerm || filterStatus !== 'all' 
                                                                     ? 'Try adjusting your search or filter criteria.'
-                                                                    : 'No paper submission history available yet.'
+                                                                    : 'No submissions have been made yet.'
                                                                 }
                                                             </p>
                                                             {(!searchTerm && filterStatus === 'all') && (
@@ -331,9 +317,9 @@ export default function PaperHistoryPage({ histories = [] }) {
                                 </div>
                                 
                                 {/* Pagination */}
-                                {histories?.links && (
+                                {submissions?.links && (
                                     <div className="mt-8">
-                                        <Pagination links={histories.links} />
+                                        <Pagination links={submissions.links} />
                                     </div>
                                 )}
                             </div>

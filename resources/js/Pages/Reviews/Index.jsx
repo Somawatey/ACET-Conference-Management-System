@@ -1,5 +1,7 @@
 import { Head, Link } from "@inertiajs/react";
 import { useState } from "react";
+import AdminLayout from '@/Layouts/AdminLayout';
+import Breadcrumb from '@/Components/Breadcrumb';
 import Pagination from "@/Components/Pagination";
 import PaperList from "./Partial/PaperList";
 
@@ -48,19 +50,15 @@ export default function ReviewsIndex({ reviews }) {
         }
     };
 
-    return (
-        <div className="bg-gradient-to-br from-blue-50 to-white min-h-screen">
-            <Head title="My Assigned Papers" />
-            
-            <section>
-                <header className="bg-[#12284B] shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        <h2 className="text-white text-2xl font-bold tracking-wide drop-shadow">
-                            My Assigned Papers
-                        </h2>
-                    </div>
-                </header>
+    const headWeb = 'My Assigned Papers';
+    const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
+    return (
+        <AdminLayout>
+            <Head title="My Assigned Papers" />
+            <Breadcrumb title={headWeb} links={linksBreadcrumb} />
+            
+            <div className="bg-white min-h-screen">
                 <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                     {/* Header Section */}
                     <div className="mb-8">
@@ -130,7 +128,7 @@ export default function ReviewsIndex({ reviews }) {
                         </div>
                     )}
                 </main>
-            </section>
-        </div>
+            </div>
+        </AdminLayout>
     );
 }

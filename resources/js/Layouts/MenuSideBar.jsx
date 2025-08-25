@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Breadcrumb from '@/Components/Breadcrumb';
 
 export default function MenuSideBar({ isSidebarOpen, onToggle }) {
+    const [isReviewSubmenuOpen, setIsReviewSubmenuOpen] = useState(false);
     const { url, auth } = usePage().props;
     const can = auth?.can ?? {};
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -374,6 +375,46 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                       d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z" />
                             </svg>
                             Review History
+                        </Link>
+
+                        {/* Your Submission */}
+                        <Link 
+                            href={route('submissions.index')} 
+                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                route().current('submissions.index')
+                                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+                                    : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
+                            }`}
+                        >
+                            <svg className={`flex-shrink-0 w-5 h-5 mr-3 transition-colors duration-200 ${
+                                route().current('submissions.index')
+                                    ? 'text-blue-600' 
+                                    : 'text-gray-400 group-hover:text-gray-600'
+                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                      d="M9 12h6m-6 4h6M7 6h10m-7 14v-4a2 2 0 012-2h6a2 2 0 012 2v4m-9 0H5a2 2 0 01-2-2v-6a2 2 0 012-2h2m0 0V4a2 2 0 012-2h2a2 2 0 012 2v2" />
+                            </svg>
+                            Your Submission
+                        </Link>
+
+                        {/* Submission History */}
+                        <Link 
+                            href={route('paper-history.index')} 
+                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                route().current('submissions.history')
+                                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+                                    : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
+                            }`}
+                        >
+                            <svg className={`flex-shrink-0 w-5 h-5 mr-3 transition-colors duration-200 ${
+                                route().current('submissions.history')
+                                    ? 'text-blue-600' 
+                                    : 'text-gray-400 group-hover:text-gray-600'
+                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Submission History
                         </Link>
 
                         {/* Divider */}
