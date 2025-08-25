@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AdminLTELayout from '../Layouts/AdminLayout';
-import { Head } from '@inertiajs/react';
 import Breadcrumb from '@/Components/Breadcrumb';
+import { Head } from '@inertiajs/react';
 import { 
     Chart as ChartJS, 
     CategoryScale, 
@@ -16,6 +16,7 @@ import {
     Filler 
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import moment from 'moment';
 
 // Register ChartJS components
 ChartJS.register(
@@ -31,57 +32,88 @@ ChartJS.register(
     Filler
 );
 
-const Dashboard = () => {
+const Dashboard = ( { 
+    totalConferences, 
+    totalPapers, 
+    totalSpeakers, 
+    totalUsers,
+    papersByTopic,
+    totalOrganizers,
+    totalReviewers,
+    totalAttendees,
+    totalAuthors,
+    recentPapers,
+    recentUsers
+}) => {
+    const format = (time) => {
+        return moment(time, "HH:mm:ss").format("hh:mm A");
+    };
     const headWeb = 'Analytics Dashboard';
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
     
     // Date range state
     const [dateRange, setDateRange] = useState('thisWeek');
     
-    // Mock data for charts
     const lineChartData = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        labels: ['Conferences', 'Papers', 'Speakers', 'Users'],
         datasets: [
             {
-                label: 'Paper Submissions',
-                data: [65, 59, 80, 81, 56, 55, 72],
-                fill: true,
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                borderColor: 'rgb(59, 130, 246)',
-                tension: 0.4,
+                label: 'Totals',
+                data: [totalConferences, totalPapers, totalSpeakers, totalUsers],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(16, 185, 129, 0.7)',
+                    'rgba(239, 68, 68, 0.7)',
+                    'rgba(239, 233, 68, 1)',
+                ],
+
+                borderColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(239, 68, 68)',
+                    'rgba(239, 233, 68, 1)',
+                ],
+                borderWidth: 1,
             },
-            {
-                label: 'Registrations',
-                data: [28, 48, 40, 19, 86, 27, 90],
-                fill: true,
-                backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                borderColor: 'rgb(16, 185, 129)',
-                tension: 0.4,
-            }
-        ]
+        ],
     };
-    
+
     const barChartData = {
         labels: ['AI/ML', 'Security', 'Web Dev', 'Mobile', 'IoT', 'Blockchain', 'Cloud'],
         datasets: [
             {
                 label: 'Accepted Papers',
-                data: [12, 19, 3, 5, 2, 3, 9],
+                data: papersByTopic.map(topic => topic.total),
                 backgroundColor: 'rgba(59, 130, 246, 0.7)',
             },
             {
                 label: 'Rejected Papers',
-                data: [2, 3, 1, 2, 3, 1, 4],
+                data: papersByTopic.map(topic => topic.total),
                 backgroundColor: 'rgba(239, 68, 68, 0.7)',
             }
         ]
     };
-    
+
+    // const doughnutData = {
+    //     labels: ['Conferences', 'Papers', 'Speakers'],
+    //     datasets: [
+    //         {
+    //         data: [totalConferences, totalPapers, totalSpeakers],
+    //         backgroundColor: [
+    //             'rgba(99, 102, 241, 0.8)',
+    //             'rgba(16, 185, 129, 0.8)',
+    //             'rgba(251, 146, 60, 0.8)',
+    //         ],
+    //         },
+    //     ],
+    // };
+
     const doughnutData = {
-        labels: ['Reviewers', 'Authors', 'Attendees', 'Organizers'],
+        labels: ['Organizers', 'Reviewers', 'Attendees', 'Authors'],
         datasets: [
             {
-                data: [42, 83, 156, 19],
+                label: 'Total Users',
+                data: [totalOrganizers, totalReviewers, totalAttendees, totalAuthors],
                 backgroundColor: [
                     'rgba(99, 102, 241, 0.8)',
                     'rgba(16, 185, 129, 0.8)',
@@ -136,7 +168,7 @@ const Dashboard = () => {
                                 <div className="">
                                     <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Conferences</p>
                                     <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">15</p>
+                                        <p className="text-2xl font-semibold text-gray-900 m-0">{totalConferences}</p>
                                         <p className="ml-2 text-sm text-green-600 font-medium flex items-center m-0">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -147,12 +179,12 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gray-50 px-5 py-3">
+                        {/* <div className="bg-gray-50 px-5 py-3">
                             <div className="text-sm text-gray-500 flex justify-between items-center">
                                 <span>3 active now</span>
                                 <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View details</span>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                     
                     {/* Paper Submissions Card - FIXED */}
@@ -167,7 +199,7 @@ const Dashboard = () => {
                                 <div className="">
                                     <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Paper Submissions</p>
                                     <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">153</p>
+                                        <p className="text-2xl font-semibold text-gray-900 m-0">{totalPapers}</p>
                                         <p className="ml-2 text-sm text-green-600 font-medium flex items-center m-0">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -178,12 +210,12 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className=" bg-gray-50 px-5 py-3">
+                        {/* <div className=" bg-gray-50 px-5 py-3">
                             <div className="text-sm text-gray-500 flex justify-between items-center">
                                 <span>81 accepted</span>
                                 <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View all</span>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Registrations Card - FIXED */}
@@ -198,7 +230,7 @@ const Dashboard = () => {
                                 <div className="">
                                     <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Registrations</p>
                                     <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">326</p>
+                                        <p className="text-2xl font-semibold text-gray-900 m-0">{totalUsers}</p>
                                         <p className="ml-2 text-sm text-green-600 font-medium flex items-center m-0">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -209,12 +241,12 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gray-50 px-5 py-3">
+                        {/* <div className="bg-gray-50 px-5 py-3">
                             <div className="text-sm text-gray-500 flex justify-between items-center">
                                 <span>42 new this week</span>
                                 <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View all</span>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Speakers Card - FIXED */}
@@ -229,7 +261,7 @@ const Dashboard = () => {
                                 <div className="">
                                     <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Speakers</p>
                                     <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">24</p>
+                                        <p className="text-2xl font-semibold text-gray-900 m-0">{totalSpeakers}</p>
                                         <p className="ml-2 text-sm text-red-600 font-medium flex items-center m-0">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -240,12 +272,12 @@ const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gray-50 px-5 py-3">
+                        {/* <div className="bg-gray-50 px-5 py-3">
                             <div className="text-sm text-gray-500 flex justify-between items-center">
                                 <span>8 keynotes</span>
                                 <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View all</span>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
@@ -255,11 +287,11 @@ const Dashboard = () => {
                     <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold text-gray-800">Submissions & Registrations</h3>
-                            <div className="flex space-x-2">
+                            {/* <div className="flex space-x-2">
                                 <button className="px-3 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">Monthly</button>
                                 <button className="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:bg-gray-100">Weekly</button>
                                 <button className="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:bg-gray-100">Daily</button>
-                            </div>
+                            </div> */}
                         </div>
                         <div className="h-[300px]">
                             <Line 
@@ -380,8 +412,8 @@ const Dashboard = () => {
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div>
-                                                    <p className="text-sm text-gray-500">New paper submitted <span className="font-medium text-gray-900">Machine Learning Applications in Education</span></p>
-                                                    <p className="mt-0.5 text-sm text-gray-500">12 minutes ago</p>
+                                                    <p className="text-sm text-gray-500">{recentPapers[0]?.message} <span className="font-bold text-gray-900">{recentPapers[0]?.paper_title}</span></p>
+                                                    <p className="mt-0.5 text-sm text-gray-500">{recentPapers[0]?.created_at ? format(new Date(recentPapers[0].created_at), "HH:mm") : ""}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -400,8 +432,8 @@ const Dashboard = () => {
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div>
-                                                    <p className="text-sm text-gray-500">New registration <span className="font-medium text-gray-900">Sarah Johnson</span></p>
-                                                    <p className="mt-0.5 text-sm text-gray-500">1 hour ago</p>
+                                                    <p className="text-sm text-gray-500">New Registration: {recentUsers[0]?.message}</p>
+                                                    <p className="mt-0.5 text-sm text-gray-500">{recentUsers[0]?.created_at ? format(new Date(recentUsers[0].created_at), "HH:mm") : ""}</p>
                                                 </div>
                                             </div>
                                         </div>
