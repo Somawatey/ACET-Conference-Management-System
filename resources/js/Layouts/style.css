@@ -1,0 +1,9 @@
+.sidebar-open .content-wrapper {
+    margin-left: 16rem; /* 64px */
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.sidebar-closed .content-wrapper {
+    margin-left: 0;
+    transition: margin-left 0.3s ease-in-out;
+}
