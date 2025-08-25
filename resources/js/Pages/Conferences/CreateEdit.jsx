@@ -30,7 +30,7 @@ useEffect(() => {
         if (window.google && locationInputRef.current) {
             const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
                  // Restricts suggestions to geographical locations
-                componentRestrictions: { country: 'kh', city: 'phnompenh' },
+                componentRestrictions: { country: 'kh'},
             });
 
             // Add the event listener for when a user selects a place.
