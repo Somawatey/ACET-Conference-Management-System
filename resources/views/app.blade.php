@@ -15,6 +15,11 @@
         @viteReactRefresh
         @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
         @inertiaHead
+        {{-- Get the API key from the shared props --}}
+        @php
+            $googleMapsApiKey = $page['props']['google_maps_api_key'] ?? '';
+        @endphp
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsApiKey }}&libraries=places"></script>
     </head>
     <body class="font-sans antialiased">
         @inertia

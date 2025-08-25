@@ -1,12 +1,70 @@
-import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, usePage, Link } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 import PaperInfo from "./Partial/PaperInfo";
 import ReviewerBlock from "./Partial/Feedback";
 import ReviewSummary from "./Partial/Summary";
-import Pagination from "@/Components/Pagination";
+import Pagination from '@/Components/Pagination';
+
+function getCustomLinks(links) {
+    // Find the active page
+    const activeIndex = links.findIndex(link => link.active);
+    let start = Math.max(0, activeIndex - 2);
+    let end = Math.min(links.length, start + 5);
+
+    // Adjust start if we're at the end
+    if (end - start < 5) {
+        start = Math.max(0, end - 5);
+    }
+
+    // Only keep page number links (not prev/next)
+    const pageLinks = links.filter(link => !isNaN(Number(link.label)));
+    const customLinks = pageLinks.slice(start, end);
+
+    // Optionally, add prev/next if you want
+    const prev = links.find(link => link.label.includes('&laquo;'));
+    const next = links.find(link => link.label.includes('&raquo;'));
+
+    let result = [];
+    if (prev) result.push(prev);
+    result = result.concat(customLinks);
+    if (next) result.push(next);
+
+    return result;
+}
 
 export default function ReviewHistory({ paper, papers, reviews, filters }) {
+    const { auth } = usePage().props;
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedReviewId, setSelectedReviewId] = useState(null);
     const items = reviews ?? [];
+
+    // Get review_id from URL parameters
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const reviewId = params.get('review_id');
+            if (reviewId) {
+                setSelectedReviewId(parseInt(reviewId));
+                // Scroll to the review after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    const reviewElement = document.getElementById(`review-${reviewId}`);
+                    if (reviewElement) {
+                        reviewElement.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                    }
+                }, 100);
+            }
+        }
+    }, []);
+
+    // Check if user came from Paper Decision page
+    const isFromPaperDecision = () => {
+        if (typeof window === 'undefined') return false;
+        const params = new URLSearchParams(window.location.search);
+        return params.get('source') === 'paper-decision' && params.get('paper_id');
+    };
 
     // Initialize show/hide from query param (?show=1|0), default to show
     const initialShow = (() => {
@@ -19,6 +77,44 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
     })();
     const [showHistory, setShowHistory] = useState(initialShow);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // Handle scroll detection
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsScrolled(scrollTop > 100); // Show enhanced button after scrolling 100px
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (!e.target.closest('#user-menu-button')) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+
+    // Generate user initials
+    const getUserInitials = (name) => {
+        if (!name) return 'U';
+        return name
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase())
+            .slice(0, 2)
+            .join('');
+    };
+
+    // Check if user has a profile photo
+    const hasProfilePhoto = () => {
+        return auth?.user?.profile_photo_url;
+    };
 
     console.log("Review History Items:", items);
     console.log("Paper Info:", paper);
@@ -28,11 +124,131 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
             <Head title="Review History" />
             <section>
                 <header className="bg-[#12284B] shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
                         <h2 className="text-white text-2xl font-bold tracking-wide drop-shadow">Review History</h2>
+                        
+                        {/* Profile dropdown section */}
+                        <div className="flex items-center">
+                            <div className="flex flex-row relative mx-3">
+                                <span className="mr-3 mt-1 text-white">{`${auth?.user?.name}`}</span>
+                                <button
+                                    id="user-menu-button"
+                                    type="button"
+                                    className="flex text-sm rounded-full focus:outline-none focus:ring-1 
+                                               focus:ring-offset-2 focus:ring-gray-200"
+                                    aria-expanded={isDropdownOpen}
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                >
+                                    <div className="image">
+                                        {hasProfilePhoto() ? (
+                                            <img
+                                                src={auth.user.profile_photo_url}
+                                                className="img-circle elevation-2"
+                                                alt="User Image"
+                                                style={{ width: '34px', height: '34px', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <div
+                                                className="img-circle elevation-2 d-flex align-items-center justify-content-center"
+                                                style={{
+                                                    width: '34px',
+                                                    height: '34px',
+                                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                                                    color: 'white',
+                                                    fontSize: '14px',
+                                                    fontWeight: 'bold',
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                            >
+                                                {getUserInitials(auth?.user?.name)}
+                                            </div>
+                                        )}
+                                    </div>
+                                </button>
+
+                                {/* Dropdown menu */}
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 z-50 mt-10 w-52 origin-top-right rounded-md 
+                                                    shadow-lg ring-1 ring-black ring-opacity-5 
+                                                    focus:outline-none bg-white"
+                                    >
+                                        <div className='px-4 py-2 mt-2'>
+                                            <div className="py-1 border-b border-gray-200">
+                                                <p className="text-sm text-gray-900 ">
+                                                    <b>Username:</b> {auth?.user?.name}
+                                                </p>
+                                                <p className="text-sm text-gray-900">
+                                                    <b>Email:</b> {auth?.user?.email}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ul className="py-1">
+                                            <li>
+                                                <Link href={route('dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 transition duration-200">
+                                                    Dashboard
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link href={route('profile.edit')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 transition duration-200">
+                                                    Profile Settings
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link
+                                                    href={route('logout')}
+                                                    method="post"
+                                                    as="button"
+                                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 transition duration-200"
+                                                >
+                                                    Logout
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </header>
+                
+                {/* Sticky Back Button when coming from Paper Decision */}
+                {isFromPaperDecision() && (
+                    <div className={`sticky top-0 z-40 transition-all duration-300 ${
+                        isScrolled 
+                            ? '-translate-x-24 mr-5' 
+                            : ''
+                    }`}>
+                        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+                            <div className={`inline-block transition-all duration-300 ${
+                                isScrolled 
+                                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-2 border border-blue-200 shadow-sm' 
+                                    : ''
+                            }`}>
+                                <Link
+                                    href={route('paper-decision.show', { paper: filters.paper_id })}
+                                    className={`inline-flex items-center text-sm font-medium transition-all duration-200 ${
+                                        isScrolled 
+                                            ? 'text-blue-700 hover:text-blue-900' 
+                                            : 'text-indigo-600 hover:text-indigo-800'
+                                    }`}
+                                >
+                                    <svg className={`mr-2 transition-all duration-200 ${
+                                        isScrolled ? 'w-5 h-5' : 'w-4 h-4'
+                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    </svg>
+                                    <span className="whitespace-nowrap">{isScrolled ? 'Back' : 'Back to Paper Decision'}</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
                 <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+
                     {/* Paper Information */}
                     {paper && (
                         <div className="mb-8">
@@ -144,7 +360,14 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                         <>
                             <div className="space-y-6 mb-8">
                                 {items.map((review) => (
-                                    <ReviewerBlock key={review.id} review={review} />
+                                    <ReviewerBlock 
+                                        key={review.id} 
+                                        review={review}
+                                        isSelected={selectedReviewId === review.id}
+                                        onToggle={(reviewId) => {
+                                            setSelectedReviewId(selectedReviewId === reviewId ? null : reviewId);
+                                        }}
+                                    />
                                 ))}
                                 {items.length === 0 && (
                                     <div className="bg-white shadow rounded-lg p-6 text-gray-600">
@@ -159,7 +382,7 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                     )}
                     {/* Pagination */}
                     <div className="mt-6 flex justify-end">
-                        <Pagination links={papers?.links} />
+                        <Pagination links={getCustomLinks(papers?.links)} />
                     </div>
                 </main>
             </section>

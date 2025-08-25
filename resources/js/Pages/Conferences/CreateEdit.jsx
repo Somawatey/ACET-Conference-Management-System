@@ -7,10 +7,60 @@ import TextInput from '@/Components/TextInput';
 import AdminLayout from '@/Layouts/AdminLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Transition } from '@headlessui/react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function ConferencesCreateEdit({ conference = {} }) {
+    const locationInputRef = useRef(null);
+    const { google_maps_api_key } = usePage().props; // <-- Get the key
+
+// In your CreateEdit.jsx component
+
+useEffect(() => {
+    const scriptId = 'google-maps-script';
+
+    // Guard clause: if the API key is missing, do nothing.
+    if (!google_maps_api_key) {
+        console.error("Google Maps API key is missing. Please check your backend configuration.");
+        return;
+    }
+
+    // This function initializes the autocomplete feature.
+    const initializeAutocomplete = () => {
+        if (window.google && locationInputRef.current) {
+            const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
+                 // Restricts suggestions to geographical locations
+                componentRestrictions: { country: 'kh'},
+            });
+
+            // Add the event listener for when a user selects a place.
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place.formatted_address) {
+                    // Update the form's state with the selected address.
+                    setData('location', place.formatted_address);
+                }
+            });
+        }
+    };
+
+    // Check if the script is already on the page.
+    if (document.getElementById(scriptId)) {
+        initializeAutocomplete(); // If so, just run the initialization.
+    } else {
+        // If not, create and append the script.
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${google_maps_api_key}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        // Set the onload callback to our initialization function.
+        script.onload = initializeAutocomplete;
+        document.body.appendChild(script);
+    }
+
+}, [google_maps_api_key]); // Dependency array is correct.
+
     // Manage form state and submission via Inertia's useForm
     const { data, setData, post, patch, errors, reset, processing, recentlySuccessful } =
         useForm({
@@ -103,20 +153,21 @@ export default function ConferencesCreateEdit({ conference = {} }) {
                         <InputError className="mt-2" message={errors.date} />
                       </div>
 
-                      <div>
+                      <div >
                         <label htmlFor="location" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
                         <input
-                          type="text"
-                          name="location"
-                          id="location"
-                          value={data.location}
-                          onChange={(e) => setData('location', e.target.value)}
-                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="CADT"
-                          required
+                            type="text"
+                            name="location"
+                            ref={locationInputRef}
+                            id="location"
+                            value={data.location} // Change 'defaultValue' back to 'value'
+                            onChange={(e) => setData('location', e.target.value)}                            
+                            className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            required
                         />
                         <InputError className="mt-2" message={errors.location} />
-                      </div>
+                        
+                      </div >
 
                       <button
                         type="submit"

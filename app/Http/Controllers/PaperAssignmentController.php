@@ -45,20 +45,55 @@ class PaperAssignmentController extends Controller
     {
         $request->validate([
             'paper_id' => 'required|exists:papers,id',
-            'reviewer_id' => 'required|exists:users,id',
+            'reviewer_ids' => 'required|array|min:1|max:4',
+            'reviewer_ids.*' => 'required|exists:users,id',
             'due_date' => 'required|date|after:today',
         ]);
 
-        PaperAssignment::create([
-            'paper_id' => $request->paper_id,
-            'reviewer_id' => $request->reviewer_id,
-            'assigned_by' => auth()->id(),
-            'due_date' => $request->due_date,
-            'status' => 'pending'
-        ]);
+        try {
+            // Begin transaction
+            \DB::beginTransaction();
 
-        return redirect()->route('paper-assignments.index')
-                        ->with('success', 'Paper assigned successfully.');
+            // Check for existing active assignments
+            $existingAssignments = PaperAssignment::where('paper_id', $request->paper_id)
+                ->whereIn('reviewer_id', $request->reviewer_ids)
+                ->where('status', '!=', 'cancelled')
+                ->get();
+
+            if ($existingAssignments->isNotEmpty()) {
+                return back()->withErrors([
+                    'reviewer_ids' => 'Some selected reviewers are already assigned to this paper.'
+                ])->withInput();
+            }
+
+            // Mark all existing assignments as cancelled instead of deleting them
+            PaperAssignment::where('paper_id', $request->paper_id)
+                ->update(['status' => 'cancelled']);
+
+            // Create new assignments for each reviewer
+            $newAssignments = [];
+            foreach ($request->reviewer_ids as $reviewerId) {
+                $newAssignments[] = PaperAssignment::create([
+                    'paper_id' => $request->paper_id,
+                    'reviewer_id' => $reviewerId,
+                    'assigned_by' => auth()->id(),
+                    'due_date' => $request->due_date,
+                    'status' => 'pending'
+                ]);
+            }
+
+            // If we got here, all went well, so commit the transaction
+            \DB::commit();
+
+            return back()->with('success', 'Paper assigned successfully.');
+
+        } catch (\Exception $e) {
+            // Something went wrong, rollback transaction
+            \DB::rollback();
+            return back()->withErrors([
+                'error' => 'Failed to assign reviewers. Please try again.'
+            ])->withInput();
+        }
     }
 
     /**

@@ -8,12 +8,13 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\PaperAssignmentController;
-use App\Http\Controllers\PaperHistoryController;
 use App\Http\Controllers\DecisionController;
+use App\Http\Controllers\PaperHistoryController;
 use App\Http\Controllers\ConferenceController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -99,6 +100,9 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy');
     });
 
+    // Your Submissions alias route
+    Route::get('/your-submissions', [SubmissionController::class, 'index'])->name('your-submissions.index');
+
     // Paper Assignment routes
     Route::prefix('paper-assignments')->group(function () {
         Route::get('/', [PaperAssignmentController::class, 'index'])->name('paper-assignments.index');
@@ -122,11 +126,13 @@ Route::middleware('auth')->group(function () {
 
     // Review routes
     Route::prefix('reviews')->group(function () {
-        Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.index');
-        Route::get('/create/{paper_id?}', [ReviewController::class, 'create'])->name('reviews.create');
-        Route::get('/{id}', [ReviewController::class, 'show'])->name('reviews.show');
+        Route::get('/', [ReviewController::class, 'reviewList'])->name('reviews.reviewList');
+        Route::get('/index', [ReviewController::class, 'reviewList'])->name('reviews.index');
+        Route::get('/create/{paper?}', [ReviewController::class, 'create'])->name('reviews.create');
+        //for viewing feedback in paperDecision
+        Route::get('/{review}', [ReviewController::class, 'show'])->name('reviews.show');
         Route::get('/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
-        Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::post('/', [ReviewController::class, 'store'])->name('reviews.store');
         Route::patch("/{id}", [ReviewController::class, 'update'])->name('reviews.update');
         Route::delete("/{id}", [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
@@ -134,10 +140,37 @@ Route::middleware('auth')->group(function () {
     // Paper Decision routes
     Route::prefix('paper-decision')->group(function () {
         Route::get('/', [DecisionController::class, 'index'])->name('paper-decision.index');
+        Route::get('/create/{paper}', [DecisionController::class, 'create'])->name('paper-decision.create');
+        Route::get('/{paper}/edit', [DecisionController::class, 'edit'])->name('paper-decision.edit');
+        Route::get('/{paper}', [DecisionController::class, 'show'])->name('paper-decision.show');
+        Route::post('/{paper}', [DecisionController::class, 'store'])->name('paper-decision.store');
+        Route::patch('/{paper}', [DecisionController::class, 'update'])->name('paper-decision.update');
+        Route::post('/notify/{paper}', [DecisionController::class, 'notifyAuthor'])->name('paper-decision.notify');
+    });
+
+    // Debug routes
+    Route::get('/debug/paper/{paper}', function(App\Models\Paper $paper) {
+        return response()->json([
+            'paper_id' => $paper->id,
+            'paper_title' => $paper->paper_title,
+            'status' => $paper->status ?? 'no status'
+        ]);
+    });
+    
+    Route::post('/debug/paper/{paper}', function(Request $request, App\Models\Paper $paper) {
+        return response()->json([
+            'message' => 'POST request received',
+            'paper_id' => $paper->id,
+            'request_data' => $request->all()
+        ]);
     });
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+     // Paper History
+    Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
+
+    Route::get('/reviewers', [UserController::class, 'reviewers']);
 
      // Conference routes
     Route::prefix('conferences')->group(function () {

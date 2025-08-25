@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Paper;
+use App\Models\User;
+
 
 class PaperController extends Controller
 {
@@ -13,13 +15,16 @@ class PaperController extends Controller
      */
     public function index()
     {
-        $papers = Paper::with(['user', 'conference'])
-						
-                      ->orderBy('created_at', 'desc')
-                      ->paginate(10);
+        $users = User::with('roles')->paginate(10)->appends(request()->query());
+        $papers = Paper::with(['user', 'conference', 'authorInfo', 'submission', 'assignments' => function($query) {
+            $query->where('status', '!=', 'cancelled');
+        }])
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
 
         return Inertia::render('Papers/Index', [
-            'papers' => $papers
+            'users' => $users,
+            'papers' => $papers,
         ]);
     }
 
@@ -78,10 +83,22 @@ class PaperController extends Controller
      */
     public function destroy($id)
     {
-        $paper = Paper::findOrFail($id);
-        $paper->delete();
-        
-        return redirect()->route('papers.index');
+        try {
+            $paper = Paper::findOrFail($id);
+            
+            // Delete related data first to prevent foreign key constraints
+            $paper->reviews()->delete();
+            $paper->decision()->delete();
+            
+            // Delete the paper
+            $paper->delete();
+            
+            return redirect()->route('papers.index')
+                ->with('success', 'Paper deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('papers.index')
+                ->with('error', 'Failed to delete paper: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -89,12 +106,25 @@ class PaperController extends Controller
      */
     public function paperHistory()
     {
-        $papers = Paper::with(['user', 'conference', 'reviews.reviewer'])
-                      ->orderBy('created_at', 'desc')
-                      ->get();
+        // Build history rows from submissions to reflect actual submission events
+    $histories = \App\Models\Submission::with(['paper.user', 'paper.decision', 'authorInfo', 'user'])
+            ->orderByDesc('submitted_at')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'paper_id' => $s->paper_id,
+                    'paper_title' => optional($s->paper)->paper_title ?? optional($s->paper)->title ?? '',
+                    'author_name' => optional($s->authorInfo)->author_name ?? optional(optional($s->paper)->user)->name ?? '',
+                    'corresponding_email' => optional($s->authorInfo)->correspond_email ?? optional($s->authorInfo)->author_email ?? '',
+            'submitted_by' => optional($s->user)->name ?? '',
+                    'created_at' => optional($s->created_at)->toDateTimeString() ?? optional($s->submitted_at)->toDateTimeString(),
+            'status' => optional(optional($s->paper)->decision)->decision ?? optional($s->paper)->status ?? 'Pending',
+                ];
+            });
 
         return Inertia::render('PaperHistory/Index', [
-            'papers' => $papers
+            'histories' => $histories,
         ]);
     }
 

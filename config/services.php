@@ -13,6 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'google' => [
+        'maps_api_key' => env('AIzaSyBSs1Is5_AvJkeV4jL_JDVClyej96FNfQo'),
+    ],
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
