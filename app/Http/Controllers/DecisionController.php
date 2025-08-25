@@ -87,15 +87,15 @@ class DecisionController extends Controller
     public function create(Paper $paper)
     {
         try {
-            // Load paper with relationships
-            $paper->load(['user', 'topic', 'reviews.reviewer']);
+            // Load paper with relationships (removed 'topic' as it's not a relationship)
+            $paper->load(['user', 'reviews.reviewer']);
             
             // Transform paper data
             $transformedPaper = [
                 'id' => $paper->id,
                 'title' => $paper->paper_title ?? $paper->title ?? '',
                 'author' => optional($paper->user)->name ?? '',
-                'track' => $paper->topic,
+                'track' => $paper->topic, // topic is a direct field, not a relationship
                 'status' => $paper->status ?? 'Pending',
             ];
 
@@ -103,6 +103,7 @@ class DecisionController extends Controller
             $reviews = $paper->reviews->map(function ($review) {
                 return [
                     'id' => $review->id,
+                    'paper_id' => $review->paper_id,
                     'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
                     'status' => $review->recommendation ?? 'Pending',
                     'comment' => $review->comment ?? '',
@@ -130,19 +131,20 @@ class DecisionController extends Controller
      */
     public function show(Paper $paper)
     {
-        // Load relationships
-        $paper->load(['submission.authorInfo', 'topic', 'reviews.reviewer']);
+        // Load relationships (removed 'topic' as it's not a relationship)
+        $paper->load(['submission.authorInfo', 'reviews.reviewer']);
         $transformedPaper = [
             'id' => $paper->id,
             'title' => $paper->paper_title ?? $paper->title ?? '',
             'author' => optional($paper->submission?->authorInfo)->author_name ?? '',
-            'track' => $paper->topic,
+            'track' => $paper->topic, // topic is a direct field, not a relationship
             'status' => $paper->status ?? 'Pending',
         ];
 
         $reviews = $paper->reviews->map(function ($review) {
             return [
                 'id' => $review->id,
+                'paper_id' => $review->paper_id,
                 'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
                 'status' => $review->recommendation ?? 'Pending',
                 'comment' => $review->comment ?? '',
@@ -232,19 +234,20 @@ class DecisionController extends Controller
      */
     public function edit(Paper $paper)
     {
-        // Load relationships
-        $paper->load(['user', 'topic', 'reviews.reviewer', 'decision.organizer']);
+        // Load relationships (removed 'topic' as it's not a relationship)
+        $paper->load(['user', 'reviews.reviewer', 'decision.organizer']);
 
         $transformedPaper = [
             'id' => $paper->id,
             'title' => $paper->paper_title ?? $paper->title ?? '',
             'author' => optional($paper->user)->name ?? '',
-            'track' => $paper->topic,
+            'track' => $paper->topic, // topic is a direct field, not a relationship
         ];
 
         $reviews = $paper->reviews->map(function ($review) {
             return [
                 'id' => $review->id,
+                'paper_id' => $review->paper_id,
                 'reviewer' => optional($review->reviewer)->name ?? 'Unknown',
                 'status' => $review->recommendation ?? 'Pending',
             ];

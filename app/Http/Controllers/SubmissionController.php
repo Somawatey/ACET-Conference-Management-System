@@ -112,13 +112,41 @@ class SubmissionController extends Controller
      */
     public function index()
     {
-        $submissions = Submission::with(['paper'])
+        // Fetch submissions with related paper, author info, and decision for current user
+        $submissions = Submission::with(['paper.decision', 'paper.reviews', 'authorInfo', 'user'])
             ->where('user_id', Auth::id())
             ->latest('submitted_at')
             ->get();
 
-        return Inertia::render('Submission/Index', [
-            'submissions' => $submissions,
+        // Transform submissions to match Papers/Index structure
+        $transformedSubmissions = $submissions->map(function ($submission) {
+            $paper = $submission->paper;
+            $authorName = optional($submission->authorInfo)->author_name
+                ?? optional($paper->user)->name
+                ?? '';
+            
+            return [
+                'id' => $paper->id,
+                'submission_id' => $submission->id,
+                'title' => $paper->paper_title ?? $paper->title ?? '',
+                'topic' => $paper->topic,
+                'author_name' => $authorName,
+                'review_status' => $paper->reviews && $paper->reviews->count() > 0
+                    ? $paper->reviews->map(function ($review) {
+                        return $review->recommendation ?? 'Pending';
+                    })->implode(', ')
+                    : 'Pending',
+                'decision' => optional($paper->decision)->decision ?? 'Pending',
+                'status' => $paper->status ?? 'Pending',
+                'submitted_at' => optional($submission->submitted_at)->toDateTimeString(),
+                'track' => $submission->track ?? '',
+                'institute' => optional($submission->authorInfo)->institute ?? '',
+                'correspond_email' => optional($submission->authorInfo)->correspond_email ?? '',
+            ];
+        });
+
+        return Inertia::render('YourSubmission/Index', [
+            'papers' => $transformedSubmissions,
         ]);
     }
 
