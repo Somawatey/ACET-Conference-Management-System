@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLTELayout from '../Layouts/AdminLayout';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import Breadcrumb from '@/Components/Breadcrumb';
 import { 
     Chart as ChartJS, 
@@ -31,80 +31,100 @@ ChartJS.register(
     Filler
 );
 
-const Dashboard = () => {
+const Dashboard = ({ 
+    totalConferences, 
+    totalPapers, 
+    totalSpeakers, 
+    totalUsers,
+    papersByTopic,
+    totalOrganizers,
+    totalReviewers,
+    totalAttendees,
+    totalAuthors,
+    recentPapers,
+    recentUsers,
+    paperStatusData,  // ✅ NEW
+    monthlyData       // ✅ NEW
+}) => {
+    const format = (time) => {
+        return new Date(time).toLocaleDateString();
+    };
+    
     const headWeb = 'Analytics Dashboard';
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
     
     // Date range state
     const [dateRange, setDateRange] = useState('thisWeek');
-    
-    // Mock data for charts
-    const lineChartData = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-            {
-                label: 'Paper Submissions',
-                data: [65, 59, 80, 81, 56, 55, 72],
-                fill: true,
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                borderColor: 'rgb(59, 130, 246)',
-                tension: 0.4,
-            },
-            {
-                label: 'Registrations',
-                data: [28, 48, 40, 19, 86, 27, 90],
-                fill: true,
-                backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                borderColor: 'rgb(16, 185, 129)',
-                tension: 0.4,
-            }
-        ]
+
+    // ✅ Use real chart data from backend
+    const barChartData = paperStatusData || {
+        labels: ['Pending', 'Accepted', 'Rejected'],
+        datasets: [{
+            label: 'Paper Count',
+            data: [0, 0, 0],
+            backgroundColor: ['rgba(251, 191, 36, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)']
+        }]
     };
-    
-    const barChartData = {
-        labels: ['AI/ML', 'Security', 'Web Dev', 'Mobile', 'IoT', 'Blockchain', 'Cloud'],
-        datasets: [
-            {
-                label: 'Accepted Papers',
-                data: [12, 19, 3, 5, 2, 3, 9],
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-            },
-            {
-                label: 'Rejected Papers',
-                data: [2, 3, 1, 2, 3, 1, 4],
-                backgroundColor: 'rgba(239, 68, 68, 0.7)',
-            }
-        ]
+
+    const lineChartData = monthlyData || {
+        labels: [],
+        datasets: []
     };
-    
+
+    // Doughnut chart for user roles
     const doughnutData = {
-        labels: ['Reviewers', 'Authors', 'Attendees', 'Organizers'],
+        labels: ['Organizers', 'Reviewers', 'Attendees', 'Authors'],
         datasets: [
             {
-                data: [42, 83, 156, 19],
+                data: [totalOrganizers, totalReviewers, totalAttendees, totalAuthors],
                 backgroundColor: [
                     'rgba(99, 102, 241, 0.8)',
                     'rgba(16, 185, 129, 0.8)',
                     'rgba(251, 146, 60, 0.8)',
-                    'rgba(239, 68, 68, 0.8)'
+                    'rgba(239, 68, 68, 0.8)',
                 ],
                 borderColor: [
                     'rgb(99, 102, 241)',
                     'rgb(16, 185, 129)',
                     'rgb(251, 146, 60)',
-                    'rgb(239, 68, 68)'
+                    'rgb(239, 68, 68)',
                 ],
                 borderWidth: 1,
             }
         ]
     };
-    
+
+    // Chart options
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    usePointStyle: true,
+                },
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    drawBorder: false,
+                },
+            },
+            x: {
+                grid: {
+                    display: false,
+                },
+            },
+        },
+    };
+
     return (
         <AdminLTELayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} style={{ zIndex: 1 }}/>}>
-            {/* <Head title={headWeb} /> */}
-
             <div className="min-h-screen px-5 pb-10">
-                {/* Date Range Selector and Overview */}
+                {/* Date Range Selector */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                     <div className="md:mt-0">
                         <select
@@ -124,9 +144,9 @@ const Dashboard = () => {
                 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {/* Conference Card - FIXED */}
+                    {/* Conference Card */}
                     <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden h-full">
-                        <div className="flex-1 flex flex-col justify-center items-center">
+                        <div className="flex-1 flex flex-col justify-center items-center p-5">
                             <div className="flex items-center justify-center gap-5">
                                 <div className="flex-shrink-0 rounded-md bg-purple-100 p-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -135,29 +155,15 @@ const Dashboard = () => {
                                 </div>
                                 <div className="">
                                     <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Conferences</p>
-                                    <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">15</p>
-                                        <p className="ml-2 text-sm text-green-600 font-medium flex items-center m-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                            </svg>
-                                            18.9%
-                                        </p>
-                                    </div>
+                                    <p className="text-2xl font-semibold text-gray-900 m-0">{totalConferences}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 px-5 py-3">
-                            <div className="text-sm text-gray-500 flex justify-between items-center">
-                                <span>3 active now</span>
-                                <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View details</span>
                             </div>
                         </div>
                     </div>
                     
-                    {/* Paper Submissions Card - FIXED */}
+                    {/* Paper Card */}
                     <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden h-full">
-                        <div className="flex-1 flex flex-col justify-center items-center">
+                        <div className="flex-1 flex flex-col justify-center items-center p-5">
                             <div className="flex items-center justify-center gap-5">
                                 <div className="flex-shrink-0 rounded-md bg-blue-100 p-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,28 +171,14 @@ const Dashboard = () => {
                                     </svg>
                                 </div>
                                 <div className="">
-                                    <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Paper Submissions</p>
-                                    <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">153</p>
-                                        <p className="ml-2 text-sm text-green-600 font-medium flex items-center m-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                            </svg>
-                                            12.5%
-                                        </p>
-                                    </div>
+                                    <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Papers</p>
+                                    <p className="text-2xl font-semibold text-gray-900 m-0">{totalPapers}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div className=" bg-gray-50 px-5 py-3">
-                            <div className="text-sm text-gray-500 flex justify-between items-center">
-                                <span>81 accepted</span>
-                                <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View all</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Registrations Card - FIXED */}
+                    {/* Users Card */}
                     <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden h-full">
                         <div className="flex-1 flex flex-col justify-center items-center p-5">
                             <div className="flex items-center justify-center gap-5">
@@ -196,54 +188,26 @@ const Dashboard = () => {
                                     </svg>
                                 </div>
                                 <div className="">
-                                    <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Registrations</p>
-                                    <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">326</p>
-                                        <p className="ml-2 text-sm text-green-600 font-medium flex items-center m-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                            </svg>
-                                            8.2%
-                                        </p>
-                                    </div>
+                                    <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Users</p>
+                                    <p className="text-2xl font-semibold text-gray-900 m-0">{totalUsers}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 px-5 py-3">
-                            <div className="text-sm text-gray-500 flex justify-between items-center">
-                                <span>42 new this week</span>
-                                <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View all</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Speakers Card - FIXED */}
+                    {/* Speakers Card */}
                     <div className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden h-full">
-                        <div className="flex-1 flex flex-col justify-center items-center">
-                            <div className="flex items-center  gap-5">
+                        <div className="flex-1 flex flex-col justify-center items-center p-5">
+                            <div className="flex items-center gap-5">
                                 <div className="flex-shrink-0 rounded-md bg-orange-100 p-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                                     </svg>
                                 </div>
                                 <div className="">
-                                    <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Speakers</p>
-                                    <div className="flex items-baseline">
-                                        <p className="text-2xl font-semibold text-gray-900 m-0">24</p>
-                                        <p className="ml-2 text-sm text-red-600 font-medium flex items-center m-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                                            </svg>
-                                            2.3%
-                                        </p>
-                                    </div>
+                                    <p className="text-gray-500 text-[15px] font-medium uppercase m-0">Events</p>
+                                    <p className="text-2xl font-semibold text-gray-900 m-0">{totalSpeakers}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 px-5 py-3">
-                            <div className="text-sm text-gray-500 flex justify-between items-center">
-                                <span>8 keynotes</span>
-                                <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">View all</span>
                             </div>
                         </div>
                     </div>
@@ -253,43 +217,15 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     {/* Line Chart */}
                     <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800">Submissions & Registrations</h3>
-                            <div className="flex space-x-2">
-                                <button className="px-3 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">Monthly</button>
-                                <button className="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:bg-gray-100">Weekly</button>
-                                <button className="px-3 py-1 text-xs font-medium rounded text-gray-500 hover:bg-gray-100">Daily</button>
-                            </div>
-                        </div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Monthly Trends</h3>
                         <div className="h-[300px]">
-                            <Line 
-                                data={lineChartData} 
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                            labels: {
-                                                usePointStyle: true,
-                                            },
-                                        },
-                                    },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            grid: {
-                                                drawBorder: false,
-                                            },
-                                        },
-                                        x: {
-                                            grid: {
-                                                display: false,
-                                            },
-                                        },
-                                    },
-                                }}
-                            />
+                            {lineChartData.labels && lineChartData.labels.length > 0 ? (
+                                <Line data={lineChartData} options={chartOptions} />
+                            ) : (
+                                <div className="flex items-center justify-center h-full text-gray-500">
+                                    No monthly data available
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -318,135 +254,86 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Bar Chart */}
+                {/* ✅ Bar Chart - Paper Status */}
                 <div className="bg-white p-6 rounded-lg shadow-md mb-8">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Papers by Topic</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Paper Status Distribution</h3>
                         <button className="text-sm text-blue-600 hover:text-blue-800">View Details</button>
                     </div>
                     <div className="h-[300px]">
-                        <Bar 
-                            data={barChartData} 
-                            options={{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        position: 'top',
-                                        labels: {
-                                            usePointStyle: true,
-                                        },
-                                    },
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        grid: {
-                                            drawBorder: false,
-                                        },
-                                    },
-                                    x: {
-                                        grid: {
-                                            display: false,
-                                        },
-                                    },
-                                },
-                            }}
-                        />
+                        {barChartData.labels && barChartData.labels.length > 0 ? (
+                            <Bar data={barChartData} options={chartOptions} />
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-gray-500">
+                                No paper status data available
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Recent Activity */}
-                <div className="flex flex-col justify-between bg-white rounded-lg shadow-md overflow-hidden">
-                    <div className="p-6 border-b border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-800">Recent Activity</h3>
-                            <button className="text-sm text-blue-600 hover:text-blue-800">View All</button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Recent Papers */}
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Papers</h3>
+                        <div className="space-y-3">
+                            {recentPapers && recentPapers.length > 0 ? (
+                                recentPapers.map((paper, index) => (
+                                    <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex-shrink-0">
+                                            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
+                                                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                                {paper.message}
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                {format(paper.created_at)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center text-gray-500 py-4">
+                                    No recent papers
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <div className="p-6">
-                        <div className="flow-root">
-                            <ul className="-mb-8">
-                                <li>
-                                    <div className="relative pb-8">
-                                        <span className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                        <div className="relative flex items-start space-x-3">
-                                            <div className="relative">
-                                                <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
-                                                    <svg className="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div>
-                                                    <p className="text-sm text-gray-500">New paper submitted <span className="font-medium text-gray-900">Machine Learning Applications in Education</span></p>
-                                                    <p className="mt-0.5 text-sm text-gray-500">12 minutes ago</p>
-                                                </div>
+
+                    {/* Recent Users */}
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Registrations</h3>
+                        <div className="space-y-3">
+                            {recentUsers && recentUsers.length > 0 ? (
+                                recentUsers.map((user, index) => (
+                                    <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex-shrink-0">
+                                            <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
+                                                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div className="relative pb-8">
-                                        <span className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                        <div className="relative flex items-start space-x-3">
-                                            <div className="relative">
-                                                <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                                    <svg className="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div>
-                                                    <p className="text-sm text-gray-500">New registration <span className="font-medium text-gray-900">Sarah Johnson</span></p>
-                                                    <p className="mt-0.5 text-sm text-gray-500">1 hour ago</p>
-                                                </div>
-                                            </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                                {user.message}
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                {format(user.created_at)}
+                                            </p>
                                         </div>
                                     </div>
-                                </li>
-                                <li>
-                                    <div className="relative pb-8">
-                                        <span className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                        <div className="relative flex items-start space-x-3">
-                                            <div className="relative">
-                                                <div className="h-10 w-10 rounded-full bg-yellow-500 flex items-center justify-center ring-8 ring-white">
-                                                    <svg className="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Paper review completed <span className="font-medium text-gray-900">Blockchain Security Analysis</span></p>
-                                                    <p className="mt-0.5 text-sm text-gray-500">3 hours ago</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div className="relative">
-                                        <div className="relative flex items-start space-x-3">
-                                            <div className="relative">
-                                                <div className="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center ring-8 ring-white">
-                                                    <svg className="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div>
-                                                    <p className="text-sm text-gray-500">New payment received <span className="font-medium text-gray-900">$750.00</span></p>
-                                                    <p className="mt-0.5 text-sm text-gray-500">Yesterday at 11:42 PM</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
+                                ))
+                            ) : (
+                                <div className="text-center text-gray-500 py-4">
+                                    No recent registrations
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
