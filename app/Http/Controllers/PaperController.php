@@ -83,10 +83,22 @@ class PaperController extends Controller
      */
     public function destroy($id)
     {
-        $paper = Paper::findOrFail($id);
-        $paper->delete();
-        
-        return redirect()->route('papers.index');
+        try {
+            $paper = Paper::findOrFail($id);
+            
+            // Delete related data first to prevent foreign key constraints
+            $paper->reviews()->delete();
+            $paper->decision()->delete();
+            
+            // Delete the paper
+            $paper->delete();
+            
+            return redirect()->route('papers.index')
+                ->with('success', 'Paper deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('papers.index')
+                ->with('error', 'Failed to delete paper: ' . $e->getMessage());
+        }
     }
 
     /**

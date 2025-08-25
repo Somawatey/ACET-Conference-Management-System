@@ -101,12 +101,10 @@ export default function PaperPage({ users, papers }) {
             alert("You can only assign up to 4 reviewers.");
             return;
         }
-        const reviewer = reviews.find(r => r.id === reviewerId);
-        setAssignedReviewers(prev => ({
-            ...prev,
-            [paperId]: [...(prev[paperId] || []), reviewer]
-        }));
     };
+    // const isReviewerAssigned = (paperId, reviewerId) => false;
+    // const getAssignedReviewers = (paperId) => [];
+    // const assignReviewer = (paperId, reviewerId) => { };
 
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
@@ -158,7 +156,7 @@ export default function PaperPage({ users, papers }) {
                                                     onAssignReviewer={() => openAssignReviewerModal(paper)}
                                                 >
                                                     <StatusBadge status={paper.status} />
-                                                    <PaperActions paper={paper} onAssignReviewer={() => openAssignReviewerModal(paper)} />
+                                                    <PaperActions paper={paper} onManageReviewers={() => openAssignReviewerModal(paper)} />
                                                 </PaperRow>
                                             )) : (
                                                 <tr>
