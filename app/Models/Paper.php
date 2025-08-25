@@ -49,6 +49,18 @@ class Paper extends Model
         );
     }
 
+    public function assignments()
+    {
+        return $this->hasMany(PaperAssignment::class);
+    }
+
+    public function assignedReviewers()
+    {
+        return $this->belongsToMany(User::class, 'paper_assignments', 'paper_id', 'reviewer_id')
+            ->withPivot('status', 'due_date')
+            ->where('status', '!=', 'cancelled');
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
