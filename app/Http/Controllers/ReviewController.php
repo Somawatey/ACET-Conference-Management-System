@@ -188,11 +188,13 @@ class ReviewController extends Controller
                 if ($existingReview) {
                     // Use existing review and add review status to paper
                     $paper->review_status = $existingReview->recommendation ?? 'pending';
+                    $paper->review_id = $existingReview->id; // Add review ID for routing
                     $existingReview->paper = $paper;
                     $reviewsData->push($existingReview);
                 } else {
                     // No review exists yet - set status as pending
                     $paper->review_status = 'pending';
+                    $paper->review_id = null; // No review ID available
                     // Create a mock review object for papers without reviews yet
                     $mockReview = new Review();
                     $mockReview->paper = $paper;
