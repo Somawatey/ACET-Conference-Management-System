@@ -13,6 +13,23 @@ const AdminLayout = ({ breadcrumb, children }) => {
         setIsSidebarOpen(prev => !prev);
     };
 
+    // Auto-close sidebar on smaller screens
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 1024) { // lg breakpoint - closes sidebar earlier to prevent blur
+                setIsSidebarOpen(false);
+            } else {
+                setIsSidebarOpen(true);
+            }
+        };
+
+        // Check on initial load
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div className="wrapper">
             {flash?.success && (
@@ -25,9 +42,9 @@ const AdminLayout = ({ breadcrumb, children }) => {
             <MenuSideBar isSidebarOpen={isSidebarOpen} onToggle={handleSidebarToggle} />
 
             {/* Content Wrapper */}
-            <div className={`content-wrapper transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+            <div className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0'} pt-16`}>
                 {breadcrumb && breadcrumb}
-                <section className="content">{children}</section>
+                <section className="content p-4">{children}</section>
             </div>
             
         </div>
