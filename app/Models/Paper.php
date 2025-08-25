@@ -2,10 +2,17 @@
 
 namespace App\Models;
 use App\Models\User;
+use App\Models\Topic;
+use App\Models\Submission;
+use App\Models\AuthorInfo;
+use App\Models\Review;
+use App\Models\Decision;
+use App\Models\Conference;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Paper extends Model
 {
@@ -17,9 +24,29 @@ class Paper extends Model
         'abstract',
     ];
 
-    public function user(): BelongsTo
+    // Expose a computed public URL similar to User::profile_photo_url
+    protected $appends = [
+        'file_url',
+    ];
+    public function topic(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Topic::class);
+    }
+    public function getFileUrlAttribute(): ?string
+    {
+        return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
+    }
+
+    public function user(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            User::class,
+            Submission::class,
+            'paper_id', // Foreign key on submissions table
+            'id', // Foreign key on users table  
+            'id', // Local key on papers table
+            'user_id' // Local key on submissions table
+        );
     }
 
 

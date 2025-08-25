@@ -2,14 +2,16 @@ import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '@/Components/Breadcrumb';
 
-export default function MenuSideBar({ isSidebarOpen, onToggle }) {
+export default function MenuSideBar() {
     const { url, auth } = usePage().props;
     const can = auth?.can ?? {};
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Toggle sidebar
     const toggleSidebar = () => {
-        onToggle();
+        setIsSidebarOpen(prev => !prev);
+        console.log("Toggle Sidebar:", !isSidebarOpen);
     };
 
     // Close sidebar when clicking outside on mobile
@@ -56,54 +58,42 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
     return (
         <>
             {/* Top Navigation Bar */}
-            {/* nav & sidebar */}
-            <nav
-                className={`fixed top-0 z-30 bg-gray-50 dark:bg-gray-50 h-16 transition-all duration-300 ease-in-out
-        ${isSidebarOpen ? 'left-64 right-0' : 'left-0 right-0'}`}
-            >
-                <div className="px-4 h-full flex items-center justify-between w-full">
-                    {/* Left side - Toggle + Logo */}
-                    <div className="flex items-center gap-4">
-                        <button
-                            type="button"
-                            data-sidebar-toggle
-                            onClick={toggleSidebar}
-                            className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 
-                       focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 
-                       dark:hover:bg-gray-700 dark:focus:ring-gray-600 transition-all duration-300"
-                        >
-                            <span className="sr-only">Toggle sidebar</span>
-                            <svg className="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    clipRule="evenodd"
-                                    fillRule="evenodd"
-                                    d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 
-                           0 010 1.5H2.75A.75.75 0 012 4.75zm0 
-                           10.5a.75.75 0 01.75-.75h7.5a.75.75 
-                           0 010 1.5h-7.5a.75.75 0 
-                           01-.75-.75zM2 10a.75.75 
-                           0 01.75-.75h14.5a.75.75 
-                           0 010 1.5H2.75A.75.75 0 
-                           012 10z"
-                                ></path>
-                            </svg>
-                        </button>
+            <nav className="fixed top-0 left-0 right-0 z-30 bg-gray-50 dark:bg-gray-50 h-16">
+                <div className="px-4 h-full flex items-center justify-between">
+                    {/* Left side - Toggle button */}
+                    {Breadcrumb}
+                    <button
+                        type="button"
+                        data-sidebar-toggle
+                        onClick={toggleSidebar}
+                        className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 
+                                   focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 
+                                   dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    >
+                        <span className="sr-only">Toggle sidebar</span>
+                        <svg className="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                            <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 
+                            010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 
+                            0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 
+                            0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 
+                            012 10z"></path>
+                        </svg>
+                    </button>
 
-                        {/* Logo for mobile */}
-                        <Link href="/" className="sm:hidden flex items-center">
-                            <img src="/images/Logo.png" className="h-10 w-auto" alt="Logo" />
-                        </Link>
-                    </div>
+                    {/* Logo for mobile */}
+                    <Link href='/' className="sm:hidden flex items-center">
+                        <img src="/images/Logo.png" className="h-10 w-auto" alt="Logo" />
+                    </Link>
 
                     {/* Right side - Profile dropdown */}
-                    <div className="flex items-center">
-                        <div className="flex flex-row relative">
+                    <div className="flex items-center justify-end w-full">
+                        <div className="flex flex-row relative mx-3">
                             <span className="mr-3 mt-1">{`${auth?.user?.name}`}</span>
                             <button
                                 id="user-menu-button"
                                 type="button"
                                 className="flex text-sm rounded-full focus:outline-none focus:ring-1 
-                           focus:ring-offset-2 focus:ring-gray-200"
+                                           focus:ring-offset-2 focus:ring-gray-200"
                                 aria-expanded={isDropdownOpen}
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             >
@@ -117,14 +107,14 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                         />
                                     ) : (
                                         <div
-                                            className="img-circle elevation-2 flex items-center justify-center"
+                                            className="img-circle elevation-2 d-flex align-items-center justify-content-center"
                                             style={{
                                                 width: '34px',
                                                 height: '34px',
                                                 background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                                                 color: 'white',
                                                 fontSize: '14px',
-                                                fontWeight: 'bold',
+                                                fontWeight: 'bold'
                                             }}
                                         >
                                             {getUserInitials(auth?.user?.name)}
@@ -135,12 +125,11 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
 
                             {/* Dropdown menu */}
                             {isDropdownOpen && (
-                                <div
-                                    className="absolute right-0 z-50 mt-10 w-52 origin-top-right rounded-md 
-                                shadow-lg ring-1 ring-black ring-opacity-5 
-                                focus:outline-none bg-gray-50 dark:bg-gray-100"
+                                <div className="absolute right-0 z-50 mt-10 w-52 origin-top-right rounded-md 
+                                                shadow-lg ring-1 ring-black ring-opacity-5 
+                                                focus:outline-none bg-gray-50 dark:bg-gray-100"
                                 >
-                                    <div className="px-4 py-2 mt-2">
+                                    <div className='px-4 py-2 mt-2'>
                                         <div className="py-1 border-b dark:border-gray-600">
                                             <p className="text-sm text-gray-900 ">
                                                 <b>Username:</b> {auth?.user?.name}
@@ -163,8 +152,8 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                                 method="post"
                                                 as="button"
                                                 className="block w-full text-left px-4 py-2 text-sm 
-                                           text-gray-700 hover:bg-gray-100 dark:hover:bg-blue-300 
-                                           dark:text-white-700 dark:hover:text-black ease-in-out duration-300"
+                                                           text-gray-700 hover:bg-gray-100 dark:hover:bg-blue-300 
+                                                           dark:text-white-700 dark:hover:text-black ease-in-out duration-300"
                                             >
                                                 Logout
                                             </Link>
@@ -180,11 +169,11 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
             {/* Sidebar */}
             <aside
                 id="logo-sidebar"
-                className={`fixed top-0 left-0 z-50 w-64 h-screen transition-all duration-300 ease-in-out
-                    ${isSidebarOpen ? 'translate-x-0 ml-0' : '-translate-x-full -ml-64'}`}
+                className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    } sm:translate-x-0`}
                 aria-label="Sidebar"
             >
-                <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-50">
+                <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-200">
                     <div className="logo w-full flex justify-center items-center">
                         <Link href="/" className="flex items-center ps-2.5 mb-5">
                             <img
@@ -280,21 +269,6 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                         <path d="M16 14V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v15a3 3 0 0 0 3 3h12a1 1 0 0 0 0-2h-1v-2a2 2 0 0 0 2-2ZM4 2h2v12H4V2Zm8 16H3a1 1 0 0 1 0-2h9v2Z" />
                                     </svg>
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper</span>
-                                </Link>
-                            </li>
-                        )}
-
-                        {can['conference-list'] && (
-                            <li>
-                                <Link 
-                                    href={route('conferences.index')} 
-                                    className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('conferences.index') ? 'bg-gray-100 dark:bg-gray-400' : ''} ${route().current('conferences.index') && 'active'}`}
-                                >
-                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 0C4.612 0 0 4.336 0 9.667c0 2.76 1.333 5.21 3.391 6.69C3.94 18.667 6.894 20 10 20s6.06-1.333 6.609-3.643C18.667 14.877 20 12.427 20 9.667 20 4.336 15.388 0 10 0zm0 16c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6z"/>
-                                        <path d="M13.5 8.5h-3v-3a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1z"/>
-                                    </svg>
-                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Conferences</span>
                                 </Link>
                             </li>
                         )}
