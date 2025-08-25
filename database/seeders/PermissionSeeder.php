@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -29,15 +28,20 @@ class PermissionSeeder extends Seeder
             'agenda-create',
             'agenda-edit',
             'agenda-delete',
-          
+
             'paper-list',
             'paper-create',
             'paper-edit',
             'paper-delete',
             'paper-assign',
-            // Required by routes under `paper-decisions` group
-            'paper-decision',
+            'paper-review',
+            'paper-approve',
+            'paper-reject',
 
+            'conference-list',
+            'conference-create', 
+            'conference-edit',
+            'conference-delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -45,12 +49,6 @@ class PermissionSeeder extends Seeder
             if (!$old_permission) {
                 Permission::create(['name' => $permission]);
             }
-        }
-
-        // Ensure Admin role (if it already exists) gets all current permissions
-        $adminRole = Role::where('name', 'Admin')->first();
-        if ($adminRole) {
-            $adminRole->syncPermissions(Permission::all());
         }
     }
 }

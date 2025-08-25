@@ -4,8 +4,8 @@ namespace App\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Paper extends Model
 {
@@ -15,24 +15,29 @@ class Paper extends Model
         'topic',
         'keyword',
         'abstract',
-        'user_id',
-        'conference_id',
-        'status'
     ];
 
+    // Expose a computed public URL similar to User::profile_photo_url
+    protected $appends = [
+        'file_url',
+    ];
     public function topic(): BelongsTo
     {
         return $this->belongsTo(Topic::class);
     }
-
-    public function user(): BelongsTo
+    public function getFileUrlAttribute(): ?string
     {
-        return $this->belongsTo(User::class);
+        return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
     }
 
-    public function conference(): BelongsTo
+    public function author(): BelongsTo
     {
-        return $this->belongsTo(Conference::class);
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function submission(): HasOne
+    {
+        return $this->hasOne(Submission::class);
     }
 
     public function reviews(): HasMany
@@ -45,13 +50,17 @@ class Paper extends Model
         return $this->hasOne(Decision::class);
     }
 
-    public function submission(): HasOne
-    {
-        return $this->hasOne(Submission::class);
-    }
-
     public function session(): HasOne
     {
         return $this->hasOne(ConferenceSession::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function conference(): BelongsTo
+    {
+        return $this->belongsTo(Conference::class);
     }
 }

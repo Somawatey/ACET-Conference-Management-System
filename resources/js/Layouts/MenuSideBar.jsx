@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import Breadcrumb from '@/Components/Breadcrumb';
 
 export default function MenuSideBar() {
     const { url, auth } = usePage().props;
@@ -60,6 +61,7 @@ export default function MenuSideBar() {
             <nav className="fixed top-0 left-0 right-0 z-30 bg-gray-50 dark:bg-gray-50 h-16">
                 <div className="px-4 h-full flex items-center justify-between">
                     {/* Left side - Toggle button */}
+                    {Breadcrumb}
                     <button
                         type="button"
                         data-sidebar-toggle
@@ -197,25 +199,49 @@ export default function MenuSideBar() {
                         </li>
                         {can['agenda-list'] && (
                             <li className={`nav-item ${(route().current('agenda.index') || route().current('agenda.create')) && 'menu-is-opening menu-open'}`}>
-                                <Link 
-                                    href={route('agenda.index')} 
-                                    className={`flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('agenda.index') && 'active'}`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white' fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <Link href={route('agenda.index')} className={`flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group nav-link ${route().current('agenda.index') && 'active'}`}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className='shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth={2}
+                                    >
                                         <circle cx="12" cy="12" r="10" className="stroke-current" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" className="stroke-current" />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 6v6l4 2"
+                                            className="stroke-current"
+                                        />
                                     </svg>
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Agenda</span>
                                 </Link>
                             </li>
                         )}
+                        {can['conference-list'] && (
+                            <li className={`nav-item ${(route().current('conferences.index') || route().current('conferences.create')) && 'menu-is-opening menu-open'}`}>
+                                <Link
+                                    href={route('conferences.index')} className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group nav-link ${(route().current('conferences.index') || route().current('conferences.create')) && 'active'}`}
+                                >
+                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Conferences</span>
+                                </Link>
+                            </li>
+                        )}
                         {can['user-list'] && (
                             <li className={`nav-item ${(route().current('users.index') || route().current('users.create')) && 'menu-is-opening menu-open'}`}>
-                                <Link 
-                                    href={route('users.index')} 
-                                    className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('users.index') && 'active'} ${(route().current('roles.index') || route().current('roles.create')) && 'active'}`}
-                                >
-                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                <Link href={route('users.index')} className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group nav-link ${(route().current('users.index') || route().current('users.create')) && 'active'}`}>
+                                    <svg
+                                        className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 18"
+                                    >
                                         <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
                                     </svg>
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Users</span>
@@ -223,11 +249,8 @@ export default function MenuSideBar() {
                             </li>
                         )}
                         {can['role-list'] && (
-                            <li>
-                                <Link 
-                                    href={route('roles.index')} 
-                                    className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('roles.index') && 'active'}`}
-                                >
+                            <li className={`nav-item ${(route().current('roles.index') || route().current('roles.create')) && 'menu-is-opening menu-open'}`}>
+                                <Link href={route('roles.index')} className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group nav-link ${(route().current('roles.index') || route().current('roles.create')) && 'active'}`}>
                                     <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M19.728 10.686c-2.38 2.256-6.153 3.381-9.875 3.381-3.722 0-7.4-1.126-9.571-3.371L0 10.437V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.6l-.272.286Z" />
                                         <path d="m.135 7.847 1.542 1.417c3.6 3.712 12.747 3.7 16.635.01L19.605 7.9A.98.98 0 0 1 20 7.652V6a2 2 0 0 0-2-2h-3V3a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3v1H2a2 2 0 0 0-2 2v1.765c.047.024.092.051.135.082ZM10 10.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5ZM7 3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1H7V3Z" />
@@ -250,7 +273,8 @@ export default function MenuSideBar() {
                                 </Link>
                             </li>
                         )}
-                        {can['paper-assign'] && (
+
+                        {/* {can['paper-assign'] && (
                             <li>
                                 <Link 
                                     href={route('paper-assignments.index')} 
@@ -262,7 +286,18 @@ export default function MenuSideBar() {
                                     <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Assign Papers</span>
                                 </Link>
                             </li>
-                        )}
+                        )} */}
+
+                        {/* <li>
+                            <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper-history.index') && 'active'}`}>
+                                <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Paper History</span>
+                                </a>
+                            </Link>
+                        </li> */}
                         <li>
                             <Link 
                                 href={route('reviews.index')} 
@@ -274,6 +309,8 @@ export default function MenuSideBar() {
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Reviews</span>
                             </Link>
                         </li>
+
+
                         <li>
                             <Link 
                                 href={route('review.history')} 
@@ -285,11 +322,20 @@ export default function MenuSideBar() {
                                 <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Review History</span>
                             </Link>
                         </li>
+
+                        {/* <li>
+                            <Link href={route('paper-history.index')} className={`nav-link ${route().current('paper.history') && 'active'}`}>
+                                <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group">
+                                    <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
+                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z" />
+                                    </svg>
+                                    <span className="flex-1 ms-3 whitespace-nowrap text-gray-700">Submission History</span>
+                                </a>
+                            </Link>
+                        </li> */}
+
                         <li>
-                            <Link 
-                                href={route('submissions.create')} 
-                                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group ${route().current('submissions.create') && 'active'}`}
-                            >
+                            <Link href={route('submissions.create')} className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-400 group nav-link ${route().current('submissions.create') && 'active'}`}>
                                 <svg className="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white ml-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z" />
                                     <path d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z" />
