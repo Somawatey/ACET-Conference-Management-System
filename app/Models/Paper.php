@@ -17,7 +17,15 @@ class Paper extends Model
         'abstract',
     ];
 
-    public function user(): BelongsTo
+    // Expose a computed public URL similar to User::profile_photo_url
+    protected $appends = [
+        'file_url',
+    ];
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class);
+    }
+    public function getFileUrlAttribute(): ?string
     {
         return $this->belongsTo(User::class);
     }
