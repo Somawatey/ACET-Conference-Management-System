@@ -98,6 +98,9 @@ Route::middleware('auth')->group(function () {
         Route::delete("/{id}", [SubmissionController::class, 'destroy'])->name('submissions.destroy');
     });
 
+    // Your Submissions alias route
+    Route::get('/your-submissions', [SubmissionController::class, 'index'])->name('your-submissions.index');
+
     // Paper Assignment routes
     Route::prefix('paper-assignments')->group(function () {
         Route::get('/', [PaperAssignmentController::class, 'index'])->name('paper-assignments.index');
