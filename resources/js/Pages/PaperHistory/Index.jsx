@@ -4,7 +4,7 @@ import Pagination from '@/Components/Pagination';
 import { Head, Link } from '@inertiajs/react';
 import { useState, Fragment } from 'react';
 
-export default function PaperHistoryPage({ histories = [] }) {
+export default function PaperHistoryPage({ histories = [], sidebarOpen = true }) {
     const [openId, setOpenId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
@@ -58,11 +58,12 @@ export default function PaperHistoryPage({ histories = [] }) {
             <Breadcrumb title={headWeb} links={linksBreadcrumb} />
             
             <div className="bg-white min-h-screen">
-                <div className="w-full">
-                    <main className="mx-auto px-4 py-6 sm:px-6 lg:px-8 xl:px-12 
-                                   max-w-full sm:max-w-7xl 
-                                   transition-all duration-300 ease-in-out">
-                        
+                <div className="">
+                    <main
+                        className={`transition-all duration-300 ease-in-out px-4 py-6 sm:px-6 lg:px-8 xl:px-12
+                            ${sidebarOpen ? 'max-w-full sm:max-w-7xl mx-auto' : 'max-w-full mx-0'}
+                        `}
+                    >
                         {/* Header Section */}
                         <div className="mb-6 lg:mb-8">
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

@@ -53,10 +53,10 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
             {/* Top Navigation Bar */}
             <nav className={`fixed top-0 right-0 z-30 bg-white/90 backdrop-blur-lg border-b border-gray-200/50 h-16 transition-all duration-300 ease-in-out shadow-sm ${
                 sidebarOpen ? 'left-64' : 'left-0'
-            }`}>
+            }`}> 
                 <div className="px-6 h-full flex items-center justify-between">
                     {/* Left side - Toggle button */}
-                    {Breadcrumb}
+                    <Breadcrumb />
                     <button
                         type="button"
                         data-sidebar-toggle
@@ -352,7 +352,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                     : 'text-gray-400 group-hover:text-gray-600'
                             }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      d="M9 12h6m-6 4h6M7 6h10m-7 14v-4a2 2 0 012-2h6a2 2 0 012 2v4m-9 0H5a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             Reviews
                         </Link>
