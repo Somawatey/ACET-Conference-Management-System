@@ -36,9 +36,9 @@ useEffect(() => {
             // Add the event listener for when a user selects a place.
             autocomplete.addListener('place_changed', () => {
                 const place = autocomplete.getPlace();
-                if (place.formatted_address) {
+                if (place.name) {
                     // Update the form's state with the selected address.
-                    setData('location', place.formatted_address);
+                    setData('location', place.name);
                 }
             });
         }
