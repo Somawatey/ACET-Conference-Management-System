@@ -42,7 +42,7 @@ const AdminLayout = ({ breadcrumb, children }) => {
             <MenuSideBar isSidebarOpen={isSidebarOpen} onToggle={handleSidebarToggle} />
 
             {/* Content Wrapper */}
-            <div className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0'} pt-16`}>
+            <div className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0l'} pt-8`}>
                 {breadcrumb && breadcrumb}
                 <section className="content">{children}</section>
             </div>

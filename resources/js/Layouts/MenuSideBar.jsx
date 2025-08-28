@@ -53,34 +53,34 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
             {/* Top Navigation Bar */}
             <nav className={`fixed top-0 right-0 z-30 bg-white/90 backdrop-blur-lg border-b border-gray-200/50 h-16 transition-all duration-300 ease-in-out shadow-sm ${
                 sidebarOpen ? 'left-64' : 'left-0'
-            }`}>
+            }`}> 
                 <div className="px-6 h-full flex items-center justify-between">
-                    {/* Left side - Toggle button */}
-                    {Breadcrumb}
-                    <button
-                        type="button"
-                        data-sidebar-toggle
-                        onClick={toggleSidebar}
-                        className="inline-flex items-center justify-center p-2.5 text-gray-500 rounded-xl 
-                                   hover:bg-gray-100/70 hover:text-gray-700 transition-all duration-200
-                                   focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-1
-                                   active:scale-95 transform"
-                    >
-                        <span className="sr-only">Toggle sidebar</span>
-                        <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                            <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 
-                            010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 
-                            0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 
-                            0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 
-                            012 10z"></path>
-                        </svg>
-                    </button>
-
+                    {/* Left side - Toggle button repositioned to left edge */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            data-sidebar-toggle
+                            onClick={toggleSidebar}
+                            className="inline-flex items-center justify-center p-2.5 text-gray-500 rounded-xl 
+                                       hover:bg-gray-100/70 hover:text-gray-700 transition-all duration-200
+                                       focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-1
+                                       active:scale-95 transform mr-2"
+                        >
+                            <span className="sr-only">Toggle sidebar</span>
+                            <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                                <path clipRule="evenodd" fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 
+                                010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 
+                                0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 
+                                0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 
+                                012 10z"></path>
+                            </svg>
+                        </button>
+                        <Breadcrumb />
+                    </div>
                     {/* Logo for mobile */}
                     <Link href='/' className="sm:hidden flex items-center">
                         <img src="/images/Logo.png" className="h-10 w-auto" alt="Logo" />
                     </Link>
-
                     {/* Right side - Profile dropdown */}
                     <div className="flex items-center justify-end w-full">
                         <div className="flex items-center relative">
@@ -111,7 +111,6 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                     </div>
                                 )}
                             </button>
-
                             {/* Dropdown menu */}
                             {isDropdownOpen && (
                                 <div className="absolute top-0 right-0 z-50 mt-2 w-72 origin-top-right 
@@ -144,7 +143,6 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                             </div>
                                         </div>
                                     </div>
-                                    
                                     {/* Menu Items */}
                                     <div className="py-2">
                                         <Link 
@@ -156,11 +154,10 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                             <svg className="w-4 h-4 mr-3 text-gray-400 group-hover:text-gray-500" 
                                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                      d="M16 7a4 4 0 11-8 0 4 4 0 0 18 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" />
                                             </svg>
                                             Profile Settings
                                         </Link>
-                                        
                                         <Link
                                             href={route('logout')}
                                             method="post"
@@ -172,7 +169,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                             <svg className="w-4 h-4 mr-3 text-red-400 group-hover:text-red-500" 
                                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1" />
                                             </svg>
                                             Sign out
                                         </Link>
@@ -350,7 +347,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                     : 'text-gray-400 group-hover:text-gray-600'
                             }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                      d="M9 12h6m-6 4h6M7 6h10m-7 14v-4a2 2 0 012-2h6a2 2 0 012 2v4m-9 0H5a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             Reviews
                         </Link>
