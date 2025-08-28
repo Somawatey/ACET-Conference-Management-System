@@ -111,7 +111,7 @@ export default function PaperPage({ users, papers }) {
             <Head title={headWeb} />
             <div className="bg-white min-h-screen font-sans">
                 <div className="max-w-screen-xl mx-auto">
-                    <div className="p-6">
+                    <div className="px-14">
                         <div className="flex items-center justify-between mb-4">
                             {/* Search input */}
                             <div className="relative w-1/4">

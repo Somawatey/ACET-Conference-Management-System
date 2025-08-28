@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Login from '../Pages/Auth/Login.jsx';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
+    const can = auth?.can ?? {};
     const testimonialsData = [
         {
             name: 'Hikmet Atceken',
@@ -94,11 +95,40 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div className='flex-1 items-center justify-center '>
                         <img src="/ACET.png" alt="Confora Logo" className='h-[30px]' />
                     </div>
-                    <nav className=' flex justify-center items-center list-none cursor-pointer gap-[70px]'>
-                        {Li('Home')}
-                        {Li('Agenda')}
-                        {Li('Publisher')}
-                        {Li('Papers')}
+                    <nav className='flex justify-center items-center list-none cursor-pointer gap-[70px]'>
+                        {can['agenda-list'] && (
+                            <Link
+                                href={route('agenda.index')}
+                                className={`flex items-center px-2 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    route().current('agenda.index')
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100'
+                                    : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
+                            }`}
+                        >
+                            Agenda
+                        </Link>)}
+                        {can['conference-list'] && (
+                            <Link
+                                href={route('conferences.index')}
+                                className={`flex items-center px-2 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    (route().current('conferences.index') || route().current('conferences.create'))
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100'
+                                : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
+                                }`}
+                                >
+                            Conferences
+                        </Link>)}
+                        {can['paper-list'] && (
+                            <Link
+                                href={route('papers.index')}
+                                className={`flex items-center px-2 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    route().current('papers.index')
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100'
+                                    : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
+                            }`}
+                        >
+                            Paper
+                        </Link>)}
                     </nav>
                     <nav className="flex-1 flex justify-end gap-2 items-center">
                         {auth?.user ? (
@@ -523,7 +553,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             <i className="fas fa-quote-right mr-2"></i> Publisher
                         </span>
                         <h1 className="text-4xl font-extrabold text-gray-900">
-                            Here are our <span className="text-blue-600">Authors</span> and <span className="text-blue-600">Researchers</span>
+                            Here are our <span className="text-blue-600">Authors</span>
                         </h1>
                         <p className="mt-4 text-lg text-gray-600">
                             Learn more about how our platform has transformed the conference experience for authors and researchers.
@@ -601,9 +631,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </div>
                 </div>
                 <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-                <div className="sm:flex sm:items-center sm:justify-between">
+                <div className="sm:flex sm:items-center sm:justify-between px-5 py-3">
                     <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">All Rights Reserved.</span>
-                    <div className="flex sm:justify-center sm:mt-0">
+                    <div className="flex sm:justify-center sm:mt-0 p-3">
                         <a href="#" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
                             <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 8 19">
                                     <path fillRule="evenodd" d="M6.135 3H8V0H6.135a4.147 4.147 0 0 0-4.142 4.142V6H0v3h2v9.938h3V9h2.021l.592-3H5V3.591A.6.6 0 0 1 5.592 3h.543Z" clipRule="evenodd"/>
