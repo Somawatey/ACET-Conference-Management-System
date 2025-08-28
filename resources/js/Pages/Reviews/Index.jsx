@@ -59,7 +59,7 @@ export default function ReviewsIndex({ reviews }) {
             <Breadcrumb title={headWeb} links={linksBreadcrumb} />
             
             <div className="bg-white min-h-screen">
-                <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Header Section */}
                     <div className="mb-8">
                         <div className="flex justify-between items-center mb-6">
