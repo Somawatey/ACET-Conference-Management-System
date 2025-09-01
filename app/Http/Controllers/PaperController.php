@@ -13,18 +13,62 @@ class PaperController extends Controller
     /**
      * Display a listing of papers
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Get search and filter parameters
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        // Start building the query with correct relationships
+        $papersQuery = Paper::with([
+            'user', 
+            'conference', 
+            'submission.authorInfo', // Access authorInfo through submission
+            'assignments' => function($query) {
+                $query->where('status', '!=', 'cancelled');
+            }
+        ]);
+
+        // Apply search filter - FIXED to match your actual database columns
+        if ($search) {
+            $papersQuery->where(function($query) use ($search) {
+                $query->where('paper_title', 'like', "%{$search}%")
+                      ->orWhere('topic', 'like', "%{$search}%")
+                      ->orWhere('abstract', 'like', "%{$search}%")
+                      // Search through submission->authorInfo relationship
+                      ->orWhereHas('submission.authorInfo', function($authorQuery) use ($search) {
+                          $authorQuery->where('author_name', 'like', "%{$search}%")
+                                     ->orWhere('author_email', 'like', "%{$search}%")
+                                     ->orWhere('correspond_email', 'like', "%{$search}%");
+                      })
+                      // Search through user relationship
+                      ->orWhereHas('user', function($userQuery) use ($search) {
+                          $userQuery->where('name', 'like', "%{$search}%")
+                                   ->orWhere('email', 'like', "%{$search}%");
+                      });
+            });
+        }
+
+        // Apply status filter
+        if ($status) {
+            $papersQuery->where('status', $status);
+        }
+
+        // Get papers with pagination and preserve query parameters
+        $papers = $papersQuery->orderBy('created_at', 'desc')
+                             ->paginate(10)
+                             ->withQueryString();
+
+        // Get users for reviewers
         $users = User::with('roles')->paginate(10)->appends(request()->query());
-        $papers = Paper::with(['user', 'conference', 'authorInfo', 'submission', 'assignments' => function($query) {
-            $query->where('status', '!=', 'cancelled');
-        }])
-        ->orderBy('created_at', 'desc')
-        ->paginate(10);
 
         return Inertia::render('Papers/Index', [
             'users' => $users,
             'papers' => $papers,
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+            ]
         ]);
     }
 
