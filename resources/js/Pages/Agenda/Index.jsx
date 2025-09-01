@@ -276,7 +276,7 @@ export default function AgendaPage({ agendas, filters }) {
                                         <th className='text-left p-4'>Conference</th>
                                         <th className='text-left p-4'>Date</th>
                                         <th className='text-left p-4'>Time</th>
-                                        <th className='text-left p-4'>Location</th>
+                                        <th className='text-left p-4'>Room</th>
                                         <th className='text-left p-4'>Speaker</th>
                                         <th className='text-left p-4'>Actions</th>
                                     </tr>
@@ -356,7 +356,7 @@ export default function AgendaPage({ agendas, filters }) {
                                                         </button>
                                                         
                                                         {/* PDF Export Single Button */}
-                                                        <button 
+                                                        {/* <button 
                                                             onClick={() => exportSingleAgenda(agenda)}
                                                             className="text-gray-600 hover:text-red-600 transition-colors duration-200"
                                                             title="Export PDF"
@@ -364,7 +364,7 @@ export default function AgendaPage({ agendas, filters }) {
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                             </svg>
-                                                        </button>
+                                                        </button> */}
                                                         
                                                         {/* Edit Button */}
                                                         {can['agenda-edit'] && (
