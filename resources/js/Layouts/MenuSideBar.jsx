@@ -204,11 +204,12 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                     {/* Navigation Menu */}
                     <nav className="space-y-1">
                         {/* Dashboard */}
-                        <Link 
-                            href={route('dashboard')} 
-                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                                route().current('dashboard') 
-                                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+                        {can['dashboard'] && (
+                            <Link
+                                href={route('dashboard')}
+                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    route().current('dashboard')
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100'
                                     : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
                             }`}
                         >
@@ -222,9 +223,9 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                             </svg>
                             Dashboard
                         </Link>
+                        )}
 
-                        {/* Agenda */}
-                        {can['agenda-list'] && (
+                        {/* Agenda every one can view the agenda list*/}
                             <Link 
                                 href={route('agenda.index')} 
                                 className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
@@ -243,7 +244,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                 </svg>
                                 Agenda
                             </Link>
-                        )}
+                     
 
                         {/* Conferences */}
                         {can['conference-list'] && (
@@ -333,11 +334,13 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                 Paper
                             </Link>
                         )}
-                        <Link 
-                            href={route('reviews.index')} 
-                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                                route().current('reviews.index')
-                                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+
+                        {can['review-list'] && (
+                            <Link 
+                                href={route('reviews.index')} 
+                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    route().current('reviews.index')
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
                                     : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
                             }`}
                         >
@@ -351,13 +354,15 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                             </svg>
                             Reviews
                         </Link>
+                        )}
 
                         {/* Review History */}
-                        <Link 
-                            href={route('review.history')} 
-                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                                route().current('review.history')
-                                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+                        {can['review-history'] && (
+                            <Link 
+                                href={route('review.history')} 
+                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    route().current('review.history')
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
                                     : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
                             }`}
                         >
@@ -371,6 +376,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                             </svg>
                             Review History
                         </Link>
+                    )}
 
                         {/* Your Submission */}
                         <Link 
@@ -393,11 +399,12 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                         </Link>
 
                         {/* Submission History */}
-                        <Link 
-                            href={route('paper-history.index')} 
-                            className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                                route().current('submissions.history')
-                                    ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+                        {can['submission-history'] && (
+                            <Link 
+                                href={route('paper-history.index')} 
+                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                                    route().current('submissions.history')
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
                                     : 'text-gray-700 hover:bg-gray-100/70 hover:text-gray-900'
                             }`}
                         >
@@ -411,6 +418,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                             </svg>
                             Submission History
                         </Link>
+                        )}
 
                         {/* Divider */}
                         <div className="my-4 border-t border-gray-200/60"></div>
