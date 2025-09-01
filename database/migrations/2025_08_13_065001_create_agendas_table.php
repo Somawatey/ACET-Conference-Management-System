@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('session', ['morning', 'afternoon', 'evening']);
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('type', ['session', 'keynote', 'break', 'lunch', 'networking', 'workshop']);
+            $table->enum('type', ['session', 'keynote', 'break', 'lunch', 'networking', 'workshop'])->nullable();
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');

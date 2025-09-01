@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import Login from '../Pages/Auth/Login.jsx';
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+export default function Welcome({ auth, laravelVersion, phpVersion, canResetPassword }) {
     const can = auth?.can ?? {};
     const testimonialsData = [
         {
@@ -281,7 +281,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             >
                                 ✕
                             </button>
-                            <Login />
+                            <Login canResetPassword={true} />
                         </div>
                     </div>
                 )}

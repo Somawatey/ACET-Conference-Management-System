@@ -81,7 +81,7 @@ export default function Login({ status, canResetPassword }) {
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <label htmlFor="remember_me" className="flex items-center">
+                        <label htmlFor="remember_me" className="flex items-center m-0">
                             <Checkbox
                                 id="remember_me"
                                 name="remember"
