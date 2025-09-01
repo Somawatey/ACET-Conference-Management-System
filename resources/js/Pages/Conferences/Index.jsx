@@ -84,7 +84,7 @@ export default function ConferencePage({ conferences }) {
                 <div className="max-w-9xl px-3">
                     {/*-- Header --*/}
 
-                    <div className="p-6">
+                    <div className="px-14">
                     
                         {/*-- Create Conference Section --*/}
                         <div className="flex items-center justify-between mb-4">

@@ -113,7 +113,7 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                             </button>
                             {/* Dropdown menu */}
                             {isDropdownOpen && (
-                                <div className="absolute right-0 z-50 mt-2 w-72 origin-top-right 
+                                <div className="absolute top-0 right-0 z-50 mt-2 w-72 origin-top-right 
                                                 bg-white rounded-xl shadow-xl border border-gray-200/50
                                                 ring-1 ring-black/5 backdrop-blur-lg
                                                 transform transition-all duration-200 ease-out
@@ -333,8 +333,6 @@ export default function MenuSideBar({ isSidebarOpen, onToggle }) {
                                 Paper
                             </Link>
                         )}
-
-                        {/* Reviews */}
                         <Link 
                             href={route('reviews.index')} 
                             className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
