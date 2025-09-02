@@ -289,7 +289,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
                 {/* Hero Section */}
                 <section className="px-8 py-16 text-center bg-gray-100">
                     <h1 className="text-4xl md:text-5xl font-bold leading-snug">
-                        Welcome to Confora <br />
+                        Welcome to ACET <br />
                         <span className="text-blue">Conferences Management</span>
                     </h1>
                     <p className="text-gray-500 mt-4 max-w-2xl mx-auto">Bringing researchers together, one paper at a time. Your work deserves the world's stage.</p>

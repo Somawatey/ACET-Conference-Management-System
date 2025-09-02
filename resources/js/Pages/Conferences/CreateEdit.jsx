@@ -12,7 +12,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function ConferencesCreateEdit({ conference = {} }) {
     const locationInputRef = useRef(null);
-    const { google_maps_api_key } = usePage().props; // <-- Get the key
+    const {google_maps_api_key} = usePage().props; // <-- Get the key
 
 // In your CreateEdit.jsx component
 
@@ -101,82 +101,158 @@ useEffect(() => {
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
             {/* Set the browser page title */}
             <Head title={headWeb} />
-            <section className="bg-white dark:bg-white">
-              <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                  <div className="p-6 space-y-6 sm:p-8">
-                    <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-dark text-center">
+            <section className="h-screen bg-white dark:bg-white py-4">
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="bg-white rounded-lg shadow-lg border border-gray-100">
+                  <div className="p-6 sm:p-8">
+                    <div className="flex items-center mb-6">
+                      <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <h1 className="text-2xl font-bold text-gray-900">
                         {headWeb}
-                    </h1>
-                    <form className="space-y-4 md:space-y-6" onSubmit={submit}>
-                      <div>
-                        <label htmlFor="conf_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Conference Name</label>
-                        <input
-                          type="text"
-                          name="conf_name"
-                          id="conf_name"
-                          value={data.conf_name}
-                          onChange={(e) => setData('conf_name', e.target.value)}
-                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="ACET Conference 2025"
-                          required
-                        />
-                        <InputError className="mt-2" message={errors.conf_name} />
-                      </div>
-                      
-                      <div>
-                        <label htmlFor="topic" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Topic</label>
-                        <input
-                          type="text"
-                          name="topic"
-                          id="topic"
-                          value={data.topic}
-                          onChange={(e) => setData('topic', e.target.value)}
-                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="Technology Innovation"
-                          required
-                        />
-                        <InputError className="mt-2" message={errors.topic} />
-                      </div>
-
-                      <div>
-                        <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Conference Date</label>
-                        <input
-                          type="date"
-                          name="date"
-                          id="date"
-                          value={data.date}
-                          onChange={(e) => setData('date', e.target.value)}
-                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          required
-                        />
-                        <InputError className="mt-2" message={errors.date} />
-                      </div>
-
-                      <div >
-                        <label htmlFor="location" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
-                        <input
-                            type="text"
-                            name="location"
-                            ref={locationInputRef}
-                            id="location"
-                            value={data.location} // Change 'defaultValue' back to 'value'
-                            onChange={(e) => setData('location', e.target.value)}                            
-                            className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            required
-                        />
-                        <InputError className="mt-2" message={errors.location} />
+                      </h1>
+                    </div>
+                    <form className="space-y-6" onSubmit={submit}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="col-span-1">
+                          <div className="mb-6">
+                            <label htmlFor="conf_name" className="block mb-2 text-sm font-medium text-gray-900">Conference Name</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                              </div>
+                              <input
+                                type="text"
+                                name="conf_name"
+                                id="conf_name"
+                                value={data.conf_name}
+                                onChange={(e) => setData('conf_name', e.target.value)}
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                                placeholder="ACET Conference 2025"
+                                required
+                              />
+                            </div>
+                            <InputError className="mt-2" message={errors.conf_name} />
+                          </div>
+                          
+                          <div className="mb-6">
+                            <label htmlFor="topic" className="block mb-2 text-sm font-medium text-gray-900">Conference Topic</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                </svg>
+                              </div>
+                              <input
+                                type="text"
+                                name="topic"
+                                id="topic"
+                                value={data.topic}
+                                onChange={(e) => setData('topic', e.target.value)}
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                                placeholder="Technology Innovation"
+                                required
+                              />
+                            </div>
+                            <InputError className="mt-2" message={errors.topic} />
+                          </div>
+                        </div>
                         
-                      </div >
+                        <div className="col-span-1">
+                          <div className="mb-6">
+                            <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-900">Conference Date</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <input
+                                type="date"
+                                name="date"
+                                id="date"
+                                value={data.date}
+                                onChange={(e) => setData('date', e.target.value)}
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                                required
+                              />
+                            </div>
+                            <InputError className="mt-2" message={errors.date} />
+                          </div>
 
-                      <button
-                        type="submit"
-                        disabled={processing}
-                        className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                      >
-                        {processing ? (conference?.id ? 'Updating...' : 'Creating...') : (conference?.id ? 'Update Conference' : 'Create Conference')}
-                      </button>
+                          <div className="mb-6">
+                            <label htmlFor="location" className="block mb-2 text-sm font-medium text-gray-900">Location</label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                              </div>
+                              <input
+                                type="text"
+                                name="location"
+                                ref={locationInputRef}
+                                id="location"
+                                value={data.location}
+                                onChange={(e) => setData('location', e.target.value)}
+                                className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                                placeholder="Enter a location"
+                                required
+                              />
+                            </div>
+                            <InputError className="mt-2" message={errors.location} />
+                            <p className="mt-1 text-xs text-gray-500">Type to search for a location or enter manually</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end space-x-4 border-t pt-6">
+                        <Link
+                          href={route('conferences.index')}
+                          className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm px-5 py-2.5 text-center font-medium"
+                        >
+                          Cancel
+                        </Link>
+                        <button
+                          type="submit"
+                          disabled={processing}
+                          className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
+                        >
+                          {processing ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              {conference?.id ? 'Updating...' : 'Creating...'}
+                            </>
+                          ) : (
+                            <>
+                              {conference?.id ? 'Update Conference' : 'Create Conference'}
+                              <svg className="w-4 h-4 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                              </svg>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </form>
+                    <div className="mt-6 bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg border-t">
+                      <div className="text-xs text-gray-500">
+                        <p className="mb-2">
+                          <span className="font-medium">Note:</span> Created conferences will be visible to all users with appropriate permissions.
+                        </p>
+                        <p>
+                          <span className="font-medium">Need help?</span> Contact the system administrator if you encounter any issues.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
