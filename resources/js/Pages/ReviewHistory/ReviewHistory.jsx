@@ -130,17 +130,17 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
             <Breadcrumb title={headWeb} links={linksBreadcrumb} />
 
             <div className="bg-white min-h-screen">
-                <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                <main className="mx-auto max-w-9xl px-5 py-10 sm:px-6 lg:px-8">
 
                     {/* Sticky Back Button when coming from Paper Decision */}
                     {isFromPaperDecision() && (
                         <div className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled
-                                ? '-translate-x-24 mr-5'
+                                ? '-translate-x-5'
                                 : ''
                             }`}>
                             <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
                                 <div className={`inline-block transition-all duration-300 ${isScrolled
-                                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-2 border border-blue-200 shadow-sm'
+                                        ? 'mt-1'
                                         : ''
                                     }`}>
                                     <Link
@@ -154,7 +154,7 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                                             }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                         </svg>
-                                        <span className="whitespace-nowrap">{isScrolled ? 'Back' : 'Back to Paper Decision'}</span>
+                                        <span className="whitespace-nowrap">Back to Paper Decision</span>
                                     </Link>
                                 </div>
                             </div>

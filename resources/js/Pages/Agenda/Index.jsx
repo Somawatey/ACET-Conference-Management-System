@@ -156,8 +156,8 @@ export default function AgendaPage({ agendas, filters }) {
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />} >
             <Head title={headWeb} />
             <div className="h-full font-sans">
-                <div className="max-w-screen-xl mx-auto">
-                    <div className="px-5">
+                <div className="max-w-9xl">
+                    <div className="px-4">
                         {/*-- Search and Filter Section --*/}
                         <div className="flex gap-4 w-full mb-4 bg-white p-4 rounded-lg shadow-sm border">
                             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -405,7 +405,7 @@ export default function AgendaPage({ agendas, filters }) {
                         </div>
 
                         {/*-- Pagination --*/}
-                        <div className='flex justify-between items-center pb-5'>
+                        <div className='flex justify-end items-center pb-5'>
                             <div className='mt-4 flex flex-col items-start'>
                                 <div>
                                     <Pagination links={agendas.links} />

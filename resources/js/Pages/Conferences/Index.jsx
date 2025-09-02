@@ -98,7 +98,7 @@ export default function ConferencePage({ conferences }) {
             />
             
             <div className="bg-white min-h-screen font-sans">
-                <div className="max-w-screen-xl mx-auto">
+                <div className="max-w-9xl px-3">
                     {/*-- Header --*/}
 
                     <div className="p-6">
