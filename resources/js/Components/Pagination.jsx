@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 export default function Pagination({ links }) {    
     return (
         links?.length <= 10 ? 
-            <ul className="pagination pagination-sm m-0 float-right">
+            <ul className="pagination pagination-sm m-0 float-right pb-5">
                 {links?.map((link, key) => (
                     link?.url === null ?
                         (

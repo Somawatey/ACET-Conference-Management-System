@@ -131,7 +131,7 @@ class AgendaController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => [
-                'required',
+                'nullable',
                 Rule::in(['session', 'keynote', 'break', 'lunch', 'networking', 'workshop']),
             ],
             'date' => 'required|date',
@@ -192,7 +192,7 @@ class AgendaController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => [
-                'required',
+                'nullable',
                 Rule::in(['session', 'keynote', 'break', 'lunch', 'networking', 'workshop']),
             ],
             'date' => 'required|date',
