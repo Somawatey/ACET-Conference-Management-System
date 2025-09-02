@@ -44,7 +44,7 @@ const AdminLayout = ({ breadcrumb, children }) => {
             {/* Content Wrapper */}
             <div className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0l'} pt-8`}>
                 {breadcrumb && breadcrumb}
-                <section className="content p-4">{children}</section>
+                <section className="content">{children}</section>
             </div>
             
         </div>

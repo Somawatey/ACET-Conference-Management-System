@@ -42,6 +42,15 @@ class PermissionSeeder extends Seeder
             'conference-create', 
             'conference-edit',
             'conference-delete',
+
+            'review-history',
+            'submission-history',
+            'dashboard',
+            'review-list',
+            'review-create',
+            'review-edit',
+            'review-delete',
+
         ];
 
         foreach ($permissions as $permission) {
