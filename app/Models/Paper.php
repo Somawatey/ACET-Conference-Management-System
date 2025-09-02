@@ -108,4 +108,17 @@ class Paper extends Model
     {
         return $this->url ? asset('storage/' . ltrim($this->url, '/')) : null;
     }
+    
+    public function getAuthorNameAttribute()
+    {
+        // Try to get author name from submission->authorInfo
+        if ($this->submission && $this->submission->authorInfo) {
+            return $this->submission->authorInfo->author_name;
+        }
+        // Fallback to author relationship if available
+        if ($this->author) {
+            return $this->author->name;
+        }
+        return null;
+    }
 }
