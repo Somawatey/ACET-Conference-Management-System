@@ -6,8 +6,8 @@ export default function PaperRow({ paper, isOpen, onToggle, onAssignReviewer }) 
     const getPaperTitle = (p) => (p?.paper_title ?? p?.title ?? '');
     const getTopicText = (p) => (typeof p?.topic === 'object' ? (p.topic?.name ?? '') : (p?.topic ?? ''));
     const getAuthorName = (p) => {
-        if (p?.author_info?.author_name) {
-            return p.author_info.author_name;
+        if (p?.submission?.author_info?.author_name) {
+            return p.submission.author_info.author_name;
         }
         return 'No Author';
     };

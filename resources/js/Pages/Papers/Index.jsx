@@ -127,17 +127,10 @@ export default function PaperPage({ users, papers, filters = {} }) {
             : [];
     const rows = normalizedPapers.length > 0 ? normalizedPapers : [];
 
+    console.log(normalizedPapers);
+
     const [openId, setOpenId] = useState(null);
     const toggleRow = (id) => setOpenId((prev) => (prev === id ? null : id));
-
-    const getTopicText = (p) => (typeof p?.topic === 'object' ? (p.topic?.name ?? '') : (p?.topic ?? ''));
-    const getPaperTitle = (p) => (p?.paper_title ?? p?.title ?? '');
-    const getAuthorName = (p) => {
-        if (p?.author_info?.author_name) {
-            return p.author_info.author_name;
-        }
-        return 'No Author';
-    };
 
     const statusClass = (status) => {
         const s = (status || '').toString().toLowerCase();
