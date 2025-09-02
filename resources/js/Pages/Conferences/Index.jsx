@@ -11,6 +11,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import moment from 'moment';
 import { useState } from 'react';
+import Map from '@/Components/Map';
 
 export default function ConferencePage({ conferences }) {
     const { auth } = usePage().props;
@@ -19,6 +20,8 @@ export default function ConferencePage({ conferences }) {
     const datasList = conferences.data;
     const [confirmingDataDeletion, setConfirmingDataDeletion] = useState(false);
     const [dataEdit, setDataEdit] = useState({})
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [showMap, setShowMap] = useState(false);
     const { data: deleteData, setData: setDeleteData, delete: destroy, processing, reset, errors, clearErrors } =
         useForm({
             id: '',
@@ -77,9 +80,23 @@ export default function ConferencePage({ conferences }) {
     const headWeb = 'Conference List'
     const linksBreadcrumb = [{ title: 'Home', url: '/' }, { title: headWeb, url: '' }];
 
+    // Function to handle location click
+    const handleLocationClick = (location) => {
+        setSelectedLocation(location);
+        setShowMap(true);
+    };
+    
     return (
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />} >
             <Head title={headWeb} />
+            
+            {/* Pass the selected location and show state to Map component */}
+            <Map 
+                location={selectedLocation} 
+                open={showMap}
+                onClose={() => setShowMap(false)}
+            />
+            
             <div className="bg-white min-h-screen font-sans">
                 <div className="max-w-9xl px-3">
                     {/*-- Header --*/}
@@ -157,7 +174,10 @@ export default function ConferencePage({ conferences }) {
                                                     </div>
                                                 </td>
                                                 <td className="p-4">
-                                                    <div className="flex items-start">
+                                                    <div 
+                                                        className="flex items-start cursor-pointer hover:text-blue-600"
+                                                        onClick={() => handleLocationClick(conference.location)}
+                                                    >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             className="mr-2"
