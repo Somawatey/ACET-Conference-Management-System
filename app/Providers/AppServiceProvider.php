@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         Inertia::share([
-            'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+            'google_maps_api_key' => config('services.google.maps_api_key'),
         ]);
     }
 }

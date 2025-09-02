@@ -12,7 +12,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function ConferencesCreateEdit({ conference = {} }) {
     const locationInputRef = useRef(null);
-    const { google_maps_api_key } = usePage().props; // <-- Get the key
+    const {google_maps_api_key} = usePage().props; // <-- Get the key
 
 // In your CreateEdit.jsx component
 
