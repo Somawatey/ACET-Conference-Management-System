@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('paper_title');
             $table->string('url')->nullable();
-            $table->enum('topic', ['AI', 'ML', 'Data Science', 'Software Engineering', 'Computer Networks', 'Cybersecurity', 'Other']);
+            $table->enum('topic', ['AI','NLP', 'Machine Learning', 'Data Sciences', 'Software Engineering', 'Computer Networks', 'Cybersecurity', 'IOT Networking' ,'Other']);
             $table->string('keyword')->nullable();
             $table->text('abstract')->nullable();
             $table->timestamps();
