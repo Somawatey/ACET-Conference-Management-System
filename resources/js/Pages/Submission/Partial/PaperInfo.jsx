@@ -57,8 +57,16 @@ export default function PaperInfo({ className = '', data = {}, errors = {}, onCh
                             <option value="">Select topic</option>
                             <option value="NLP">NLP</option>
                             <option value="AI">AI</option>
+                            <option value="Machine Learning">Machine Learning</option>
                             <option value="Data Sciences">Data Sciences</option>
                             <option value="IoT Networking">IoT Networking</option>
+                            <option value="Software Engineering">Software Engineering</option>
+                            <option value="Computer Networks">Computer Networks</option>
+                            <option value="Cybersecurity">Cybersecurity</option>
+                            <option value="Other">Other</option>
+
+
+
                         </select>
                         <InputError className="mt-2" message={errors.topic} />
                     </div>
