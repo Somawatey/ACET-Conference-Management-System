@@ -10,12 +10,14 @@ class Conference extends Model
     protected $fillable = [
         'conf_name',
         'topic',
-        'date',
+        'start_date',
+        'end_date',
         'location'
     ];
 
     protected $casts = [
-        'date' => 'date'
+        'start_date' => 'date',
+        'end_date' => 'date'
     ];
 
     // Add this accessor to format date for forms

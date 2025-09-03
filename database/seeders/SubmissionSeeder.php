@@ -21,7 +21,8 @@ class SubmissionSeeder extends Seeder
         $conference = Conference::firstOrCreate([
             'conf_name' => 'ACET 2024 Conference',
             'topic' => 'Educational Technology and Innovation',
-            'date' => '2024-12-01',
+            'start_date' => '2024-11-15',
+            'end_date' => '2024-12-01',
             'location' => 'Virtual Conference',
         ]);
 

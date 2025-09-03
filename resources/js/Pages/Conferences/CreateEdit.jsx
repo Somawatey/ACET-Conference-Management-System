@@ -12,54 +12,49 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function ConferencesCreateEdit({ conference = {} }) {
     const locationInputRef = useRef(null);
-    const {google_maps_api_key} = usePage().props; // <-- Get the key
+    const {google_maps_api_key} = usePage().props; // <-- Get from usePage() like working version
 
-// In your CreateEdit.jsx component
+    // Simplified Google Maps initialization (like working version)
+    useEffect(() => {
+        const scriptId = 'google-maps-script';
 
-useEffect(() => {
-    const scriptId = 'google-maps-script';
-
-    // Guard clause: if the API key is missing, do nothing.
-    if (!google_maps_api_key) {
-        console.error("Google Maps API key is missing. Please check your backend configuration.");
-        return;
-    }
-
-    // This function initializes the autocomplete feature.
-    const initializeAutocomplete = () => {
-        if (window.google && locationInputRef.current) {
-            const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
-                 // Restricts suggestions to geographical locations
-                componentRestrictions: { country: 'kh'},
-            });
-
-            // Add the event listener for when a user selects a place.
-            autocomplete.addListener('place_changed', () => {
-                const place = autocomplete.getPlace();
-                if (place.name) {
-                    // Update the form's state with the selected address.
-                    setData('location', place.name);
-                }
-            });
+        // Guard clause: if the API key is missing, do nothing.
+        if (!google_maps_api_key) {
+            console.log("Google Maps API key is missing. Location autocomplete disabled.");
+            return;
         }
-    };
 
-    // Check if the script is already on the page.
-    if (document.getElementById(scriptId)) {
-        initializeAutocomplete(); // If so, just run the initialization.
-    } else {
-        // If not, create and append the script.
-        const script = document.createElement('script');
-        script.id = scriptId;
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${google_maps_api_key}&libraries=places`;
-        script.async = true;
-        script.defer = true;
-        // Set the onload callback to our initialization function.
-        script.onload = initializeAutocomplete;
-        document.body.appendChild(script);
-    }
+        // Simple initialization function (like working version)
+        const initializeAutocomplete = () => {
+            if (window.google && locationInputRef.current) {
+                const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
+                    componentRestrictions: { country: 'kh'},
+                });
 
-}, [google_maps_api_key]); // Dependency array is correct.
+                // Use place.name like working version
+                autocomplete.addListener('place_changed', () => {
+                    const place = autocomplete.getPlace();
+                    if (place.name) {
+                        setData('location', place.name);
+                    }
+                });
+            }
+        };
+
+        // Simple script loading (like working version)
+        if (document.getElementById(scriptId)) {
+            initializeAutocomplete();
+        } else {
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${google_maps_api_key}&libraries=places`;
+            script.async = true;
+            script.defer = true;
+            script.onload = initializeAutocomplete;
+            document.body.appendChild(script);
+        }
+
+    }, [google_maps_api_key]);
 
     // Manage form state and submission via Inertia's useForm
     const { data, setData, post, patch, errors, reset, processing, recentlySuccessful } =
@@ -67,9 +62,65 @@ useEffect(() => {
             // Initial values (use existing conference data when editing)
             conf_name: conference?.conf_name || '',
             topic: conference?.topic || '',
-            date: conference?.date || '',
+            start_date: conference?.start_date || '',
+            end_date: conference?.end_date || '',
             location: conference?.location || '',
         });
+
+    // Function to calculate the difference in days
+    const calculateDaysDifference = () => {
+        if (data.start_date && data.end_date) {
+            const startDate = new Date(data.start_date);
+            const endDate = new Date(data.end_date);
+            const timeDiff = endDate - startDate;
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+            return daysDiff > 0 ? daysDiff : 0;
+        }
+        return 0;
+    };
+
+    // Function to generate day options
+    const generateDayOptions = () => {
+        const totalDays = calculateDaysDifference();
+        const options = [];
+        
+        if (totalDays > 0) {
+            for (let i = 1; i <= totalDays; i++) {
+                const currentDate = new Date(data.start_date);
+                currentDate.setDate(currentDate.getDate() + (i - 1));
+                const formattedDate = currentDate.toLocaleDateString('en-GB');
+                
+                options.push({
+                    value: currentDate.toISOString().split('T')[0],
+                    label: `Day ${i} (${formattedDate})`,
+                    day: i
+                });
+            }
+        }
+        
+        return options;
+    };
+
+    // Handle end date change to ensure it's not before start date
+    const handleEndDateChange = (e) => {
+        const newEndDate = e.target.value;
+        if (data.start_date && newEndDate < data.start_date) {
+            alert('End date cannot be before start date');
+            return;
+        }
+        setData('end_date', newEndDate);
+    };
+
+    // Handle start date change to ensure end date is updated if needed
+    const handleStartDateChange = (e) => {
+        const newStartDate = e.target.value;
+        setData('start_date', newStartDate);
+        
+        // If end date is set and is before new start date, clear it
+        if (data.end_date && data.end_date < newStartDate) {
+            setData('end_date', '');
+        }
+    };
 
     // Submit handler: create when no conference ID, otherwise update
     const submit = (e) => {
@@ -78,7 +129,7 @@ useEffect(() => {
             post(route('conferences.store'), { 
                 preserveState: true,
                 onSuccess: () => {
-                    reset(); // Clear the form on successful create
+                    reset();
                 },
             });
         } else {
@@ -97,9 +148,7 @@ useEffect(() => {
     ];
 
     return (
-        // Layout wrapper with breadcrumb navigation
         <AdminLayout breadcrumb={<Breadcrumb header={headWeb} links={linksBreadcrumb} />}>
-            {/* Set the browser page title */}
             <Head title={headWeb} />
             <section className="h-screen bg-white dark:bg-white py-4">
               <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -164,8 +213,9 @@ useEffect(() => {
                         </div>
                         
                         <div className="col-span-1">
+                          {/* Start Date Field */}
                           <div className="mb-6">
-                            <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-900">Conference Date</label>
+                            <label htmlFor="start_date" className="block mb-2 text-sm font-medium text-gray-900">Conference Start Date</label>
                             <div className="relative">
                               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,42 +224,91 @@ useEffect(() => {
                               </div>
                               <input
                                 type="date"
-                                name="date"
-                                id="date"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
+                                name="start_date"
+                                id="start_date"
+                                value={data.start_date}
+                                onChange={handleStartDateChange}
                                 className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
                                 required
                               />
                             </div>
-                            <InputError className="mt-2" message={errors.date} />
+                            <InputError className="mt-2" message={errors.start_date} />
                           </div>
 
+                          {/* End Date Field */}
                           <div className="mb-6">
-                            <label htmlFor="location" className="block mb-2 text-sm font-medium text-gray-900">Location</label>
+                            <label htmlFor="end_date" className="block mb-2 text-sm font-medium text-gray-900">Conference End Date</label>
                             <div className="relative">
                               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                               </div>
                               <input
-                                type="text"
-                                name="location"
-                                ref={locationInputRef}
-                                id="location"
-                                value={data.location}
-                                onChange={(e) => setData('location', e.target.value)}
+                                type="date"
+                                name="end_date"
+                                id="end_date"
+                                value={data.end_date}
+                                onChange={handleEndDateChange}
+                                min={data.start_date}
                                 className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                                placeholder="Enter a location"
                                 required
                               />
                             </div>
-                            <InputError className="mt-2" message={errors.location} />
-                            <p className="mt-1 text-xs text-gray-500">Type to search for a location or enter manually</p>
+                            <InputError className="mt-2" message={errors.end_date} />
                           </div>
                         </div>
+                      </div>
+
+                      {/* Conference Duration Info */}
+                      {data.start_date && data.end_date && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                          <h3 className="text-sm font-medium text-blue-800 mb-2">Conference Duration</h3>
+                          <p className="text-sm text-blue-700">
+                            Total Days: <strong>{calculateDaysDifference()} days</strong>
+                          </p>
+                          <div className="mt-2">
+                            <p className="text-xs text-blue-600 mb-1">Days breakdown:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {generateDayOptions().map((day, index) => (
+                                <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  {day.label}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Location Field */}
+                      <div className="mb-6">
+                        <label htmlFor="location" className="block mb-2 text-sm font-medium text-gray-900">Location</label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <input
+                            type="text"
+                            name="location"
+                            ref={locationInputRef}
+                            id="location"
+                            value={data.location}
+                            onChange={(e) => setData('location', e.target.value)}
+                            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+                            placeholder="Enter a location"
+                            required
+                          />
+                        </div>
+                        <InputError className="mt-2" message={errors.location} />
+                        <p className="mt-1 text-xs text-gray-500">
+                          {google_maps_api_key ? 
+                            "Type to search for a location or enter manually" : 
+                            "Google Maps autocomplete disabled - enter location manually"
+                          }
+                        </p>
                       </div>
 
                       <div className="flex items-center justify-end space-x-4 border-t pt-6">
@@ -243,16 +342,6 @@ useEffect(() => {
                         </button>
                       </div>
                     </form>
-                    <div className="mt-6 bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg border-t">
-                      <div className="text-xs text-gray-500">
-                        <p className="mb-2">
-                          <span className="font-medium">Note:</span> Created conferences will be visible to all users with appropriate permissions.
-                        </p>
-                        <p>
-                          <span className="font-medium">Need help?</span> Contact the system administrator if you encounter any issues.
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>

@@ -101,7 +101,7 @@ export default function ConferencePage({ conferences }) {
                 <div className="max-w-9xl px-3">
                     {/*-- Header --*/}
 
-                    <div className="px-14">
+                    <div className="p-6">
                     
                         {/*-- Create Conference Section --*/}
                         <div className="flex items-center justify-between mb-4">
@@ -163,13 +163,22 @@ export default function ConferencePage({ conferences }) {
                                                         {conference.topic}
                                                     </span>
                                                 </td>
+                                                                                    
                                                 <td className="p-4">
                                                     <div className="flex flex-col">
                                                         <span className="font-medium text-gray-900">
-                                                            {moment(conference.date).format("DD/MM/YYYY")}
+                                                            {conference.start_date && conference.end_date ? (
+                                                                <>
+                                                                    {moment(conference.start_date).format("DD/MM/YYYY")} - {moment(conference.end_date).format("DD/MM/YYYY")}
+                                                                </>
+                                                            ) : conference.date ? (
+                                                                moment(conference.date).format("DD/MM/YYYY")
+                                                            ) : (
+                                                                'Date not set'
+                                                            )}
                                                         </span>
                                                         <span className="text-sm text-gray-500">
-                                                            {moment(conference.date).fromNow()}
+                                                            {conference.start_date ? moment(conference.start_date).fromNow() : ''}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -222,7 +231,7 @@ export default function ConferencePage({ conferences }) {
                                         <tr>
                                             <td colSpan={8} className="text-center p-8">
                                                 <div className="flex flex-col items-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                                     </svg>
                                                     <p className="text-gray-500 text-lg">No conferences found</p>
@@ -243,7 +252,7 @@ export default function ConferencePage({ conferences }) {
                 
                 {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (
-                    <div className="fixed inset-0 z-50 bg-opacity-60 flex justify-center items-center">
+                    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center">
                         <div className="bg-white text-black p-8 rounded-lg shadow-xl w-full max-w-md">
                             <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
                             <p>Are you sure you want to delete the conference "<strong>{deleteData.conf_name}</strong>"? This action cannot be undone.</p>

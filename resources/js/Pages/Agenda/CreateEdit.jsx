@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "@inertiajs/react";
 
 export default function AgendaForm({ datas = null, papers = [], conferences = [], session = [], type = [] }) {
     const [activeTab, setActiveTab] = useState("info");
-    const [selectedDate, setSelectedDate] = useState(datas?.date ? new Date(datas.date) : null);
 
     // Initialize form with existing data
     const { data, setData, post, put, processing, errors } = useForm({
@@ -26,7 +23,48 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
         order_index: datas?.order_index ?? 0
     });
 
-    // Add this function after your other handler functions (around line 85)
+    // HELPER: Calculate which conference day a given date represents
+    const calculateConferenceDay = (conferenceId, targetDate) => {
+        const conference = conferences.find(conf => conf.id == conferenceId);
+        if (!conference || !conference.start_date || !targetDate) return null;
+        
+        const startDate = new Date(conference.start_date);
+        const dateToCheck = new Date(targetDate);
+        
+        // Reset time to avoid timezone issues
+        startDate.setHours(0, 0, 0, 0);
+        dateToCheck.setHours(0, 0, 0, 0);
+        
+        // Calculate the difference in days
+        const timeDiff = dateToCheck.getTime() - startDate.getTime();
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        
+        return daysDiff + 1;
+    };
+
+    // HELPER: Get the current conference day for the selected date
+    const getCurrentConferenceDay = () => {
+        if (data.conference_id && data.date) {
+            return calculateConferenceDay(data.conference_id, data.date);
+        }
+        return null;
+    };
+
+    // HELPER: Get conference day info (for display)
+    const getConferenceDayInfo = () => {
+        const dayNumber = getCurrentConferenceDay();
+        if (dayNumber && data.date) {
+            const formattedDate = new Date(data.date).toLocaleDateString('en-GB');
+            return {
+                day: dayNumber,
+                date: data.date,
+                formattedDate: formattedDate,
+                label: `Day ${dayNumber} (${formattedDate})`
+            };
+        }
+        return null;
+    };
+
     const handleStartTimeChange = (e) => {
         const startTime = e.target.value;
         setData("start_time", startTime);
@@ -46,23 +84,52 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
         }
     };
 
+    // Handle conference selection change
+    const handleConferenceChange = (e) => {
+        const conferenceId = e.target.value;
+        setData("conference_id", conferenceId);
+        
+        // Clear date when conference changes
+        setData("date", "");
+    };
+
+    // Get all available days for the selected conference
+    const getConferenceDays = () => {
+        const selectedConference = conferences.find(conf => conf.id == data.conference_id);
+        if (selectedConference && selectedConference.start_date && selectedConference.end_date) {
+            const startDate = new Date(selectedConference.start_date);
+            const endDate = new Date(selectedConference.end_date);
+            const timeDiff = endDate - startDate;
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+            
+            const days = [];
+            for (let i = 1; i <= daysDiff; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(currentDate.getDate() + (i - 1));
+                const formattedDate = currentDate.toLocaleDateString('en-GB');
+                const isoDate = currentDate.toISOString().split('T')[0];
+                
+                days.push({
+                    day: i,
+                    date: isoDate,
+                    formattedDate: formattedDate,
+                    label: `Day ${i} (${formattedDate})`
+                });
+            }
+            return days;
+        }
+        return [];
+    };
+
     useEffect(() => {
         if (datas) {
             console.log("Received agenda data:", datas);
-            
-            if (datas.date) {
-                setSelectedDate(new Date(datas.date));
-            }
         }
     }, [datas]);
 
-    // Handle form submission (only called from review tab)
+    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        if (selectedDate && !data.date) {
-            setData("date", selectedDate.toISOString().split('T')[0]);
-        }
         
         console.log("Submitting data:", data);
         
@@ -99,11 +166,15 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                 alert("Please enter an event title before proceeding.");
                 return;
             }
+            if (!data.conference_id) {
+                alert("Please select a conference before proceeding.");
+                return;
+            }
             setActiveTab("dateTime");
         } else if (activeTab === "dateTime") {
-            // Validate required fields for dateTime tab before proceeding
-            if (!selectedDate) {
-                alert("Please select a date before proceeding.");
+            // Enhanced validation for dateTime tab
+            if (!data.date) {
+                alert("Please select a conference day before proceeding.");
                 return;
             }
             if (!data.start_time) {
@@ -114,8 +185,6 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                 alert("Please select an end time before proceeding.");
                 return;
             }
-            // Update date in form data before moving to review
-            setData("date", selectedDate.toISOString().split('T')[0]);
             setActiveTab("review");
         }
     };
@@ -174,10 +243,53 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                         {/* Info Tab */}
                         {activeTab === "info" && (
                             <div className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    {/* Conference - MOVED TO TOP AND MADE REQUIRED */}
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Select Conference *
+                                            <span className="text-xs text-red-600 ml-2">(Required - Select this first)</span>
+                                        </label>
+                                        <select
+                                            value={data.conference_id}
+                                            onChange={handleConferenceChange}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        >
+                                            <option value="">-- Choose Conference --</option>
+                                            {conferences.map((conf) => (
+                                                <option key={conf.id} value={conf.id}>
+                                                    {conf.conf_name}
+                                                    {conf.start_date && conf.end_date && (
+                                                        ` (${new Date(conf.start_date).toLocaleDateString('en-GB')} - ${new Date(conf.end_date).toLocaleDateString('en-GB')})`
+                                                    )}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.conference_id && <p className="text-red-500 text-sm mt-1">{errors.conference_id}</p>}
+                                        
+                                        {/* Conference Duration Info */}
+                                        {data.conference_id && (() => {
+                                            const selectedConf = conferences.find(c => c.id == data.conference_id);
+                                            if (selectedConf && selectedConf.start_date && selectedConf.end_date) {
+                                                const days = getConferenceDays();
+                                                return (
+                                                    <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
+                                                        <p className="text-sm text-blue-800 font-medium">
+                                                            Selected Conference: {selectedConf.conf_name}
+                                                        </p>
+                                                        <p className="text-xs text-blue-600 mt-1">
+                                                            Duration: {days.length} day(s)
+                                                        </p>
+                                                    </div>
+                                                );
+                                            }
+                                        })()}
+                                    </div>
+
                                     {/* Paper */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Paper</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Paper (Optional)</label>
                                         <select
                                             value={data.paper_id}
                                             onChange={(e) => setData("paper_id", e.target.value)}
@@ -193,27 +305,7 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                         {errors.paper_id && <p className="text-red-500 text-sm mt-1">{errors.paper_id}</p>}
                                     </div>
 
-                                    {/* Conference */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Conference</label>
-                                        <select
-                                            value={data.conference_id}
-                                            onChange={(e) => setData("conference_id", e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                        >
-                                            <option value="">-- Choose Conference --</option>
-                                            {conferences.map((conf) => (
-                                                <option key={conf.id} value={conf.id}>
-                                                    {conf.conf_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors.conference_id && <p className="text-red-500 text-sm mt-1">{errors.conference_id}</p>}
-                                    </div>
-                                </div>
-
-                                {/* Title, Speaker, Location, Description */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    {/* Event Title */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Event Title *</label>
                                         <input
@@ -226,7 +318,10 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                         />
                                         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                                     </div>
+                                </div>
 
+                                {/* Speaker and Location */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Speaker</label>
                                         <input
@@ -238,19 +333,20 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                         />
                                         {errors.speaker && <p className="text-red-500 text-sm mt-1">{errors.speaker}</p>}
                                     </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Room/Location</label>
+                                        <input
+                                            type="text"
+                                            value={data.location}
+                                            onChange={(e) => setData("location", e.target.value)}
+                                            placeholder="Enter room or location"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Room</label>
-                                    <input
-                                        type="text"
-                                        value={data.location}
-                                        onChange={(e) => setData("location", e.target.value)}
-                                        placeholder="Enter room"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-
+                                {/* Description */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                     <textarea
@@ -262,7 +358,7 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                 </div>
 
                                 {/* Navigation Buttons */}
-                                <div className="flex justify-start   space-x-4 mt-6">
+                                <div className="flex justify-start space-x-4 mt-6">
                                     <button
                                         type="button"
                                         onClick={handleNext}
@@ -277,28 +373,69 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                             </div>
                         )}
 
-                        {/* DateTime Tab */}
+                        {/* DateTime Tab - SIMPLIFIED (NO CUSTOM DATE PICKER) */}
                         {activeTab === "dateTime" && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="flex flex-col space-y-6">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="w-full">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Date *</label>
-                                            <DatePicker
-                                                selected={selectedDate}
-                                                onChange={(date) => {
-                                                    setSelectedDate(date);
-                                                    setData("date", date ? date.toISOString().split('T')[0] : '');
+                                    {/* Conference Day Selection - ONLY OPTION */}
+                                    {data.conference_id ? (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Select Conference Day *
+                                                <span className="text-xs text-blue-600 ml-2">(Choose which day of the conference)</span>
+                                            </label>
+                                            <select
+                                                value={data.date || ''}
+                                                onChange={(e) => {
+                                                    const selectedDate = e.target.value;
+                                                    setData("date", selectedDate);
+                                                    console.log("Selected conference day:", selectedDate);
                                                 }}
-                                                dateFormat="PPP"
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                                 required
-                                            />
+                                            >
+                                                <option value="">-- Choose Conference Day --</option>
+                                                {getConferenceDays().map((day) => (
+                                                    <option key={day.day} value={day.date}>
+                                                        {day.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Select which day of the conference this agenda item is for
+                                            </p>
                                             {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
+                                            
+                                            {/* Show selected day info */}
+                                            {data.date && (
+                                                <div className="mt-2 p-3 bg-green-50 rounded-md border border-green-200">
+                                                    <p className="text-sm text-green-800 font-medium">
+                                                        Selected: Conference Day {getCurrentConferenceDay()}
+                                                    </p>
+                                                    <p className="text-xs text-green-600">
+                                                        {new Date(data.date).toLocaleDateString('en-US', { 
+                                                            weekday: 'long', 
+                                                            year: 'numeric', 
+                                                            month: 'long', 
+                                                            day: 'numeric' 
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
+                                    ) : (
+                                        <div className="p-4 bg-yellow-50 rounded-md border border-yellow-200">
+                                            <p className="text-yellow-800 text-sm">
+                                                ⚠️ Please select a conference first in the Information tab to see available days.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Session and Time in a row */}
+                                    <div className="grid grid-cols-2 gap-4">
                                         {/* Session */}
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Session</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Session</label>
                                             <select
                                                 value={data.session}
                                                 onChange={(e) => setData("session", e.target.value)}
@@ -313,8 +450,27 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                             </select>
                                             {errors.session && <p className="text-red-500 text-sm mt-1">{errors.session}</p>}
                                         </div>
+
+                                        {/* Type */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
+                                            <select
+                                                value={data.type}
+                                                onChange={(e) => setData("type", e.target.value)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                                <option value="">-- Choose Type --</option>
+                                                {type && type.length > 0 && type.map((typeItem) => (
+                                                    <option key={typeItem} value={typeItem}>
+                                                        {typeItem}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
+                                        </div>
                                     </div>
                                     
+                                    {/* Start Time */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Start Time *
@@ -330,40 +486,77 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                         {errors.start_time && <p className="text-red-500 text-sm mt-1">{errors.start_time}</p>}
                                     </div>
                                     
+                                    {/* End Time */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             End Time *
-                                            <span className="text-xs text-gray-500 ml-2">(Automatically calculated)</span>
+                                            <span className="text-xs text-gray-500 ml-2">(You can modify this)</span>
                                         </label>
                                         <input
                                             type="time"
                                             value={data.end_time}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                                            onChange={(e) => setData("end_time", e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                             required
-                                            readOnly
                                         />
                                         <p className="text-xs text-blue-600 mt-1">
-                                            Duration: 1 hour (Conference sessions are limited to 1 hour maximum)
+                                            Duration: {data.start_time && data.end_time ? 
+                                                (() => {
+                                                    const start = new Date(`2000-01-01T${data.start_time}:00`);
+                                                    const end = new Date(`2000-01-01T${data.end_time}:00`);
+                                                    const diff = (end - start) / (1000 * 60); // minutes
+                                                    const hours = Math.floor(diff / 60);
+                                                    const minutes = diff % 60;
+                                                    return `${hours}h ${minutes}m`;
+                                                })()
+                                                : "Not calculated"
+                                            }
                                         </p>
                                         {errors.end_time && <p className="text-red-500 text-sm mt-1">{errors.end_time}</p>}
                                     </div>
                                 </div>
 
+                                {/* Preview Panel */}
                                 <div className="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Date & Time Preview</h3>
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Schedule Preview</h3>
                                     <div className="space-y-3">
-                                        <p><strong>Date:</strong> {selectedDate ? selectedDate.toLocaleDateString() : "Not selected"}</p>
+                                        {data.conference_id && (
+                                            <p><strong>Conference:</strong> {conferences.find(c => c.id == data.conference_id)?.conf_name || "Not selected"}</p>
+                                        )}
+                                        
+                                        {/* Enhanced conference day display */}
+                                        {data.conference_id && data.date && (
+                                            <div className="p-3 bg-green-50 rounded-md border border-green-200">
+                                                <p className="text-sm text-green-800">
+                                                    <strong>Conference Day:</strong> {getConferenceDayInfo()?.label || "Calculating..."}
+                                                </p>
+                                                <p className="text-xs text-green-600 mt-1">
+                                                    {new Date(data.date).toLocaleDateString('en-US', { 
+                                                        weekday: 'long', 
+                                                        year: 'numeric', 
+                                                        month: 'long', 
+                                                        day: 'numeric' 
+                                                    })}
+                                                </p>
+                                            </div>
+                                        )}
+                                        
                                         <p><strong>Start Time:</strong> {data.start_time || "Not selected"}</p>
                                         <p><strong>End Time:</strong> {data.end_time || "Not selected"}</p>
                                         <p><strong>Session:</strong> {data.session || "Not selected"}</p>
+                                        <p><strong>Type:</strong> {data.type || "Not selected"}</p>
                                         
                                         {data.start_time && data.end_time && (
                                             <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-200">
                                                 <p className="text-sm text-blue-800">
-                                                    <strong>Duration:</strong> 1 hour
-                                                </p>
-                                                <p className="text-xs text-blue-600 mt-1">
-                                                    Conference sessions are automatically set to 1 hour duration for optimal scheduling.
+                                                    <strong>Duration:</strong> {(() => {
+                                                        const start = new Date(`2000-01-01T${data.start_time}:00`);
+                                                        const end = new Date(`2000-01-01T${data.end_time}:00`);
+                                                        const diff = (end - start) / (1000 * 60); // minutes
+                                                        const hours = Math.floor(diff / 60);
+                                                        const minutes = diff % 60;
+                                                        return `${hours}h ${minutes}m`;
+                                                    })()}
                                                 </p>
                                             </div>
                                         )}
@@ -406,15 +599,36 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                             <div>
                                                 <p className="mb-2"><strong>Paper:</strong> {papers.find(p => p.id == data.paper_id)?.paper_title || "Not selected"}</p>
                                                 <p className="mb-2"><strong>Conference:</strong> {conferences.find(c => c.id == data.conference_id)?.conf_name || "Not selected"}</p>
+                                                
+                                                {/* Show calculated conference day in review */}
+                                                {data.conference_id && data.date && (
+                                                    <div className="mb-2 p-2 bg-green-50 rounded border border-green-200">
+                                                        <p className="text-sm"><strong>Conference Day:</strong> {getConferenceDayInfo()?.label || "Calculating..."}</p>
+                                                    </div>
+                                                )}
+                                                
                                                 <p className="mb-2"><strong>Session:</strong> {data.session || "Not selected"}</p>
+                                                <p className="mb-2"><strong>Type:</strong> {data.type || "Not selected"}</p>
                                                 <p className="mb-2"><strong>Title:</strong> {data.title || "Not provided"}</p>
                                                 <p className="mb-2"><strong>Speaker:</strong> {data.speaker || "Not provided"}</p>
                                                 <p className="mb-2"><strong>Location:</strong> {data.location || "Not provided"}</p>
                                             </div>
                                             <div>
-                                                <p className="mb-2"><strong>Date:</strong> {selectedDate ? selectedDate.toLocaleDateString() : "Not selected"}</p>
+                                                <p className="mb-2"><strong>Date:</strong> {data.date ? new Date(data.date).toLocaleDateString() : "Not selected"}</p>
                                                 <p className="mb-2"><strong>Start Time:</strong> {data.start_time || "Not selected"}</p>
                                                 <p className="mb-2"><strong>End Time:</strong> {data.end_time || "Not selected"}</p>
+                                                
+                                                {data.start_time && data.end_time && (
+                                                    <p className="mb-2"><strong>Duration:</strong> {(() => {
+                                                        const start = new Date(`2000-01-01T${data.start_time}:00`);
+                                                        const end = new Date(`2000-01-01T${data.end_time}:00`);
+                                                        const diff = (end - start) / (1000 * 60);
+                                                        const hours = Math.floor(diff / 60);
+                                                        const minutes = diff % 60;
+                                                        return `${hours}h ${minutes}m`;
+                                                    })()}</p>
+                                                )}
+                                                
                                                 <p className="mb-2"><strong>Description:</strong></p>
                                                 <p className="text-gray-600 text-sm">{data.description || "Not provided"}</p>
                                             </div>
@@ -449,7 +663,7 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
                                                     <>
                                                         <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 012h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                         </svg>
                                                         Processing...
                                                     </>

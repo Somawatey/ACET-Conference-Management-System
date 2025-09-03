@@ -91,10 +91,20 @@ class AgendaController extends Controller
     public function create(): Response
     {
         $papers = Paper::select('id', 'paper_title')->get();
-        $conferences = Conference::select('id', 'conf_name')->get();
+        
+        // FIXED: Include the date fields that the frontend needs
+        $conferences = Conference::select([
+            'id', 
+            'conf_name',
+            'start_date',     // Add this field
+            'end_date',       // Add this field
+            'topic',          // Optional: for more context
+            'location'        // Optional: for more context
+        ])->get();
+        
         $sessionValues = $this->getEnumValues('agendas', 'session');
         $typeValues = $this->getEnumValues('agendas', 'type');
-        // dd($papers);
+        
         return Inertia::render('Agenda/CreateEdit', [
             'papers' => $papers,
             'conferences' => $conferences,
@@ -127,7 +137,7 @@ class AgendaController extends Controller
     {
         $validated = $request->validate([
             'conference_id' => 'required|integer|exists:conferences,id',
-            'paper_id' => 'required|integer|exists:papers,id',
+            'paper_id' => 'nullable|integer|exists:papers,id',  // Changed to nullable
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => [
@@ -142,10 +152,9 @@ class AgendaController extends Controller
             'order_index' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
             'session' => [
-                'required',
+                'nullable',  // Changed to nullable
                 Rule::in(['morning', 'afternoon', 'evening']),
             ],
-
         ]);
 
         Agenda::create($validated);
@@ -167,7 +176,17 @@ class AgendaController extends Controller
     {
         $agenda = Agenda::findOrFail($id);
         $papers = Paper::select('id', 'paper_title')->get();
-        $conferences = Conference::select('id', 'conf_name')->get();
+        
+        // FIXED: Include the date fields that the frontend needs
+        $conferences = Conference::select([
+            'id', 
+            'conf_name',
+            'start_date',     // Add this field
+            'end_date',       // Add this field
+            'topic',          // Optional: for more context
+            'location'        // Optional: for more context
+        ])->get();
+        
         // Get enum values directly from database schema
         $sessionValues = $this->getEnumValues('agendas', 'session');
         $typeValues = $this->getEnumValues('agendas', 'type');
@@ -189,6 +208,7 @@ class AgendaController extends Controller
         $agenda = Agenda::findOrFail($id);
         $validated = $request->validate([
             'conference_id' => 'required|integer|exists:conferences,id',
+            'paper_id' => 'nullable|integer|exists:papers,id',  // Changed to nullable
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => [
@@ -203,11 +223,11 @@ class AgendaController extends Controller
             'order_index' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
             'session' => [
-                'required',
+                'nullable',  // Changed to nullable
                 Rule::in(['morning', 'afternoon', 'evening']),
             ],
-
         ]);
+        
         $agenda->update($validated);
         return redirect()->route('agenda.index')
             ->with('success', 'Agenda item updated successfully.');

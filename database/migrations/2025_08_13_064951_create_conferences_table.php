@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('conf_name');
             $table->string('topic');
-            $table->date('date');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->string('location');
             $table->timestamps();
         });
