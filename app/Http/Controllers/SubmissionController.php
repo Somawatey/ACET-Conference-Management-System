@@ -219,11 +219,11 @@ class SubmissionController extends Controller
     private function normalizeTopic(string $topic): string
     {
         $map = [
-            'NLP'             => 'AI',
-            'Data Sciences'   => 'Data Science',
-            'IoT Networking'  => 'Computer Networks',
+            'Data Sciences'   => 'Data Sciences',
+            'IoT Networking'  => 'IOT Networking',
+            'Machine Learning' => 'Machine Learning',
         ];
-        $allowed = ['AI', 'ML', 'Data Science', 'Software Engineering', 'Computer Networks', 'Cybersecurity', 'Other'];
+        $allowed = ['AI', 'NLP', 'Machine Learning', 'Data Sciences', 'Software Engineering', 'Computer Networks', 'Cybersecurity', 'IOT Networking', 'Other'];
 
         $normalized = $map[$topic] ?? $topic;
 
