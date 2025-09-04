@@ -301,9 +301,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
                             >
                                 Submit Your Paper
                             </Link>
-                            <button className="border border-gray-300 px-6 py-3 rounded-full hover:bg-gray-100 hover:scale-105 ease-in-out duration-300">
-                                Get The Templates
-                            </button>
                         </div>
                     </div>
                     {/* Rating */}

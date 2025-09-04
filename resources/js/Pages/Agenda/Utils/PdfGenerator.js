@@ -93,14 +93,42 @@ export class AgendaPdfGenerator {
         this.currentY += 30;
     }
 
-    addTableHeader() {
+    // ✅ Updated to dynamically get unique rooms from agendas
+    getUniqueRooms(agendas) {
+        const rooms = new Set();
+        
+        if (agendas && agendas.length > 0) {
+            agendas.forEach(agenda => {
+                if (agenda.location && agenda.location.trim()) {
+                    rooms.add(agenda.location.trim());
+                }
+            });
+        }
+        
+        // Convert to array and sort
+        const roomArray = Array.from(rooms).sort();
+        
+        // If no rooms found, provide default rooms
+        if (roomArray.length === 0) {
+            return ['Room A', 'Room B', 'Room C', 'Room D'];
+        }
+        
+        // Ensure we have at least 4 columns for better layout
+        while (roomArray.length < 4) {
+            roomArray.push('TBA');
+        }
+        
+        return roomArray.slice(0, 6); // Max 6 rooms for layout purposes
+    }
+
+    addTableHeader(agendas = []) {
         const tableWidth = this.pageWidth - (this.margin * 2);
+        const uniqueRooms = this.getUniqueRooms(agendas);
+        const numberOfRooms = uniqueRooms.length;
+        
         const colWidths = {
             time: 50,
-            location1: (tableWidth - 50) / 4,
-            location2: (tableWidth - 50) / 4,
-            location3: (tableWidth - 50) / 4,
-            location4: (tableWidth - 50) / 4
+            room: (tableWidth - 50) / numberOfRooms
         };
 
         // Header background
@@ -124,28 +152,35 @@ export class AgendaPdfGenerator {
         this.pdf.text("Schedule", currentX + 5, this.currentY + 16);
         currentX += colWidths.time;
         
-        // Location headers
-        const locations = ["CONFERENCE HALL A", "CONFERENCE HALL B", "MEETING ROOM C", "MEETING ROOM D"];
-        const locationCodes = ["Hall A", "Hall B", "Room C", "Room D"];
-        
-        for (let i = 0; i < locations.length; i++) {
-            this.pdf.rect(currentX, this.currentY, colWidths.location1, 25);
+        // Room headers - dynamically generated
+        for (let i = 0; i < uniqueRooms.length; i++) {
+            const room = uniqueRooms[i];
+            this.pdf.rect(currentX, this.currentY, colWidths.room, 25);
             
-            // Location name
+            // Room name (truncate if too long)
             this.pdf.setFontSize(9);
             this.pdf.setFont("helvetica", "bold");
             this.pdf.setTextColor(255, 255, 255);
-            this.pdf.text(locationCodes[i], currentX + 5, this.currentY + 8);
+            
+            let roomDisplayName = room;
+            if (room.length > 15) {
+                roomDisplayName = room.substring(0, 12) + "...";
+            }
+            
+            this.pdf.text(roomDisplayName.toUpperCase(), currentX + 5, this.currentY + 8);
             
             // Sub header
             this.pdf.setFontSize(7);
             this.pdf.setFont("helvetica", "normal");
-            this.pdf.text("Conference Area", currentX + 5, this.currentY + 16);
+            this.pdf.text("Conference Room", currentX + 5, this.currentY + 16);
             
-            currentX += colWidths.location1;
+            currentX += colWidths.room;
         }
         
         this.currentY += 25;
+        
+        // Store rooms for later use
+        this.currentRooms = uniqueRooms;
     }
 
     addAgendaTableRows(agendas) {
@@ -154,13 +189,14 @@ export class AgendaPdfGenerator {
             return;
         }
 
-        // Group agendas by time slots
-        const timeSlots = this.groupAgendasByTime(agendas);
+        // Group agendas by time slots and rooms
+        const timeSlots = this.groupAgendasByTimeAndRoom(agendas);
         
         const tableWidth = this.pageWidth - (this.margin * 2);
+        const numberOfRooms = this.currentRooms.length;
         const colWidths = {
             time: 50,
-            location: (tableWidth - 50) / 4
+            room: (tableWidth - 50) / numberOfRooms
         };
 
         let rowIndex = 0;
@@ -171,7 +207,7 @@ export class AgendaPdfGenerator {
             this.checkPageBreak(50);
             
             const isEvenRow = rowIndex % 2 === 0;
-            const rowHeight = this.calculateRowHeight(timeSlots[timeSlot], colWidths.location);
+            const rowHeight = this.calculateRowHeight(timeSlots[timeSlot], colWidths.room);
             
             // Row background
             if (isEvenRow) {
@@ -201,15 +237,21 @@ export class AgendaPdfGenerator {
             
             currentX += colWidths.time;
             
-            // Content columns
-            for (let i = 0; i < 4; i++) {
-                this.pdf.rect(currentX, this.currentY, colWidths.location, rowHeight);
+            // Content columns for each room
+            for (let i = 0; i < this.currentRooms.length; i++) {
+                const room = this.currentRooms[i];
+                this.pdf.rect(currentX, this.currentY, colWidths.room, rowHeight);
                 
-                if (timeSlots[timeSlot][i]) {
-                    this.addCellContent(timeSlots[timeSlot][i], currentX, this.currentY, colWidths.location, rowHeight);
+                // Find agenda for this room and time slot
+                const agendaForRoom = timeSlots[timeSlot].find(agenda => 
+                    agenda && agenda.location === room
+                );
+                
+                if (agendaForRoom) {
+                    this.addCellContent(agendaForRoom, currentX, this.currentY, colWidths.room, rowHeight);
                 }
                 
-                currentX += colWidths.location;
+                currentX += colWidths.room;
             }
             
             this.currentY += rowHeight;
@@ -259,17 +301,10 @@ export class AgendaPdfGenerator {
             const speakerLines = this.pdf.splitTextToSize(speakerText, width - padding * 2);
             this.pdf.text(speakerLines[0], x + padding, textY);
         }
-        
-        // Location indicator if available
-        if (agenda.location && textY < y + height - 12) {
-            this.pdf.setFontSize(6);
-            this.pdf.setFont("helvetica", "italic");
-            this.pdf.setTextColor(73, 80, 87);
-            this.pdf.text("Location: " + agenda.location, x + padding, textY + 8);
-        }
     }
 
-    groupAgendasByTime(agendas) {
+    // ✅ Updated to group by time and room
+    groupAgendasByTimeAndRoom(agendas) {
         const timeSlots = {};
         
         for (let i = 0; i < agendas.length; i++) {
@@ -302,7 +337,7 @@ export class AgendaPdfGenerator {
             if (agenda) {
                 // Calculate height based on title length
                 const titleLines = this.pdf.splitTextToSize(agenda.title, colWidth - 8);
-                const estimatedHeight = 20 + (Math.min(titleLines.length, 2) * 5) + (agenda.speaker ? 8 : 0) + (agenda.location ? 8 : 0);
+                const estimatedHeight = 20 + (Math.min(titleLines.length, 2) * 5) + (agenda.speaker ? 8 : 0);
                 maxHeight = Math.max(maxHeight, estimatedHeight);
             }
         }
@@ -412,8 +447,8 @@ export class AgendaPdfGenerator {
         // Add export info
         this.addExportInfo(exportDate, agendas ? agendas.length : 0, filters);
         
-        // Add table header
-        this.addTableHeader();
+        // ✅ Pass agendas to addTableHeader so it can determine rooms
+        this.addTableHeader(agendas);
         
         // Add agenda items as table rows
         this.addAgendaTableRows(agendas);
@@ -473,7 +508,7 @@ export class AgendaPdfGenerator {
             { label: 'Date:', value: this.formatDate(agenda.date) },
             { label: 'Type:', value: this.capitalize(agenda.type || 'Session') },
             { label: 'Speaker:', value: agenda.speaker || 'TBA' },
-            { label: 'Location:', value: agenda.location || 'TBA' },
+            { label: 'Room:', value: agenda.location || 'TBA' }, // ✅ Changed from Location to Room
             { label: 'Conference:', value: (agenda.conference && agenda.conference.conf_name) ? agenda.conference.conf_name : 'N/A' },
             { label: 'Session:', value: this.capitalize(agenda.session || 'N/A') },
             { label: 'ID:', value: '#' + (agenda.id || 'Unknown') }
