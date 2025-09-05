@@ -15,12 +15,6 @@ use Illuminate\Validation\Rule;
 class AgendaController extends Controller
 {
     /**
-     * Download agenda as PDF.
-     */
-    public function downloadAgenda() {
-
-    }
-    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): Response
@@ -31,7 +25,7 @@ class AgendaController extends Controller
         $agendas = Agenda::with('conference') // <- This loads the conference data
             ->orderBy('id', 'asc')
             ->paginate($pagination);
-        $sortBy = $request->input('sort_by', 'date'); // Default sort by date
+        $sortBy = $request->input('sort_by', 'id'); // Default sort by ID
         $sortOrder = $request->input('sort_order', 'asc'); // Default ascending
         $filterId = $request->input('filter_id'); // Filter by ID
         $search = $request->input('search'); // General search
@@ -57,8 +51,10 @@ class AgendaController extends Controller
             case 'id':
                 $query->orderBy('id', $sortOrder);
                 break;
-            case 'title':
-                $query->orderBy('title', $sortOrder);
+            case 'conference':
+                $query->join('conferences', 'agendas.conference_id', '=', 'conferences.id')
+                    ->orderBy('conferences.conf_name', $sortOrder)
+                    ->select('agendas.*'); // Ensure we only select agenda fields
                 break;
             case 'date':
                 $query->orderBy('date', $sortOrder)
@@ -68,8 +64,7 @@ class AgendaController extends Controller
                 $query->orderBy('speaker', $sortOrder);
                 break;
             default:
-                $query->orderBy('date', 'asc')
-                    ->orderBy('start_time', 'asc');
+                $query->orderBy('id', 'asc');
         }
         
         $agendas = $query->paginate($pagination);

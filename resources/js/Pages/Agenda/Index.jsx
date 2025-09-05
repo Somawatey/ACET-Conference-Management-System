@@ -203,7 +203,7 @@ export default function AgendaPage({ agendas, filters }) {
                                     >
                                         <option value="date">Date</option>
                                         <option value="id">ID</option>
-                                        <option value="title">Title</option>
+                                        <option value="title">Conference</option>
                                         <option value="speaker">Speaker</option>
                                     </select>
                                 </div>
