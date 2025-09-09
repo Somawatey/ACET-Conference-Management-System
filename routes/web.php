@@ -172,6 +172,10 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+    
+    // Your Reviews (for reviewers to see their own reviews)
+    Route::get('/your-reviews', [ReviewController::class, 'yourReviews'])->name('your.reviews');
+    
      // Paper History
     Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
 

@@ -44,6 +44,7 @@ class PermissionSeeder extends Seeder
             'conference-delete',
 
             'review-history',
+            'your-reviews',
             'submission-history',
             'dashboard',
             'review-list',
