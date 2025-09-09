@@ -24,6 +24,7 @@ class PaperController extends Controller
             'user', 
             'conference', 
             'submission.authorInfo', // Access authorInfo through submission
+            'decision', // Include decision with comment
             'assignments' => function($query) {
                 $query->where('status', '!=', 'cancelled');
             }

@@ -25,6 +25,8 @@ export default function YourSubmissionPage({ papers }) {
         paper?.decision?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    console.log("Filtered Papers:", filteredPapers);
+
     const rows = searchTerm ? filteredPapers : normalizedPapers;
 
     console.log("Your Submissions:", normalizedPapers);
@@ -211,20 +213,22 @@ export default function YourSubmissionPage({ papers }) {
                                                                                 {paper.status || 'Pending'}
                                                                             </span>
                                                                         </div>
+                                                                        {/* Comments Section */}
+                                                                        {paper.comment && (
+                                                                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                                                                <span className="text-sm font-medium text-gray-600">Review Comments:</span>
+                                                                                <div className="mt-2 p-3 bg-white-50 border border-yellow-200 rounded-md">
+                                                                                    <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                                                                                        {paper.comment}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                                 <div>
                                                                     <h4 className="text-lg font-semibold text-gray-900 mb-4">Available Actions</h4>
                                                                     <div className="flex flex-wrap gap-2">
-                                                                        <Link
-                                                                            href={route('review.history', { paper_id: paper.id })}
-                                                                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                                                                        >
-                                                                            <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                            </svg>
-                                                                            Review History
-                                                                        </Link>
                                                                         <Link
                                                                             href={route('submissions.show', { id: paper.submission_id })}
                                                                             className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
@@ -235,10 +239,16 @@ export default function YourSubmissionPage({ papers }) {
                                                                             </svg>
                                                                             View Submission
                                                                         </Link>
-                                                                        {(paper.decision === 'Pending' || !paper.decision) && (
+                                                                        {(['pending', 'revise', 'revised', 'resubmit', 'under_review'].includes(paper.decision?.toLowerCase()) || !paper.decision || paper.status?.toLowerCase() === 'revise') && (
                                                                             <Link
                                                                                 href={route('submissions.edit', { id: paper.submission_id })}
                                                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                                                                                onClick={() => {
+                                                                                    console.log('Edit button clicked for paper:', paper);
+                                                                                    console.log('Paper decision:', paper.decision);
+                                                                                    console.log('Paper status:', paper.status);
+                                                                                    console.log('Submission ID:', paper.submission_id);
+                                                                                }}
                                                                             >
                                                                                 <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
