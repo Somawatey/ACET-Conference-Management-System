@@ -369,7 +369,7 @@ export default function PaperPage({ users, papers, filters = {} }) {
                                                     onToggle={() => toggleRow(paper.id)}
                                                     onAssignReviewer={() => openAssignReviewerModal(paper)}
                                                 >
-                                                    <StatusBadge status={paper.status} />
+                                                    <StatusBadge status={paper.status} paper={paper} />
                                                     <PaperActions 
                                                         paper={paper} 
                                                         onManageReviewers={() => openAssignReviewerModal(paper)} 

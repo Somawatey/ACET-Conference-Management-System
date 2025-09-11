@@ -26,7 +26,8 @@ Route::get('/', function () {
     ]);
 });
 
-
+// Add this route for publications (accessible to all)
+Route::get('/publication', [PaperController::class, 'publishedPapers'])->name('publication.index');
 
 Route::middleware('auth')->group(function () {
     // Dashboard
@@ -78,6 +79,8 @@ Route::middleware('auth')->group(function () {
         Route::post("/", [PaperController::class, 'store'])->name('papers.store');
         Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
         Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy');
+        Route::post("/{id}/publish", [PaperController::class, 'publish'])->name('papers.publish');
+        Route::post("/{id}/unpublish", [PaperController::class, 'unpublish'])->name('papers.unpublish');
     });
 
        // Submission routes - PERMISSION REQUIRED ✅

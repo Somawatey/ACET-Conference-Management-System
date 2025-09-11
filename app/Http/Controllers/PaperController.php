@@ -206,4 +206,70 @@ class PaperController extends Controller
             'reviews' => $reviews
         ]);
     }
+
+    /**
+     * Display published papers
+     */
+    public function publishedPapers()
+    {
+        // Get papers that are published
+        $papers = Paper::with(['user', 'submission.authorInfo'])
+            ->where('is_published', true)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($paper) {
+                $authorInfo = $paper->submission->authorInfo ?? null;
+                
+                return [
+                    'id' => $paper->id,
+                    'title' => $paper->paper_title ?? $paper->title ?? '',
+                    'author' => $authorInfo->author_name ?? $paper->user->name ?? 'Unknown Author',
+                    'conference' => 'ACET 2025',
+                    'publishedAt' => $paper->updated_at->format('Y-m-d'),
+                    'abstract' => $paper->abstract ?? '',
+                    'pdfUrl' => $paper->url ?? null, // Use the url field from the paper
+                ];
+            });
+
+        return inertia('Publication/index', [
+            'papers' => $papers,
+        ]);
+    }
+
+    /**
+     * Publish a paper
+     */
+    public function publish(Request $request, $id)
+    {
+        try {
+            $paper = Paper::findOrFail($id);
+            
+            // Update the paper's is_published field to true
+            $paper->update(['is_published' => true]);
+
+            return redirect()->back()->with('success', 'Paper published successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to publish paper: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Unpublish a paper
+     */
+    public function unpublish(Request $request, $id)
+    {
+        try {
+            $paper = Paper::findOrFail($id);
+            
+            // Update the paper's is_published field to false
+            $paper->update(['is_published' => false]);
+
+            return redirect()->back()->with('success', 'Paper unpublished successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to unpublish paper: ' . $e->getMessage());
+        }
+    }
+
 }

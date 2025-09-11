@@ -45,10 +45,10 @@ export default function PaperRow({ paper, isOpen, onToggle, onAssignReviewer }) 
                     )}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <StatusBadge status={paper.status} />
+                    <StatusBadge status={paper.status} paper={paper} />
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <StatusBadge status={paper.status} />
+                    <StatusBadge status={paper.decision?.decision} paper={paper} />
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                     <button
