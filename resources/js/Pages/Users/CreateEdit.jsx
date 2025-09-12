@@ -31,10 +31,10 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
     setData('roles', [value]); // Single role selection
   };
 
-  // Submit handler: create when no user ID, otherwise update
+  // Submit handler: create when no user_id, otherwise update
   const submit = (e) => {
     e.preventDefault();
-    if (!user?.id) {
+    if (!user?.user_id) {
       post(route('users.store'), {
         preserveState: true,
         onSuccess: () => {
@@ -42,18 +42,17 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
         },
       });
     } else {
-      patch(route('users.update', user.id), {
+      patch(route('users.update', { user_id: user.user_id }), {
         preserveState: true,
         onSuccess: () => {
-          // Keep general data, clear only password fields on successful update
           reset('password', 'password_confirmation');
         },
       });
     }
   };
 
-  // Page title and breadcrumb trail
-  const headWeb = user?.id ? 'User Edit' : 'User Create';
+  const headWeb = user?.user_id ? 'User Edit' : 'User Create';
+
   const linksBreadcrumb = [
     { title: 'Home', url: '/' },
     { title: 'Users', url: route('users.index') },
@@ -163,7 +162,7 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
                   disabled={processing}
                   className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  {processing ? (user?.id ? 'Updating...' : 'Creating...') : (user?.id ? 'Update User' : 'Create User')}
+                  {processing ? (user?.user_id ? 'Updating...' : 'Creating...') : (user?.user_id ? 'Update User' : 'Create User')}
                 </button>
               </form>
             </div>
