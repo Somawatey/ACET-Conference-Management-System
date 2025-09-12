@@ -52,10 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index')->middleware(['check:user-list']);
         Route::get('/create', [UserController::class, 'create'])->name('users.create')->middleware(['check:user-create']);
-        Route::get('/{user_id}', [UserController::class, 'edit'])->name('users.edit')->middleware(['check:user-edit']);
+        Route::get('/{user}', [UserController::class, 'edit'])->name('users.edit')->middleware(['check:user-edit']);
         Route::post("/", [UserController::class, 'store'])->name('users.store');
-        Route::patch("/{user_id}", [UserController::class, 'update'])->name('users.update');
-        Route::delete("/{user_id}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
+        Route::patch("/{user}", [UserController::class, 'update'])->name('users.update');
+        Route::delete("/{user}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
     });
 
     // Agenda routes

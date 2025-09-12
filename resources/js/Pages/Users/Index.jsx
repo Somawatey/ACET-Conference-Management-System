@@ -42,7 +42,7 @@ export default function UserPage({ users }) {
 
     const confirmDataDeletion = (data) => {
         setDataEdit(data);
-        setDeleteData('id', data.user_id)
+        setDeleteData('id', data.id)
         setDeleteData('name', data.name)
         setConfirmingDataDeletion(true);
     };
@@ -56,7 +56,7 @@ export default function UserPage({ users }) {
 
     const deleteDataRow = (e) => {
         e.preventDefault();
-        destroy(route('users.destroy', { user_id: dataEdit.user_id }), {
+        destroy(route('users.destroy', { user: dataEdit.id }), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
             onFinish: () => reset(),
@@ -121,8 +121,8 @@ export default function UserPage({ users }) {
                                 <tbody className="bg-white text-gray-700">
                                     {datasList.length > 0 ?
                                         datasList.map((user) => (
-                                            <tr key={user.user_id} className="border-b border-gray-200 hover:bg-gray-50">
-                                                <td className="p-4">{user.user_id}</td>
+                                            <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                                <td className="p-4">{user.id}</td>
                                                 <td className="p-4 font-medium">
                                                     <div className="flex items-center">
                                                         {hasProfilePhoto(user) ? (
@@ -172,7 +172,7 @@ export default function UserPage({ users }) {
                                                     <div className="flex items-center justify-center space-x-4">
                                                         {/*-- Edit Button --*/}
                                                         {can['user-edit'] && (
-                                                            <Link href={route('users.edit', { user_id: user.user_id })} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                                            <Link href={route('users.edit', { user: user.id })} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                                 </svg>

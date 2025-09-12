@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Login from '../Pages/Auth/Login.jsx';
 
 export default function Welcome({ auth, laravelVersion, phpVersion, canResetPassword }) {
@@ -56,6 +56,22 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
 
     const [showLogin, setShowLogin] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    // Handle scroll lock when modal is open
+    useEffect(() => {
+        if (showLogin) {
+            // Prevent scrolling
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Restore scrolling
+            document.body.style.overflow = 'unset';
+        }
+
+        // Cleanup function to restore scrolling when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showLogin]);
 
     // Generate user initials
     const getUserInitials = (name) => {
@@ -273,11 +289,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
 
                 {/* Rest of your existing code remains the same */}
                 {showLogin && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-                        <div className="w-full max-w-lg h-[600px] bg-white rounded-lg shadow-lg relative flex items-center justify-center">
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+                        <div className="relative w-full max-w-md">
                             <button
                                 onClick={() => setShowLogin(false)}
-                                className="absolute top-2 right-2 text-gray-500 text-bold"
+                                className="absolute -top-2 -right-2 z-10 bg-gray-500 hover:bg-gray-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold"
                             >
                                 ✕
                             </button>

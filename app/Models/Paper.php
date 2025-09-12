@@ -48,7 +48,7 @@ class Paper extends Model
             User::class,
             Submission::class,
             'paper_id', // Foreign key on submissions table
-            'user_id', // Foreign key on users table  
+            'id', // Foreign key on users table  
             'id', // Local key on papers table
             'user_id' // Local key on submissions table
         );
@@ -57,7 +57,7 @@ class Paper extends Model
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'author_id', 'user_id');
+        return $this->belongsTo(User::class, 'author_id', 'id');
     }
 
     public function submission(): HasOne

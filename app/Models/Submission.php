@@ -23,7 +23,7 @@ class Submission extends Model
     public function user(): BelongsTo
     {
         // Specify foreign key and owner key
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
     protected $casts = [
         'submitted_elsewhere' => 'boolean',

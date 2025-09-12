@@ -21,11 +21,11 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="h-screen w-full flex items-center justify-center p-6">
+        <>
             <Head title="Log in" />
 
-            <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-                <div className="flex justify-center mb-8">
+            <div className="w-full max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                <div className="flex w-100 justify-center mb-8">
                     <Link href='/'>
                         {/* Assuming ACET.png is your logo */}
                         <img src="/ACET.png" alt="ACET Logo" className="h-12 w-auto" />
@@ -123,6 +123,6 @@ export default function Login({ status, canResetPassword }) {
                     </p>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
