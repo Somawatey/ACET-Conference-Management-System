@@ -90,6 +90,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Submission::class);
     }
 
+    public function paperAssignments(): HasMany
+    {
+        return $this->hasMany(PaperAssignment::class, 'reviewer_id');
+    }
+
     
 
    

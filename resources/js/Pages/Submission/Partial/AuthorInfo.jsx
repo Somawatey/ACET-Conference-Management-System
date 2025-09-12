@@ -21,7 +21,7 @@ export default function AuthorInfo({ className = '', data = {}, errors = {}, onC
                     <p className="mt-1 text-sm text-gray-600">
                         Please provide the details of the first author for the submission.
                     </p>
-                    {/* Grid: Name & Email above Institute & Role */}
+                    {/* Grid: Name & Email above Institute */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <InputLabel htmlFor="author-name" value="Author Name" />
@@ -51,7 +51,7 @@ export default function AuthorInfo({ className = '', data = {}, errors = {}, onC
                             />
                             <InputError className="mt-2" message={errors.author_email} />
                         </div>
-                        <div>
+                        <div className="md:col-span-2">
                             <InputLabel htmlFor="author-institute" value="Affiliation / Institution" />
                             <TextInput
                                 id="author-institute"
@@ -64,20 +64,6 @@ export default function AuthorInfo({ className = '', data = {}, errors = {}, onC
                                 onChange={onChange}
                             />
                             <InputError className="mt-2" message={errors.author_institute} />
-                        </div>
-                        <div>
-                            <InputLabel htmlFor="author-role" value="Role/Position" />
-                            <TextInput
-                                id="author-role"
-                                name="author_role"
-                                className="mt-1 block w-full"
-                                placeholder="Write your role/position title of your organization"
-                                required
-                                autoComplete="author-role"
-                                value={data.author_role || ''}
-                                onChange={onChange}
-                            />
-                            <InputError className="mt-2" message={errors.author_role} />
                         </div>
                     </div>
                 </div>

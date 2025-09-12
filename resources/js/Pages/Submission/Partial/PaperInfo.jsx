@@ -4,7 +4,7 @@ import TextInput from '@/Components/TextInput';
 import TextArea from '@/Components/TextArea';
 import PaperUpload from './PaperUpload';
 
-export default function PaperInfo({ className = '', data = {}, errors = {}, onChange }) {
+export default function PaperInfo({ className = '', data = {}, errors = {}, onChange, isEdit = false, currentFileName = null }) {
     // Adapter to pass file back to parent as a synthetic change event
     const handleFileSelect = (file) => {
         if (typeof onChange === 'function') {
@@ -120,6 +120,8 @@ export default function PaperInfo({ className = '', data = {}, errors = {}, onCh
                         onChange={handleFileSelect}
                         file={data.paper_file || null}
                         error={errors.paper_file}
+                        isEdit={isEdit}
+                        currentFileName={currentFileName}
                     />
                 </div>
             </div>

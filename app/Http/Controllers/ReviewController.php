@@ -143,6 +143,142 @@ class ReviewController extends Controller
     }
 
     /**
+     * Display reviewer's own reviews in history format (similar to review history but for current reviewer only)
+     */
+    public function yourReviews()
+    {
+        $request = request();
+
+        // Review filters
+        $status = $request->string('status')->toString(); // Accept | Revise | Reject (UI may send lowercase)
+        $rating = $request->string('rating')->toString(); // numeric score
+        $show = $request->string('show')->toString();
+        $paper_id = $request->get('paper_id'); // Get specific paper ID if provided
+
+        // Normalize status to match DB values
+        if ($status !== '') {
+            $status = ucfirst(strtolower($status)); // accept -> Accept, etc.
+        }
+
+        // Debug: Log current user ID
+        \Log::info('YourReviews - Current User ID: ' . auth()->id());
+
+        // Get papers where current user has reviews (regardless of assignment status)
+        $papersQuery = Paper::query()
+            ->with([
+                'submission.authorInfo',
+                'user',
+                'assignments' => function ($query) {
+                    $query->where('reviewer_id', auth()->id())
+                          ->where('status', '!=', 'cancelled');
+                },
+                'reviews' => function ($query) use ($status, $rating) {
+                    $query->with('reviewer')
+                          ->where('reviewer_id', auth()->id()); // Only current user's reviews
+                    
+                    if ($status !== '') {
+                        $query->where('recommendation', $status);
+                    }
+
+                    if ($rating !== '') {
+                        $query->where('score', (int) $rating);
+                    }
+                    
+                    $query->orderByDesc('created_at');
+                }
+            ])
+            ->whereHas('reviews', function ($query) {
+                $query->where('reviewer_id', auth()->id()); // Only show papers where user has reviews
+            })
+            ->orderByDesc('created_at');
+
+        // If a specific paper ID is provided, filter to that paper
+        if ($paper_id) {
+            $papersQuery->where('id', $paper_id);
+        }
+
+        // Apply additional filters if needed
+        if ($status !== '' || $rating !== '') {
+            $papersQuery->whereHas('reviews', function ($query) use ($status, $rating) {
+                $query->where('reviewer_id', auth()->id()); // Only current user's reviews
+                
+                if ($status !== '') {
+                    $query->where('recommendation', $status);
+                }
+
+                if ($rating !== '') {
+                    $query->where('score', (int) $rating);
+                }
+            });
+        }
+
+        // Paginate papers: one paper per page
+        $papers = $papersQuery
+            ->paginate(1)
+            ->appends($request->only(['status', 'rating', 'show', 'paper_id']));
+
+        // Debug: Log papers found
+        \Log::info('YourReviews - Papers found: ' . $papers->total());
+        \Log::info('YourReviews - Papers data: ' . json_encode($papers->items()));
+
+        $currentPaper = collect($papers->items())->first();
+
+        // Build top-level paper payload for UI
+        $paperPayload = null;
+        $reviewsData = collect();
+        
+        if ($currentPaper) {
+            // Get author name from submission->authorInfo first, then fallback to user
+            $authorName = null;
+            if ($currentPaper->submission && $currentPaper->submission->authorInfo) {
+                $authorName = $currentPaper->submission->authorInfo->author_name;
+            } elseif ($currentPaper->user) {
+                $authorName = $currentPaper->user->name;
+            }
+
+            $paperPayload = [
+                'id' => $currentPaper->id,
+                'title' => $currentPaper->paper_title,
+                'topic' => $currentPaper->topic,
+                'track' => optional($currentPaper->submission)->track,
+                'abstract' => $currentPaper->abstract,
+                'keywords' => $currentPaper->keywords,
+                'authors' => $authorName ?? 'Unknown Author',
+                'submissionDate' => optional($currentPaper->submission?->submitted_at)?->toDateString(),
+                'pdf_path' => $currentPaper->pdf_path,
+            ];
+
+            // Format reviews data for UI (only current user's reviews)
+            $reviewsData = $currentPaper->reviews->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'reviewBy' => optional($review->reviewer)->name ?? 'Unknown Reviewer',
+                    'reviewDate' => optional($review->created_at)?->format('Y-m-d'),
+                    'status' => $review->recommendation, // Accept | Revise | Reject
+                    'comments' => $review->feedback,
+                    'rating' => $review->score,
+                ];
+            });
+
+            // Debug: Log reviews data
+            \Log::info('YourReviews - Reviews found: ' . $currentPaper->reviews->count());
+            \Log::info('YourReviews - Reviews data: ' . json_encode($reviewsData));
+        }
+
+        return Inertia::render('YourReview/YourReview', [
+            'papers' => $papers,
+            'paper' => $paperPayload,
+            'reviews' => $reviewsData,
+            'filters' => [
+                'status' => $status,
+                'rating' => $rating,
+                'show' => $show,
+                'paper_id' => $paper_id,
+            ],
+        ]);
+    }
+
+    /**
      * Display a listing of reviews for reviewer.
      */
     public function reviewList()

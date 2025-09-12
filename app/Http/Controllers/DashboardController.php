@@ -26,8 +26,7 @@ class DashboardController extends Controller
         // User role counts - with safety checks
         $totalOrganizers = $this->getUserRoleCount('Admin');
         $totalReviewers = $this->getUserRoleCount('Reviewer');
-        $totalAttendees = $this->getUserRoleCount('Attendees');
-        $totalAuthors = $this->getUserRoleCount('Author');
+        $totalOthers = $this->getUsersWithoutRoles();
 
         $papersByTopic = Paper::select('topic', DB::raw('count(*) as total'))
             ->groupBy('topic')
@@ -67,8 +66,7 @@ class DashboardController extends Controller
             
             'totalOrganizers' => $totalOrganizers,
             'totalReviewers' => $totalReviewers,
-            'totalAttendees' => $totalAttendees,
-            'totalAuthors' => $totalAuthors,
+            'totalOthers' => $totalOthers,
 
             'papersByTopic' => $papersByTopic,
             'recentPapers' => $recentPapers,
@@ -205,6 +203,19 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             // Role doesn't exist, return 0
             return 0;
+        }
+    }
+
+    private function getUsersWithoutRoles()
+    {
+        try {
+            // Count users who don't have any roles assigned
+            return User::doesntHave('roles')->count();
+        } catch (\Exception $e) {
+            // If there's an error, fall back to counting all users minus those with roles
+            $totalUsers = User::count();
+            $usersWithRoles = User::has('roles')->count();
+            return $totalUsers - $usersWithRoles;
         }
     }
 }

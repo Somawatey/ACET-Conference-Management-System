@@ -22,6 +22,11 @@ class Paper extends Model
         'topic',
         'keyword',
         'abstract',
+        'is_published',
+    ];
+
+    protected $casts = [
+        'is_published' => 'boolean',
     ];
 
     // Expose a computed public URL similar to User::profile_photo_url

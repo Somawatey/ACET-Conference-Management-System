@@ -39,8 +39,7 @@ const Dashboard = ({
     papersByTopic,
     totalOrganizers,
     totalReviewers,
-    totalAttendees,
-    totalAuthors,
+    totalOthers, 
     recentPapers,
     recentUsers,
     paperStatusData,  // ✅ NEW
@@ -73,21 +72,19 @@ const Dashboard = ({
 
     // Doughnut chart for user roles
     const doughnutData = {
-        labels: ['Organizers', 'Reviewers', 'Attendees', 'Authors'],
+        labels: ['Organizers', 'Reviewers', 'Others'],
         datasets: [
             {
-                data: [totalOrganizers, totalReviewers, totalAttendees, totalAuthors],
+                data: [totalOrganizers, totalReviewers, totalOthers],
                 backgroundColor: [
                     'rgba(99, 102, 241, 0.8)',
                     'rgba(16, 185, 129, 0.8)',
-                    'rgba(251, 146, 60, 0.8)',
-                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(251, 146, 60, 0.8)',    
                 ],
                 borderColor: [
                     'rgb(99, 102, 241)',
                     'rgb(16, 185, 129)',
                     'rgb(251, 146, 60)',
-                    'rgb(239, 68, 68)',
                 ],
                 borderWidth: 1,
             }

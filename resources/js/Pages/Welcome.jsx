@@ -294,14 +294,18 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
                     </h1>
                     <p className="text-gray-500 mt-4 max-w-2xl mx-auto">Bringing researchers together, one paper at a time. Your work deserves the world's stage.</p>
                     <div className="flex justify-center gap-4 mt-8">
-                       <div className="flex justify-center gap-4 mt-8">
-                            <Link
-                                href={route('submissions.create')}  // ✅ Consistent with your pattern
-                                className="bg-blue text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
-                            >
-                                Submit Your Paper
-                            </Link>
-                        </div>
+                        <Link
+                            href={route('submissions.create')}
+                            className="bg-blue text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
+                        >
+                            Submit Your Paper
+                        </Link>
+                        <Link
+                            href={route('publication.index')}
+                            className="bg-black text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
+                        >
+                            Publication
+                        </Link>
                     </div>
                     {/* Rating */}
                     <div className="mt-6 flex flex-col justify-center items-center gap-2 text-yellow-500">

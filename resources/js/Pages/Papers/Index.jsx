@@ -347,6 +347,9 @@ export default function PaperPage({ users, papers, filters = {} }) {
                                                     Author
                                                 </th>
                                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    PDF
+                                                </th>
+                                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                     Status
                                                 </th>
                                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -366,7 +369,7 @@ export default function PaperPage({ users, papers, filters = {} }) {
                                                     onToggle={() => toggleRow(paper.id)}
                                                     onAssignReviewer={() => openAssignReviewerModal(paper)}
                                                 >
-                                                    <StatusBadge status={paper.status} />
+                                                    <StatusBadge status={paper.status} paper={paper} />
                                                     <PaperActions 
                                                         paper={paper} 
                                                         onManageReviewers={() => openAssignReviewerModal(paper)} 
