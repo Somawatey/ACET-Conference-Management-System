@@ -135,7 +135,7 @@ export default function ReviewHistory({ paper, papers, reviews, filters }) {
                     {/* Sticky Back Button when coming from Paper Decision */}
                     {isFromPaperDecision() && (
                         <div className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled
-                                ? '-translate-x-5'
+                                ? 'ml-3'
                                 : ''
                             }`}>
                             <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">

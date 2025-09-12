@@ -26,12 +26,15 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
+// Add this route for publications (accessible to all)
+Route::get('/publication', [PaperController::class, 'publishedPapers'])->name('publication.index');
+
+Route::middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -76,6 +79,8 @@ Route::middleware('auth')->group(function () {
         Route::post("/", [PaperController::class, 'store'])->name('papers.store');
         Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
         Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy');
+        Route::post("/{id}/publish", [PaperController::class, 'publish'])->name('papers.publish');
+        Route::post("/{id}/unpublish", [PaperController::class, 'unpublish'])->name('papers.unpublish');
     });
 
        // Submission routes - PERMISSION REQUIRED ✅
@@ -170,6 +175,10 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+    
+    // Your Reviews (for reviewers to see their own reviews)
+    Route::get('/your-reviews', [ReviewController::class, 'yourReviews'])->name('your.reviews');
+    
      // Paper History
     Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
 
