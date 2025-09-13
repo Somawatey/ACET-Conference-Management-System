@@ -8,22 +8,54 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import SecondaryButtonLink from '@/Components/SecondaryButtonLink';
 import AdminLayout from '@/Layouts/AdminLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import moment from 'moment';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function UserPage({ users }) {
+export default function UserPage({ users, filters = {} }) {
     const { auth } = usePage().props;
     const can = auth?.can ?? {};
 
     const datasList = users.data;
     const [confirmingDataDeletion, setConfirmingDataDeletion] = useState(false);
-    const [dataEdit, setDataEdit] = useState({})
+    const [dataEdit, setDataEdit] = useState({});
+    
+    // ADDED: Search state
+    const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    
     const { data: deleteData, setData: setDeleteData, delete: destroy, processing, reset, errors, clearErrors } =
         useForm({
             id: '',
             name: ''
         });
+
+    // ADDED: Handle search with debounce
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (searchTerm !== (filters.search || '')) {
+                router.get(route('users.index'), 
+                    { search: searchTerm },
+                    { 
+                        preserveState: true,
+                        preserveScroll: true,
+                        replace: true
+                    }
+                );
+            }
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [searchTerm]);
+
+    // ADDED: Clear search function
+    const clearSearch = () => {
+        setSearchTerm('');
+        router.get(route('users.index'), {}, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true
+        });
+    };
 
     // Generate user initials from name
     const getUserInitials = (name) => {
@@ -75,32 +107,61 @@ export default function UserPage({ users }) {
 
                     <div className="p-6">
 
-                        {/*-- Create User Section --*/}
+                        {/*-- Search and Create User Section --*/}
                         <div className="flex items-center justify-between mb-4">
-                            {/* Input container with relative positioning */}
+                            {/* UPDATED: Search container with functionality */}
                             <div className="relative w-1/4">
-                                {/* Icon placed absolutely within the container */}
+                                {/* Search Icon */}
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                                     </svg>
                                 </div>
+                                
+                                {/* UPDATED: Functional search input */}
                                 <input
                                     type="text"
-                                    className="bg-[#FFFFFF] border border-gray-600 rounded-md py-2 pl-10 pr-4 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Search users..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="bg-[#FFFFFF] border border-gray-600 rounded-md py-2 pl-10 pr-10 w-full text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Search users by name or email..."
                                 />
+                                
+                                {/* ADDED: Clear search button */}
+                                {searchTerm && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                        type="button"
+                                    >
+                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
                             </div>
 
-                            {/* This can be a Link to a create page or trigger a modal */}
-                            {can['user-create'] && (
-                                <Link
-                                    href={route('users.create')}
-                                    className="bg-[#0000FF] hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-md transition duration-300"
-                                >
-                                    Create User
-                                </Link>
-                            )}
+                            <div className="flex items-center space-x-4">
+                                {/* ADDED: Search results indicator */}
+                                {searchTerm && (
+                                    <span className="text-sm text-gray-600">
+                                        {users.total > 0 
+                                            ? `Found ${users.total} user(s) for "${searchTerm}"`
+                                            : `No users found for "${searchTerm}"`
+                                        }
+                                    </span>
+                                )}
+
+                                {/* Create User Button */}
+                                {can['user-create'] && (
+                                    <Link
+                                        href={route('users.create')}
+                                        className="bg-[#0000FF] hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-md transition duration-300"
+                                    >
+                                        Create User
+                                    </Link>
+                                )}
+                            </div>
                         </div>
 
                         {/*-- User Table --*/}
@@ -197,8 +258,12 @@ export default function UserPage({ users }) {
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                                     </svg>
-                                                    <p className="text-gray-500 text-lg">No users found</p>
-                                                    <p className="text-gray-400 text-sm">Create your first user to get started</p>
+                                                    <p className="text-gray-500 text-lg">
+                                                        {searchTerm ? `No users found for "${searchTerm}"` : "No users found"}
+                                                    </p>
+                                                    <p className="text-gray-400 text-sm">
+                                                        {searchTerm ? "Try adjusting your search terms" : "Create your first user to get started"}
+                                                    </p>
                                                 </div>
                                             </td>
                                         </tr>

@@ -24,6 +24,9 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
     });
   // UI: toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
+  
+  // ADDED: Check if we're in edit mode
+  const isEditMode = !!user?.id;
 
   // Handle single role selection by keeping only the latest selected ID
   const handleSelectRole = (e) => {
@@ -118,46 +121,53 @@ export default function UsersCreateEdit({ user = {}, roles = [] }) {
                   </select>
                   <InputError className="mt-2" message={errors.roles} />
                 </div>
-                <div>
-                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-grey-900">Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      id="password"
-                      value={data.password}
-                      onChange={(e) => setData('password', e.target.value)}
-                      placeholder="••••••••"
-                      className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:border-gray-600 dark:placeholder-gray-400 dark:text-grey-900 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      required={!user?.id}
-                    />
-                    <button
-                      type="button"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 dark:text-grey-900"
-                      onClick={() => setShowPassword((v) => !v)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                        <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
-                      </svg>
-                    </button>
-                  </div>
-                  <InputError className="mt-2" message={errors.password} />
-                </div>
-                <div>
-                  <label htmlFor="password_confirmation" className="block mb-2 text-sm font-medium text-gray-900 dark:text-grey-900">Confirm password</label>
-                  <input
-                    type="password"
-                    name="password_confirmation"
-                    id="password_confirmation"
-                    value={data.password_confirmation}
-                    onChange={(e) => setData('password_confirmation', e.target.value)}
-                    placeholder="••••••••"
-                    className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-grey-900 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required={!user?.id}
-                  />
-                  <InputError className="mt-2" message={errors.password_confirmation} />
-                </div>
+
+                {/* MODIFIED: Only show password fields when creating (not editing) */}
+                {!isEditMode && (
+                  <>
+                    <div>
+                      <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-grey-900">Password</label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          id="password"
+                          value={data.password}
+                          onChange={(e) => setData('password', e.target.value)}
+                          placeholder="••••••••"
+                          className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-10 dark:border-gray-600 dark:placeholder-gray-400 dark:text-grey-900 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          required
+                        />
+                        <button
+                          type="button"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 dark:text-grey-900"
+                          onClick={() => setShowPassword((v) => !v)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+                          </svg>
+                        </button>
+                      </div>
+                      <InputError className="mt-2" message={errors.password} />
+                    </div>
+                    <div>
+                      <label htmlFor="password_confirmation" className="block mb-2 text-sm font-medium text-gray-900 dark:text-grey-900">Confirm password</label>
+                      <input
+                        type="password"
+                        name="password_confirmation"
+                        id="password_confirmation"
+                        value={data.password_confirmation}
+                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                        placeholder="••••••••"
+                        className="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-grey-900 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        required
+                      />
+                      <InputError className="mt-2" message={errors.password_confirmation} />
+                    </div>
+                  </>
+                )}
+
                 <button
                   type="submit"
                   disabled={processing}
