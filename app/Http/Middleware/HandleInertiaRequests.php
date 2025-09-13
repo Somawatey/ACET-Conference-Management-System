@@ -55,7 +55,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
-             'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+             'AIzaSyBSs1Is5_AvJkeV4jL_JDVClyej96FNfQo' => env('GOOGLE_MAPS_API_KEY'),
         ]);
 
         

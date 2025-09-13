@@ -22,6 +22,11 @@ class Paper extends Model
         'topic',
         'keyword',
         'abstract',
+        'is_published',
+    ];
+
+    protected $casts = [
+        'is_published' => 'boolean',
     ];
 
     // Expose a computed public URL similar to User::profile_photo_url
@@ -52,7 +57,7 @@ class Paper extends Model
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->belongsTo(User::class, 'author_id', 'id');
     }
 
     public function submission(): HasOne

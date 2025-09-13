@@ -1,13 +1,18 @@
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 
-export default function Declare({ className = '', data = {}, errors = {}, onChange }) {
+export default function Declare({ className = '', data = {}, errors = {}, onChange, isEdit = false }) {
     return (
         <section className={className}>
             <header>
                 <h1 className="text-2xl font-semibold text-gray-900">
                     Declaration
                 </h1>
+                {isEdit && (
+                    <p className="text-sm text-gray-600 mt-2">
+                        You can update your declaration responses below.
+                    </p>
+                )}
             </header>
             <div className="mt-6 space-y-4">
                 {/* Q1 */}
@@ -22,7 +27,7 @@ export default function Declare({ className = '', data = {}, errors = {}, onChan
                                 type="radio"
                                 name="submitted_elsewhere"
                                 value="yes"
-                                checked={data.submitted_elsewhere === 'yes'}
+                                checked={data.submitted_elsewhere === 'yes' || data.submitted_elsewhere === true}
                                 onChange={onChange}
                                 className="form-radio"
                                 required
@@ -34,7 +39,7 @@ export default function Declare({ className = '', data = {}, errors = {}, onChan
                                 type="radio"
                                 name="submitted_elsewhere"
                                 value="no"
-                                checked={data.submitted_elsewhere === 'no'}
+                                checked={data.submitted_elsewhere === 'no' || data.submitted_elsewhere === false}
                                 onChange={onChange}
                                 className="form-radio"
                                 required
@@ -57,7 +62,7 @@ export default function Declare({ className = '', data = {}, errors = {}, onChan
                                 type="radio"
                                 name="original_submission"
                                 value="yes"
-                                checked={data.original_submission === 'yes'}
+                                checked={data.original_submission === 'yes' || data.original_submission === true}
                                 onChange={onChange}
                                 className="form-radio"
                                 required
@@ -69,7 +74,7 @@ export default function Declare({ className = '', data = {}, errors = {}, onChan
                                 type="radio"
                                 name="original_submission"
                                 value="no"
-                                checked={data.original_submission === 'no'}
+                                checked={data.original_submission === 'no' || data.original_submission === false}
                                 onChange={onChange}
                                 className="form-radio"
                                 required
@@ -92,7 +97,7 @@ export default function Declare({ className = '', data = {}, errors = {}, onChan
                                 type="radio"
                                 name="agree_guidelines"
                                 value="yes"
-                                checked={data.agree_guidelines === 'yes'}
+                                checked={data.agree_guidelines === 'yes' || data.agree_guidelines === true}
                                 onChange={onChange}
                                 className="form-radio"
                                 required
@@ -104,7 +109,7 @@ export default function Declare({ className = '', data = {}, errors = {}, onChan
                                 type="radio"
                                 name="agree_guidelines"
                                 value="no"
-                                checked={data.agree_guidelines === 'no'}
+                                checked={data.agree_guidelines === 'no' || data.agree_guidelines === false}
                                 onChange={onChange}
                                 className="form-radio"
                                 required

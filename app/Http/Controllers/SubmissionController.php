@@ -138,6 +138,7 @@ class SubmissionController extends Controller
                     : 'Pending',
                 'decision' => optional($paper->decision)->decision ?? 'Pending',
                 'status' => $paper->status ?? 'Pending',
+                'comment' => optional($paper->decision)->comment ?? null,
                 'submitted_at' => optional($submission->submitted_at)->toDateTimeString(),
                 'track' => $submission->track ?? '',
                 'institute' => optional($submission->authorInfo)->institute ?? '',
@@ -167,27 +168,122 @@ class SubmissionController extends Controller
      */
     public function edit($id)
     {
-        $submission = Submission::with(['paper'])->findOrFail($id);
+        $submission = Submission::with(['paper.decision', 'authorInfo'])
+            ->where('user_id', Auth::id()) // Ensure user owns this submission
+            ->findOrFail($id);
+
+        // Check if submission can be edited
+        $canEdit = $this->canEditSubmission($submission);
+        
+        if (!$canEdit['allowed']) {
+            return redirect()->route('submissions.index')
+                ->with('error', $canEdit['message']);
+        }
 
         return Inertia::render('Submission/Edit', [
             'submission' => $submission,
+            'canEdit' => $canEdit['allowed'],
         ]);
     }
 
     /**
-     * Update submission (basic example)
+     * Update submission (enhanced with proper validation)
      */
     public function update(Request $request, $id)
     {
-        $submission = Submission::findOrFail($id);
+        $submission = Submission::with(['paper.decision', 'authorInfo'])
+            ->where('user_id', Auth::id()) // Ensure user owns this submission
+            ->findOrFail($id);
 
-        $submission->update($request->only([
-            'track',
-            'submitted_elsewhere',
-            'original_submission',
-        ]));
+        // Check if submission can be edited
+        $canEdit = $this->canEditSubmission($submission);
+        
+        if (!$canEdit['allowed']) {
+            return redirect()->route('submissions.index')
+                ->with('error', $canEdit['message']);
+        }
 
-        return redirect()->back()->with('success', 'Submission updated!');
+        // Validate the update request
+        $validated = $request->validate([
+            // Author Info updates
+            'author_name'        => ['sometimes', 'string', 'max:255'],
+            'author_institute'   => ['sometimes', 'string', 'max:255'],
+            'author_email'       => ['sometimes', 'email', 'max:255'],
+            'correspond_name'    => ['sometimes', 'string', 'max:255'],
+            'correspond_email'   => ['sometimes', 'email', 'max:255'],
+            'coauthors'          => ['nullable', 'string'],
+
+            // Paper Info updates
+            'track'              => ['sometimes', 'string', 'max:255'],
+            'topic'              => ['sometimes', 'string', 'max:255'],
+            'paper_title'        => ['sometimes', 'string', 'max:255'],
+            'abstract'           => ['sometimes', 'string'],
+            'keyword'            => ['sometimes', 'string'],
+
+            // File upload (optional for updates)
+            'paper_file'         => ['nullable', 'file', 'mimes:pdf', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream', 'max:102400'],
+
+            // Declaration updates
+            'submitted_elsewhere'=> ['nullable'],
+            'original_submission'=> ['nullable'],
+        ]);
+
+        // Update AuthorInfo if provided
+        if ($submission->authorInfo && array_intersect_key($validated, array_flip(['author_name', 'author_institute', 'author_email', 'correspond_name', 'correspond_email', 'coauthors']))) {
+            $authorData = array_intersect_key($validated, array_flip(['author_name', 'author_institute', 'author_email', 'correspond_name', 'correspond_email', 'coauthors']));
+            
+            // Rename fields to match database columns
+            if (isset($authorData['author_institute'])) {
+                $authorData['institute'] = $authorData['author_institute'];
+                unset($authorData['author_institute']);
+            }
+            
+            $submission->authorInfo->update($authorData);
+        }
+
+        // Update Paper if provided
+        if ($submission->paper && array_intersect_key($validated, array_flip(['paper_title', 'topic', 'keyword', 'abstract']))) {
+            $paperData = array_intersect_key($validated, array_flip(['paper_title', 'topic', 'keyword', 'abstract']));
+            
+            // Normalize topic
+            if (isset($paperData['topic'])) {
+                $paperData['topic'] = $this->normalizeTopic($paperData['topic']);
+            }
+            
+            $submission->paper->update($paperData);
+        }
+
+        // Handle file upload if provided
+        if ($request->hasFile('paper_file')) {
+            // Delete old file if exists
+            if ($submission->paper->url) {
+                Storage::disk('public')->delete($submission->paper->url);
+            }
+            
+            // Store new file
+            $paperPath = $request->file('paper_file')->store('papers', 'public');
+            if ($paperPath) {
+                $submission->paper->update(['url' => $paperPath]);
+            }
+        }
+
+        // Update Submission fields
+        $submissionData = array_intersect_key($validated, array_flip(['track', 'submitted_elsewhere', 'original_submission']));
+        
+        if (!empty($submissionData)) {
+            // Normalize booleans
+            if (isset($submissionData['submitted_elsewhere'])) {
+                $submissionData['submitted_elsewhere'] = $this->toBool($submissionData['submitted_elsewhere']);
+            }
+            if (isset($submissionData['original_submission'])) {
+                $submissionData['original_submission'] = $this->toBool($submissionData['original_submission']);
+            }
+            
+            $submission->update($submissionData);
+        }
+
+        return redirect()->route('submissions.index')
+            ->with('success', 'Submission updated successfully!');
     }
 
     /**
@@ -228,5 +324,36 @@ class SubmissionController extends Controller
         $normalized = $map[$topic] ?? $topic;
 
         return in_array($normalized, $allowed, true) ? $normalized : 'Other';
+    }
+
+    /**
+     * Check if a submission can be edited based on its current status
+     */
+    private function canEditSubmission($submission): array
+    {
+        // Get the paper's decision
+        $decision = $submission->paper->decision->decision ?? null;
+        $status = $submission->paper->status ?? 'pending';
+
+        // Define editable statuses and decisions
+        $editableStatuses = ['pending', 'revise', 'revised', 'resubmit', 'under_review'];
+        $editableDecisions = ['pending', 'revise', 'revised', 'resubmit', null];
+
+        // Check if status OR decision allows editing (changed from AND to OR)
+        $statusAllowed = in_array(strtolower($status), $editableStatuses);
+        $decisionAllowed = in_array(strtolower($decision ?? ''), $editableDecisions);
+
+        // Allow editing if EITHER status OR decision is editable
+        if (!$statusAllowed && !$decisionAllowed) {
+            return [
+                'allowed' => false,
+                'message' => 'This submission cannot be edited because it has been ' . ($decision ?? $status) . '.'
+            ];
+        }
+
+        return [
+            'allowed' => true,
+            'message' => 'Submission can be edited.'
+        ];
     }
 }

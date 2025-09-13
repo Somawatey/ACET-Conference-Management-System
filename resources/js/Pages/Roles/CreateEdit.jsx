@@ -25,7 +25,7 @@ export default function RoleCreateEdit({ role, permissions }) {
     "agenda": ["agenda-list", "agenda-create", "agenda-edit", "agenda-delete"],
     "paper": ["paper-list", "paper-create", "paper-edit", "paper-delete", "paper-assign", "paper-review", "paper-approve", "paper-reject"],
     "conferences": ["conference-list", "conference-create", "conference-edit", "conference-delete"],
-    "review": ["review-list", "review-create", "review-edit", "review-delete", "review-history"],
+    "review": ["review-list", "review-create", "review-edit", "review-delete", "review-history", "your-reviews"],
     "dashboard": ["dashboard"],
     "other": []
   };

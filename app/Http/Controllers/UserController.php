@@ -74,9 +74,9 @@ class UserController extends Controller
     return to_route('users.index')->with("success", "User created successfully");
 }
 
-    public function edit($id)
+    public function edit(User $user)
     {
-        $user = User::with(['roles'])->find($id);
+        $user->load(['roles']);
         $roles = Role::all();
 
         return Inertia::render('Users/CreateEdit', [
@@ -85,17 +85,15 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrFail($id);
         $user->save();
         $user->syncRoles($request->roles);
         return to_route('users.index')->with("success", "User updated successfully");
     }
 
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
         $user->delete();
 
         return to_route('users.index')->with("success", "User Deleted successfully");

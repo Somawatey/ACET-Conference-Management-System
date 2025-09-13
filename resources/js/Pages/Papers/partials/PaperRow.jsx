@@ -11,6 +11,11 @@ export default function PaperRow({ paper, isOpen, onToggle, onAssignReviewer }) 
         }
         return 'No Author';
     };
+    const getPdfUrl = (p) => {
+        if (p?.url) return p.url;
+        if (p?.submission?.paper?.url) return p.submission.paper.url;
+        return null;
+    };
 
     return (
         <Fragment>
@@ -22,10 +27,28 @@ export default function PaperRow({ paper, isOpen, onToggle, onAssignReviewer }) 
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{getTopicText(paper)}</td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{getAuthorName(paper)}</td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <StatusBadge status={paper.status} />
+                    {getPdfUrl(paper) ? (
+                        <a
+                            href={`/storage/${getPdfUrl(paper)}`}
+                            download
+                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Download PDF
+                        </a>
+                    ) : (
+                        <span className="inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-gray-500 bg-gray-100 rounded">
+                            No PDF
+                        </span>
+                    )}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <StatusBadge status={paper.status} />
+                    <StatusBadge status={paper.status} paper={paper} />
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                    <StatusBadge status={paper.decision?.decision} paper={paper} />
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                     <button
@@ -43,7 +66,7 @@ export default function PaperRow({ paper, isOpen, onToggle, onAssignReviewer }) 
             </tr>
             {isOpen && (
                 <tr className="bg-gray-50">
-                    <td colSpan={7} className="p-6">
+                    <td colSpan={8} className="p-6">
                         <PaperActions paper={paper} onManageReviewers={() => onAssignReviewer(paper)} />
                     </td>
                 </tr>

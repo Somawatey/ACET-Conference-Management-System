@@ -1,6 +1,9 @@
 import { Link, router } from '@inertiajs/react';
+import { useState } from 'react';
+import PublishModal from './PublishModal';
 
 export default function PaperActions({ paper, onManageReviewers }) {
+    const [showPublishModal, setShowPublishModal] = useState(false);
     
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this paper? This action cannot be undone.')) {
@@ -13,6 +16,13 @@ export default function PaperActions({ paper, onManageReviewers }) {
                 }
             });
         }
+    };
+
+    // Check if paper is already published
+    const isPublished = paper.is_published;
+
+    const handlePublishClick = () => {
+        setShowPublishModal(true);
     };
 
     return (
@@ -58,15 +68,28 @@ export default function PaperActions({ paper, onManageReviewers }) {
                     <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Edit Decision</span>
                 </Link>
 
-                <Link 
-                    href={route('papers.edit', paper.id)} 
-                    className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 group"
+                <button
+                    onClick={handlePublishClick}
+                    className={`flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 group ${
+                        isPublished ? 'hover:bg-orange-50' : 'hover:bg-green-50'
+                    }`}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 group-hover:text-green-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Edit Paper</span>
-                </Link>
+                    {isPublished ? (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-500 group-hover:text-orange-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                            </svg>
+                            <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600">Unpublish</span>
+                        </>
+                    ) : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 group-hover:text-green-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm font-medium text-gray-700 group-hover:text-green-600">Publish</span>
+                        </>
+                    )}
+                </button>
 
                 <button
                     onClick={handleDelete}
@@ -78,6 +101,14 @@ export default function PaperActions({ paper, onManageReviewers }) {
                     <span className="text-sm font-medium text-gray-700 group-hover:text-red-600">Delete</span>
                 </button>
             </div>
+
+            {/* Publish Modal */}
+            <PublishModal
+                isOpen={showPublishModal}
+                onClose={() => setShowPublishModal(false)}
+                paper={paper}
+                isPublished={isPublished}
+            />
         </div>
     );
 }

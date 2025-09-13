@@ -26,7 +26,8 @@ Route::get('/', function () {
     ]);
 });
 
-
+// Add this route for publications (accessible to all)
+Route::get('/publication', [PaperController::class, 'publishedPapers'])->name('publication.index');
 
 Route::middleware('auth')->group(function () {
     // Dashboard
@@ -51,10 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index')->middleware(['check:user-list']);
         Route::get('/create', [UserController::class, 'create'])->name('users.create')->middleware(['check:user-create']);
-        Route::get('/{id}', [UserController::class, 'edit'])->name('users.edit')->middleware(['check:user-edit']);
+        Route::get('/{user}', [UserController::class, 'edit'])->name('users.edit')->middleware(['check:user-edit']);
         Route::post("/", [UserController::class, 'store'])->name('users.store');
-        Route::patch("/{id}", [UserController::class, 'update'])->name('users.update');
-        Route::delete("/{id}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
+        Route::patch("/{user}", [UserController::class, 'update'])->name('users.update');
+        Route::delete("/{user}", [UserController::class, 'destroy'])->name('users.destroy')->middleware(['check:user-delete']);
     });
 
     // Agenda routes
@@ -78,6 +79,8 @@ Route::middleware('auth')->group(function () {
         Route::post("/", [PaperController::class, 'store'])->name('papers.store');
         Route::patch("/{id}", [PaperController::class, 'update'])->name('papers.update');
         Route::delete("/{id}", [PaperController::class, 'destroy'])->name('papers.destroy');
+        Route::post("/{id}/publish", [PaperController::class, 'publish'])->name('papers.publish');
+        Route::post("/{id}/unpublish", [PaperController::class, 'unpublish'])->name('papers.unpublish');
     });
 
        // Submission routes - PERMISSION REQUIRED ✅
@@ -172,6 +175,10 @@ Route::middleware('auth')->group(function () {
 
     // Review History
     Route::get('/review-history', [ReviewController::class, 'index'])->name('review.history');
+    
+    // Your Reviews (for reviewers to see their own reviews)
+    Route::get('/your-reviews', [ReviewController::class, 'yourReviews'])->name('your.reviews');
+    
      // Paper History
     Route::get('/paper-history', [PaperController::class, 'paperHistory'])->name('paper-history.index');
 

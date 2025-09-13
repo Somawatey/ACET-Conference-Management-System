@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Login from '../Pages/Auth/Login.jsx';
 
 export default function Welcome({ auth, laravelVersion, phpVersion, canResetPassword }) {
@@ -56,6 +56,22 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
 
     const [showLogin, setShowLogin] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    // Handle scroll lock when modal is open
+    useEffect(() => {
+        if (showLogin) {
+            // Prevent scrolling
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Restore scrolling
+            document.body.style.overflow = 'unset';
+        }
+
+        // Cleanup function to restore scrolling when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showLogin]);
 
     // Generate user initials
     const getUserInitials = (name) => {
@@ -273,11 +289,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
 
                 {/* Rest of your existing code remains the same */}
                 {showLogin && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-                        <div className="w-full max-w-lg h-[600px] bg-white rounded-lg shadow-lg relative flex items-center justify-center">
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+                        <div className="relative w-full max-w-md">
                             <button
                                 onClick={() => setShowLogin(false)}
-                                className="absolute top-2 right-2 text-gray-500 text-bold"
+                                className="absolute -top-2 -right-2 z-10 bg-gray-500 hover:bg-gray-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold"
                             >
                                 ✕
                             </button>
@@ -294,14 +310,18 @@ export default function Welcome({ auth, laravelVersion, phpVersion, canResetPass
                     </h1>
                     <p className="text-gray-500 mt-4 max-w-2xl mx-auto">Bringing researchers together, one paper at a time. Your work deserves the world's stage.</p>
                     <div className="flex justify-center gap-4 mt-8">
-                       <div className="flex justify-center gap-4 mt-8">
-                            <Link
-                                href={route('submissions.create')}  // ✅ Consistent with your pattern
-                                className="bg-blue text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
-                            >
-                                Submit Your Paper
-                            </Link>
-                        </div>
+                        <Link
+                            href={route('submissions.create')}
+                            className="bg-blue text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
+                        >
+                            Submit Your Paper
+                        </Link>
+                        <Link
+                            href={route('publication.index')}
+                            className="bg-black text-white px-6 py-3 rounded-full hover:bg-green-700 hover:scale-105 ease-in-out duration-300"
+                        >
+                            Publication
+                        </Link>
                     </div>
                     {/* Rating */}
                     <div className="mt-6 flex flex-col justify-center items-center gap-2 text-yellow-500">
