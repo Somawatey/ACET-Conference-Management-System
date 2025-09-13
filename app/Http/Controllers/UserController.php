@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
@@ -21,7 +20,7 @@ class UserController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%");
             });
         }
         
@@ -38,45 +37,39 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
+        
         return Inertia::render('Users/CreateEdit', [
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
     public function store(Request $request)
-{
-    $validated = Validator::make($request->all(), [
-        'name' => ['required', 'string', 'max:255'],
-        'email' => [
-            'required',
-            'string',
-            'email',
-            'max:255',
-            Rule::unique('users', 'email'),
-        ],
-        'password' => ['required', 'string', 'min:8', 'confirmed'], // Add confirmed rule
-        'roles' => ['required', 'array'], // Change to array and make required
-        'roles.*' => ['integer', 'exists:roles,id'], // Validate IDs not names
-    ])->validate();
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,id',
+        ]);
 
-    $user = User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => Hash::make($validated['password']),
-    ]);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
 
-    // Get role names from IDs for assignment
-    if (!empty($validated['roles'])) {
-        $roleNames = Role::whereIn('id', $validated['roles'])->pluck('name')->toArray();
-        $user->assignRole($roleNames);
+        if (!empty($validated['roles'])) {
+            $roleNames = Role::whereIn('id', $validated['roles'])->pluck('name')->toArray();
+            $user->assignRole($roleNames);
+        }
+
+        return to_route('users.index')->with("success", "User created successfully");
     }
 
-    return to_route('users.index')->with("success", "User created successfully");
-}
-
-    public function edit(User $user)
+    public function edit($id)
     {
-        $user->load(['roles']);
+        $user = User::with(['roles'])->find($id);
         $roles = Role::all();
 
         return Inertia::render('Users/CreateEdit', [
@@ -85,26 +78,54 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, User $user)
+    // FIXED: Complete update method with proper validation and data assignment
+    public function update(Request $request, $id)
     {
-        $user->save();
-        $user->syncRoles($request->roles);
+        $user = User::findOrFail($id);
+        
+        // Validation rules
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,id',
+        ];
+        
+        // Only validate password if it's provided (for future password updates)
+        if ($request->filled('password')) {
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
+        
+        $validated = $request->validate($rules);
+        
+        // Update user data
+        $updateData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ];
+        
+        // Only update password if provided
+        if (isset($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+        
+        // FIXED: Actually update the user with the validated data
+        $user->update($updateData);
+        
+        // Sync roles
+        if (!empty($validated['roles'])) {
+            $roleNames = Role::whereIn('id', $validated['roles'])->pluck('name')->toArray();
+            $user->syncRoles($roleNames);
+        }
+        
         return to_route('users.index')->with("success", "User updated successfully");
     }
 
-    public function destroy(User $user)
+    public function destroy($id)
     {
+        $user = User::findOrFail($id);
         $user->delete();
-
-        return to_route('users.index')->with("success", "User Deleted successfully");
+        
+        return back()->with('message', 'User deleted successfully');
     }
-
-public function reviewers()
-{
-    $reviewers = User::whereHas('roles', function($q) {
-        $q->where('name', 'reviewer');
-    })->select('id', 'name')->get();
-
-    return response()->json($reviewers);
-}
 }
