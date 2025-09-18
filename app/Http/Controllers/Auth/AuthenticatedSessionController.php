@@ -27,13 +27,36 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+   public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // UPDATED: Smart redirect based on user role
+        return $this->redirectBasedOnUserRole();
+    }
+
+    /**
+     * Redirect user based on their role and permissions
+     */
+    private function redirectBasedOnUserRole(): RedirectResponse
+    {
+        $user = Auth::user();
+        
+        // Load roles if not loaded
+        if (!$user->relationLoaded('roles')) {
+            $user->load('roles');
+        }
+        
+        // Only users with roles AND dashboard permission go to dashboard
+        if (!$user->roles->isEmpty() && $user->can('dashboard')) {
+            return redirect()->route('dashboard');
+        }
+        
+        // Everyone else goes to submissions
+        return redirect()->route('submissions.index')
+            ->with('info', 'Welcome! You can submit papers and view conference information.');
     }
 
     /**
