@@ -246,13 +246,11 @@ class ComprehensiveDataSeeder extends Seeder
                     'topic' => $paperData['topic'],
                     'keyword' => $paperData['keyword'],
                     'abstract' => $paperData['abstract'],
-                    'user_id' => $user->user_id,
-                    'status' => 'pending',
                 ]);
 
                 // Create submission
                 Submission::create([
-                    'user_id' => $user->user_id,
+                    'user_id' => $user->id,
                     'paper_id' => $paper->id,
                     'author_info_id' => $authorInfo->id,
                     'track' => $paperData['track'],

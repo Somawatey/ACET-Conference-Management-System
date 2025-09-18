@@ -6,6 +6,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -123,9 +124,16 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-        
-        return back()->with('message', 'User deleted successfully');
+        try {
+            $user = User::findOrFail($id);
+            
+            // Now that we have cascade delete constraints, we can delete the user directly
+            $user->delete();
+            
+            return back()->with('success', 'User deleted successfully');
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Cannot delete user: ' . $e->getMessage());
+        }
     }
 }

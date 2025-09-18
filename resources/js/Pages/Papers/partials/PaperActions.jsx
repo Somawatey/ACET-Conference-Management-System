@@ -8,11 +8,13 @@ export default function PaperActions({ paper, onManageReviewers }) {
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this paper? This action cannot be undone.')) {
             router.delete(route('papers.destroy', paper.id), {
+                preserveScroll: true,
                 onSuccess: () => {
-                    // Handle success if needed
+                    console.log('Paper deleted successfully');
                 },
                 onError: (errors) => {
                     console.error('Error deleting paper:', errors);
+                    alert('Failed to delete paper. Please try again.');
                 }
             });
         }

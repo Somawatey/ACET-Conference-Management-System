@@ -135,24 +135,10 @@ export default function AgendaForm({ datas = null, papers = [], conferences = []
         
         if (datas?.id) {
             console.log(`Updating agenda ${datas.id} with put request`);
-            put(route("agenda.update", datas.id), {
-                onSuccess: () => {
-                    console.log("Successfully updated agenda");
-                },
-                onError: (errors) => {
-                    console.error("Update failed with errors:", errors);
-                }
-            });
+            put(route("agenda.update", datas.id));
         } else {
             console.log("Creating new agenda with post request");
-            post(route("agenda.store"), {
-                onSuccess: () => {
-                    console.log("Successfully created agenda");
-                },
-                onError: (errors) => {
-                    console.error("Creation failed with errors:", errors);
-                }
-            });
+            post(route("agenda.store"));
         }
     };
 

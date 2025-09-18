@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\Paper;
 use App\Models\User;
@@ -131,15 +132,36 @@ class PaperController extends Controller
         try {
             $paper = Paper::findOrFail($id);
             
-            // Delete related data first to prevent foreign key constraints
-            $paper->reviews()->delete();
-            $paper->decision()->delete();
-            
-            // Delete the paper
-            $paper->delete();
+            // Use database transaction for data integrity
+            \DB::transaction(function () use ($paper) {
+                // Delete related data first in proper order to prevent foreign key constraints
+                
+                // Delete paper assignments
+                $paper->assignments()->delete();
+                
+                // Delete reviews
+                $paper->reviews()->delete();
+                
+                // Delete decision
+                if ($paper->decision) {
+                    $paper->decision->delete();
+                }
+                
+                // Delete submission (this should be done carefully as it might be referenced elsewhere)
+                if ($paper->submission) {
+                    $paper->submission->delete();
+                }
+                
+                // Delete agendas that reference this paper
+                \DB::table('agendas')->where('paper_id', $paper->id)->update(['paper_id' => null]);
+                
+                // Finally delete the paper
+                $paper->delete();
+            });
             
             return redirect()->route('papers.index')
                 ->with('success', 'Paper deleted successfully.');
+                
         } catch (\Exception $e) {
             return redirect()->route('papers.index')
                 ->with('error', 'Failed to delete paper: ' . $e->getMessage());

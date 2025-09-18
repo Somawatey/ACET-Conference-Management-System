@@ -12,6 +12,7 @@ class Agenda extends Model
 
     protected $fillable = [
         'conference_id',
+        'paper_id',
         'title',
         'description',
         'type',
@@ -22,8 +23,13 @@ class Agenda extends Model
         'speaker',
         'order_index',
         'is_active',
-        'session',
-        'paper_id'
+        'session'
+    ];
+
+    protected $attributes = [
+        'is_active' => true,
+        'order_index' => 0,
+        'paper_id' => null,
     ];
 
     /**

@@ -41,7 +41,7 @@ export default function PublishModal({ isOpen, onClose, paper, isPublished }) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                    <div className="fixed inset-0 backdrop-blur-sm bg-white/10" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">

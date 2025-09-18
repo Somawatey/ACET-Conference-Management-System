@@ -252,7 +252,7 @@ export default function ConferencePage({ conferences }) {
                 
                 {/*-- Delete Confirmation Modal --*/}
                 {confirmingDataDeletion && (
-                    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-center items-center">
+                    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 flex justify-center items-center">
                         <div className="bg-white text-black p-8 rounded-lg shadow-xl w-full max-w-md">
                             <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
                             <p>Are you sure you want to delete the conference "<strong>{deleteData.conf_name}</strong>"? This action cannot be undone.</p>
